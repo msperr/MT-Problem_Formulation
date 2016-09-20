@@ -1,0 +1,91 @@
+\section{Ideas}
+
+\subsection{LP Approach}
+
+We consider the possibility of multimodal transport. The following holds:
+
+\begin{itemize}
+	\item{Each costumer has a set of alternative multimodal routes; exactly one of them must be fulfilled.}
+	\item{A multimodal route consists of a sequence of trips; each of them can be a car trip or a public transport trip.}
+\end{itemize}
+
+The routes are given in advance. The car trips are adjusted in such a way, that they fit to the public transport routes (in location and time). It is not possible to model each route as a trip, because then the car availabilities are not considered. \\
+
+We model a flow of the cars. The public transport trips are only constraints for this flow. From the fulfilled routes, we can easily determine the corresponding public transport trips and maybe add their costs to the objective function.
+
+\paragraph{MMILP} \parfill
+
+Let $\mathcal{T}$ be the set of car trips, $\mathcal{M}$ the set of multimodal routes, $\mathcal{C}$ the set of costumers. Then, $C:\mathcal{M}\to\mathcal{C}$ maps the routes to costumers and $M:\mathcal{T}\to\mathcal{M}$ maps the trips to routes. \\
+
+We build on the $\eqref{eq:MILP}$. The constraint $\eqref{eq:costumer}$ is modified to
+
+\begin{align}
+	\sum_{t\in\left(M\circ C\right)^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} \geq 1 & & \text{for all } c\in\mathcal{C}.
+\end{align}
+
+We have $\geq 1$ instead of $= 1$ because the route can have more than one trip. Due to minimization, not more than one route will be selected. To guarantee, that each trip of a selected route is fulfilled, we insert
+
+\begin{align}
+	\sum_{s\in\Nin(t)} x_{s,t} \geq \sum_{s\in\Nin(t')} x_{s,t'} & & \text{for all } t\in\mathcal{T}, t'\in M^{-1}(t)\backslash\{t\}.
+\end{align}
+
+\paragraph{Considerations}
+
+\begin{enumerate}
+	\item{Is it sufficient to only allow more than one leg for multimodal transport?}
+	\item{Are there more effects on the model? No refueling at public transport}
+	\item{What are the costs for public transport? No vehicle costs, only trip costs}
+	\item{How are the data for public transport created?}
+	\item{Is there a connection between the heuristic (Knoll) and the optimal approach (Kaiser)? Branch and Bound with result of the heuristic as a starting point}
+	\item{Does the costumer prefer a route? Less total time, less costs, fewer changes}
+\end{enumerate}
+
+\subsection{Heuristic}
+
+This is an extension to the Successive Heuristics developed in (Knoll). In contrast to this, this heuristic allows alternatives for costumers. Each of the costumers has an alternative set of multimodal routes, consisting of trips. For each costumer, exactly one route has to be fulfilled; if a route is fulfilled, each trip of this route is fulfilled.
+
+\paragraph{Approach} \parfill
+
+In contrast to the previous heuristic, not the trips but the costumer requests are split. I.e., all trips of a route and all routes of a costumer are in the same splitting. How the splitting is performed (e.g., first start time, last end time) is not specified here.
+For each splitting, we apply (MMILP) to find an optimal solution and connect the solutions as before. \\
+
+The heuristic provides bad results, if the lengths of the routes exceed the splitting lengths. This is shown by the following example: \\
+
+\begin{example}
+
+Let $t_1$, $t_2$, $t_3$ be trips with the following properties: \\
+
+\begin{table}[hb]
+	\centering
+	\begin{tabular}{c|cccc}
+		Trip & Start & End & Route & Costumer \\
+		\hline
+		$t_1$ & 8:00 & 8:15 & $r_1$ & 1 \\
+		$t_2$ & 8:30 & 8:45 & $r_2$ & 2 \\
+		$t_3$ & 9:00 & 9:15 & $r_1$ & 1 \\
+	\end{tabular}
+	\caption{Trips}
+\end{table}
+
+This means, costumer 1 uses public transport between 8:15 and 9:00. \\
+
+Let $t_1\to t_2\to t_3$ and the splitting length 30 Minutes. Then, we have $\mathcal{T}_1=\left\{t_2\right\}$ $\mathcal{T}_2=\left\{t_1, t_3\right\}$, since $t_1,t_3$ belong to the same costumer. We get 
+
+\begin{equation*}
+	z_{\operatorname{SP}_1\left(t_1\right)}^{\operatorname{start}} < z_{t_2}^{\operatorname{end}}.
+\end{equation*}
+
+Following the heuristic, the request cannot be fulfilled by a single vehicle. The optimal solution is $\left(t_1,t_2,t_3\right)$, i.e. a single vehicle can handle the request.
+
+\end{example}
+
+This problem can even occur, if there are short routes and long splittings. Maybe, we can handle the problem, if not the start or end time but some average time are decisive for the choice of the splitting.
+
+\paragraph{Considerations}
+
+\begin{enumerate}
+	\item{How long are the routes? Important for the choice of the splitting lengths}
+	\item{Are all routes of a costumer in a similar time window?}
+\end{enumerate}
+
+

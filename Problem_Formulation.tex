@@ -1,0 +1,39 @@
+\documentclass[fontsize=11pt,paper=a4,headsepline,numbers=noenddot]{scrartcl}
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{multirow}
+\usepackage{hyperref}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\fd}{f^{\operatorname{d}}}
+\newcommand{\ft}{f^{\operatorname{t}}}
+\newcommand{\Rst}{\mathcal{R}_{s,t}}
+\newcommand{\Nout}{\operatorname{N}_G^+}
+\newcommand{\Nin}{\operatorname{N}_G^-}
+\newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
+
+\theoremstyle{remark}
+\newtheorem{example}{Example}
+
+\author{Martin Sperr}
+\title{Master Thesis}
+\subtitle{Work Report}
+\date{\today}
+
+\begin{document}
+
+\pagestyle{myheadings}
+
+\markright{}
+\include{tex/Previous_Formulations}
+
+\markright{\hfill September 19, 2016}
+\include{tex/LP_Ansatz}
+
+\end{document}

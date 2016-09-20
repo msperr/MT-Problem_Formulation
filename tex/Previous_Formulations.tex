@@ -1,0 +1,39 @@
+\section{Previous Formulations}
+
+\subsection{MILP}
+
+\begin{align}
+	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}c^{\operatorname{v}} \nonumber \\
+	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(c_{s,t}^{\operatorname{d}}+c_{t}^{\operatorname{t}}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(c_{s,r}^{\operatorname{d}}+c_{r,t}^{\operatorname{d}}-c_{s,t}^{\operatorname{d}}\right)\right]}$} \tag{MILP} \label{eq:MILP} \\
+	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \tag{3.16} \\
+	& \sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } c\in\mathcal{C} \tag{3.17} \label{eq:costumer} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.18} \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \tag{3.19} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.12} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.13} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.14} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \tag{3.20} \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\mathcal{T},s\in\Nin(t),r\in\Rst \tag{3.21} \\
+	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.22}
+\end{align}
+
+\subsection{AMILP}
+
+\begin{align}
+	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}c^{\operatorname{v}} \nonumber \\
+	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(c_{s,t}^{\operatorname{d}}+c_{t}^{\operatorname{t}}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(c_{s,r}^{\operatorname{d}}+c_{r,t}^{\operatorname{d}}-c_{s,t}^{\operatorname{d}}\right)\right]}$} \tag{AMILP} \label{eq:AMILP} \\
+	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{T}\cup\mathcal{V} \tag{6.2} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.18} \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \tag{3.19} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.12} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.13} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.14} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \tag{3.20}\\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\mathcal{T},s\in\Nin(t),r\in\Rst \tag{3.21} \\
+	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.22}
+\end{align}
+
