@@ -122,7 +122,7 @@ if there exist $s\in(M\circ C)^{-1}(c)$ with $s\in\mathcal{T}_i$ and there is no
 The dummy trips do not affect the model except for the costumer constraint $\eqref{eq:costumer}$ and in the objective function. We define $\mathcal{T}^{\operatorname{d}}_{i,c}$ as the set of dummy nodes for splitting $i\in[n]$ and costumer $c\in\mathcal{C}$. Then, the modified costumer constraints in splitting $i$ are
 
 \begin{align}
-\label{eq:costumer_new}
+\label{eq:costumer_heur}
 	\sum_{t\in(M\circ C)^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} + \sum_{t\in\mathcal{T}^{\operatorname{d}}_{i,c}} y_t \geq 1 & & \text{for all } c\in\mathcal{C}
 \end{align}
 
@@ -140,7 +140,7 @@ We can introduce some multimodal route costs, by which we decide at the beginnin
 
 The heuristic has to provide only feasible solutions for the main problem. Furthermore, each feasible solution of the main problem should be a feasible result in the heuristic. 
 
-Except for the choice of trips, the subproblems are solved and connected in a feasible way with the Successive Heuristic. The dummy nodes only occur in $\eqref{eq:costumer_new}$ and in the objective, the trip choice only in $\eqref{eq:route}$ and $\eqref{eq:costumer_new}$. These constraints are maintained as follows: The route is chosen for the costumer definitively in the first splitting where the costumer occurs (either by a trip or a dummy trip). Therefore, each costumer has a route $\eqref{eq:costumer_new}$. Then, all other trips of this costumer are fixed in the following splittings $\eqref{eq:route}$. Hence, the heuristic provides a feasible solution. 
+Except for the choice of trips, the subproblems are solved and connected in a feasible way with the Successive Heuristic. The dummy nodes only occur in $\eqref{eq:costumer_heur}$ and in the objective, the trip choice only in $\eqref{eq:route}$ and $\eqref{eq:costumer_heur}$. These constraints are maintained as follows: The route is chosen for the costumer definitively in the first splitting where the costumer occurs (either by a trip or a dummy trip). Therefore, each costumer has a route $\eqref{eq:costumer_heur}$. Then, all other trips of this costumer are fixed in the following splittings $\eqref{eq:route}$. Hence, the heuristic provides a feasible solution. 
 
 Consider a feasible overall solution. The trips that have to be used in this solution are already chosen in a feasible way. Then, the heuristic is the same as the Successive Heuristic (Knoll, cap. 10).
 
