@@ -1,0 +1,33 @@
+\section{Iterative Heuristic}
+
+This is an iterative heuristic. We find an initial solution or the problem. We choose the routes for the costumers and then solve the resulting problem (equivalent to the problem without costumer choice). Considering this solution, we find costumers, for which the route choices were bad. For these costumers, we find more suitable routes. With this, we improve the solution step by step.
+
+\paragraph{Initial solution} \parfill
+
+Let $[n]$ be the set of partial instances, let $\sigma\in S_n$ with $\sigma(n)=1$ be the order, in which the partial instances are processed. This means, partial instance $\sigma(i)$ is solved at the $i$-th position, the first partial instance is solved at last.
+
+We consider partial instance $\sigma(i)\in [n]$ and costumer $c\in\mathcal{C}$, let $i$ be the first solved instance, where multimodal routes of this costumer occur. This means, in this partial instance we are choosing definitively, which routes is taken by this costumer. For the costumer, we have some trips in this splitting. For all routes of this costumer, we may have trips in subsequent splittings, too. For all routes, that are not represented in this splitting, we have dummy trips $t^{\operatorname{d}}_{i,m}$.
+
+Since we do not have any knowledge about the subsequent partial instances, we want to estimate the route costs as exactly as possible. The total costs are
+
+\begin{align}
+	C^* = C^{\operatorname{v}} + C^{\operatorname{r}} + C^{\operatorname{t}} + C^{\operatorname{d}}.
+\end{align}
+
+We can only determine the trip costs and the route costs in advance. Thus, we define
+
+\begin{align}
+	C_1(m) := \croute_m + \sum_{t\in m}\ct_t & & \text{for all } m\in\mathcal{M}.
+\end{align}
+
+These costs are used to determine which route is chosen. For this, we replace the route costs $\croute$ in $\eqref{eq:MILP_new}$ as follows:
+
+\begin{align}
+	\hat{c}^{\operatorname{r}}_m := \croute + \sum_{t\in m\backslash\mathcal{T}_i}\ct_t & & \text{for all } m\in\mathcal{M}
+\end{align}
+
+In $\hat{c}^{\operatorname{r}}$, we consider additionally the trip costs of the trips, that are not in this splitting. It is beneficial, if there are many trips of this costumer in the considered splitting. In this case, we can consider structure of the problem in more detail, according to the $\eqref{eq:MILP_new}$. The other case is, that there are only few trips of this costumer in the splitting, the majority in other splittings. Then, we cannot consider many structural properties. 
+
+With solving this partial instance, we have chosen implicitly the route of this costumer. Therefore, in the subsequent partial instances, this costumer uses, are already certain. This trips are then fixed in the respective constraints.
+
+\paragraph{Subproblem} \parfill

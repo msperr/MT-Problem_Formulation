@@ -3,8 +3,8 @@
 \subsection{MILP}
 
 \begin{align}
-	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}c^{\operatorname{v}} \nonumber \\
-	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(c_{s,t}^{\operatorname{d}}+c_{t}^{\operatorname{t}}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(c_{s,r}^{\operatorname{d}}+c_{r,t}^{\operatorname{d}}-c_{s,t}^{\operatorname{d}}\right)\right]}$} \tag{MILP} \label{eq:MILP} \\
+	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv \nonumber \\
+	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MILP} \label{eq:MILP} \\
 	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \tag{3.16} \\
 	& \sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } c\in\mathcal{C} \tag{3.17} \label{eq:costumer_prev} \\
@@ -22,8 +22,8 @@
 \subsection{AMILP}
 
 \begin{align}
-	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}c^{\operatorname{v}} \nonumber \\
-	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(c_{s,t}^{\operatorname{d}}+c_{t}^{\operatorname{t}}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(c_{s,r}^{\operatorname{d}}+c_{r,t}^{\operatorname{d}}-c_{s,t}^{\operatorname{d}}\right)\right]}$} \tag{AMILP} \label{eq:AMILP} \\
+	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv \nonumber \\
+	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_t\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{AMILP} \label{eq:AMILP} \\
 	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{T}\cup\mathcal{V} \tag{6.2} \\
 	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.18} \\

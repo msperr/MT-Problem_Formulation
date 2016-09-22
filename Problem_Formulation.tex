@@ -11,12 +11,21 @@
 
 \setlength{\parindent}{0pt}
 
-\newcommand{\fd}{f^{\operatorname{d}}}
-\newcommand{\ft}{f^{\operatorname{t}}}
+\newcommand{\fd}{f^{\operatorname{d}}} %deadhead fuel
+\newcommand{\ft}{f^{\operatorname{t}}} %trip fuel
+\newcommand{\pstart}{p^{\operatorname{start}}}
+\newcommand{\pend}{p^{\operatorname{end}}}
+\newcommand{\zstart}{z^{\operatorname{start}}}
+\newcommand{\zend}{z^{\operatorname{end}}}
+\newcommand{\cv}{c^{\operatorname{v}}} %vehicle cost
+\newcommand{\cd}{c^{\operatorname{d}}} %deadhead cost
+\newcommand{\croute}{c^{\operatorname{r}}} %route cost
+\newcommand{\ct}{c^{\operatorname{t}}} %trip cost
 \newcommand{\Rst}{\mathcal{R}_{s,t}}
 \newcommand{\Nout}{\operatorname{N}_G^+}
 \newcommand{\Nin}{\operatorname{N}_G^-}
 \newcommand{\cupdot}{\mathop{\mathaccent\cdot\cup}}
+
 \newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
 
 \theoremstyle{remark}
@@ -42,5 +51,9 @@
 \newpage
 \markright{\hfill September 20, 2016}
 \include{tex/Problem_Formulation}
+
+\newpage
+\markright{\hfill \today}
+\include{tex/Iterative_Heuristic}
 
 \end{document}
