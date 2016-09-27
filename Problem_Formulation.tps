@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Problem_Formulation.tex
 
 [Frame0_View0,0]
-TopLine=6
-Cursor=725
+TopLine=38
+Cursor=0
 
 [Frame1]
 Flags=0
@@ -72,7 +72,7 @@ Document=tex\Problem_Formulation.tex
 
 [Frame3_View0,0]
 TopLine=113
-Cursor=7098
+Cursor=0
 
 [Frame4]
 Flags=0
@@ -89,10 +89,10 @@ Class=LaTeXView
 Document=tex\Iterative_Heuristic.tex
 
 [Frame4_View0,0]
-TopLine=19
-Cursor=1561
+TopLine=60
+Cursor=3943
 
 [SessionInfo]
 FrameCount=5
-ActiveFrame=0
+ActiveFrame=3
 

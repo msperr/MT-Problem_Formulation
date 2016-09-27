@@ -1,0 +1,123 @@
+\section{Problem Formulation}
+
+\subsection{Problem Description and Notation}
+
+This formulation models the problem of optimal integration of autonomous vehicles in car sharing, considering multimodal transport.
+
+\paragraph{Notation} \parfill
+
+We are given a set of vehicles $\mathcal{V}$ and a set of costumers $\mathcal{C}$. For public transport, we have a set of available stations $\mathcal{S}$ and a set of public transport rides $\mathcal{P}$. A ride $p\in \mathcal{P}$ is a finite sequence of stations at time points $p=\left(\left(s_1,z_1\right),\dots,\left(s_k,z_k\right)\right)$ with $s_i\in\mathcal{S}$ and $z_i$ a time point for $i\in[k]$. 
+
+We are further given a set of trips $\mathcal{T}$; each trip $t\in\mathcal{T}$ is either a car trip or a public transport trip and has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$. Accordingly, we define $\mathcal{T} = \mathcal{T}_{\operatorname{car}}\cupdot\mathcal{T}_{\operatorname{public}}$. A public transport trip $t\in\Tpub$ is a connected subsequence of a public transport ride $p\in\mathcal{P}$ and it holds
+
+\begin{align*}
+	\pstart_t = s^p_i & &  \pend_t = s^p_j & & \zstart_t = z^p_i & & \zend_t = z^p_j
+\end{align*}
+
+for some $i<j$.
+
+The start position and the starting time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$. The time, a vehicle needs from its start location to a trip or from one trip to another is $t_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}, t\in\mathcal{T}$.
+
+We define the partial order $\preceq$ on $\mathcal{V}\times\mathcal{T}$. We say
+
+\begin{align*}
+	s\preceq t & & \text{if } \zend_s + t_{s,t} \leq \zend_t & & \text{for } s\in\mathcal{V}\times\mathcal{T}, t\in\mathcal{T}
+\end{align*}
+
+The expression $s\preceq t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. If one of the trips is a public transport trip, one costumer can use both of these trips in a row.
+
+We are given a set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_k\right)$ is a sequence of trips with the following properties:
+
+\begin{align*}
+	\pend_{t_i} = \pstart_{t_{i+1}} & & t_i\preceq t_{i+t} & & t_i\in\mathcal{T}_{\operatorname{car}}\Rightarrow t_{i+1}\in\mathcal{T}_{public} & & \text{for all } i\in[k-1].
+\end{align*}
+
+We define the route start and end locations and times for $m\in\mathcal{M}$
+
+\begin{align*}
+	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
+\end{align*}
+
+Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer. For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. 
+
+Additionally, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. In this model, a car is allowed to refuel at most once between two trips. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R},t\in\mathcal{T}\cup\mathcal{R}$ as the amount, the fuel level decreases along the deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cup\mathcal{R}$ is the amount of fuel, the car needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. The fuel of a car is in the interval $[0,1]$ describing the relative fuel state.
+
+\paragraph{Problem Description} \parfill
+
+The problem is the following: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every costumer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
+
+\begin{itemize}
+	\item{Each car is able to serve its scheduled trips, considering time and location.}
+	\item{The fuel state of each car is always in a feasible range.}
+	\item{Each costumer is able to complete his trip, considering time and location.}
+	\item{For each costumer, exactly one trip is chosen.}
+\end{itemize}
+
+The goal is to find a cost-minimal feasible schedule considering all these constraints.
+
+\paragraph{Costs} \parfill
+
+We have the following types of costs:
+
+\begin{itemize}
+	\item{Vehicles costs $\cv$: unit costs for each used car}
+	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R}, t\in\mathcal{T}\cup\mathcal{R}$: costs, if a car drives to a trip or a refuel station without a costumer using it}
+	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{car}}$: costs for fulfilling a trip}
+\end{itemize}
+
+For public transport, we define either trip costs for each public transport trip or fixed costs for each costumer using public transport. Finally, we define costs to consider the costumer preferences.
+
+\begin{itemize}
+	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{public}}$: costs for using public transport}
+	\item{Route-dependent costs $\croute_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
+\end{itemize}
+
+Since the trip costs for public transport are connected with the choice of the route, we easily add these costs $\sum_{t\in m\cap\Tpub}\ct_t$ to the trip costs.
+
+The route costs additionally include costumer preferences. This can be the total travel time, the number of changes or the costs for the costumers. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
+
+\subsection{Route Creation}
+
+We are not given the set of routes $\mathcal{M}$ in advance. For each costumer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstart_c, \zend_c$. All the trips of the costumer lie in this interval, i.e.
+
+\begin{align*}
+	\zstart_c \leq \zstart_m && \zend_m \leq \zend_c && \text{for all } m\in C^{-1}(c).
+\end{align*}
+
+\paragraph{Basic Restrictions} \parfill
+
+To simplify the creation of the routes, we make some assumptions. For every route $m\in\mathcal{M}$ holds:
+
+\begin{itemize}
+	\item{There are not two car trips in a row.}
+	\item{There is no car trip between two public transport trips.}
+	\item{The number of public transport trips is restricted. Usually, one can reach every station with at most two changes.}
+	\item{We define a walking distance $d$. If the distance between the start position and the first station or between the last station and the end position, there is no car trip necessary.}
+\end{itemize}
+
+We assume that we have some oracle that provides the set of feasible public transport routes for costumer $c\in\mathcal{C}$:
+
+\begin{align*}
+	M_c & = && \left\{\left(s_1,z_1,s_2,z_2\right)|s_1,s_2\in\mathcal{S}, \zstart_c\leq t_1 < t_2 \leq \zend_c, \text{ there is a public} \right. \\
+	&&& \left.\vphantom{\zstart}\text{transport route from $s_1$ to $s_2$ with start time $z_1$ and end time $z_2$}\right\}
+\end{align*}
+
+The fact, whether the costumer changes during his usage of public transport, has no effect on the model. Thus, we can consider each element in $M_c$ as a public transport trip.
+
+\paragraph{Route Creation}
+
+For each $\left(s_1,z_1,s_2,z_2\right)\in M_c$, we create a public transport trip $t$ with
+
+\begin{align*}
+	\pstart_t = s_1 && \pend_t = s_2 && \zstart_t = z_1 && \zend_t = z_2.
+\end{align*}
+
+We create car trips $t_1, t_2$ with
+
+\begin{align*}
+	\pstart_{t_1} & = \pstart_c & \pend_{t_1} & = s_1 & \zstart_{t_1} & = z_1 - t_{\pstart_c,s_1} & \zend_{t_1} & = z_1 \\
+	\pstart_{t_2} & = s_2 & \pend_{t_2} & = \pend_c & \zstart_{t_2} & = z_2 & \zend_{t_2} & = z_2 + t_{s_2,\pend_c}.
+\end{align*}
+
+To Do:
+Distinction between time for trips and time for positions
