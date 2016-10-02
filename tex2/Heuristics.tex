@@ -1,0 +1,171 @@
+\section{Heuristics}
+
+There is already a heuristic for solving an easier version of the problem (Knoll, cap. 10). This heuristic only handles the case without costumers. This means, there is a trip set $\mathcal{T}$ and each of these trips has to be fulfilled. This is even a simplification to $\eqref{eq:Knoll:MILP}$. We try to extend this heuristic such that it can tackle the problem considering multimodal transport. 
+
+\subsection{Splitting the Problem}
+
+We define the splitting of the task graph similarly to (Knoll, cap. 8) with the difference, that the splittings can be defined generally here.
+
+\begin{definition}[Splitting]
+\label{def:splitting}
+
+Let $n\in\mathbb{N}$ and let
+
+\begin{align*}
+	\Tcar=\Cupdot_{i=1}^{n+1}\Ti && \mathcal{V}=\Cupdot_{i=1}^{n+1}\Vi
+\end{align*}
+
+be partitions of the set of car trips, respectively vehicles. Then we call $\left\{\Ti|i\in[n+1]\right\}$ and $\left\{\Vi|i\in[n+1]\right\}$ splitting of $\mathcal{T}$ and $\mathcal{V}$ and $\Ti$ and $\Vi$ partial trip respectively vehicle set.
+
+\end{definition}
+
+\begin{definition}[Transformed Task Graph]
+
+Let $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ be a splitting of $\Tcar$ according to Definition \ref{def:splitting}. Then we define:
+
+\begin{enumerate}
+	\item{Split Point: Let $s\in\Ti$ for $i\in[n]\backslash\{1\}$. For $j\in[i-1]$, we define the split point $\SPjs$ with $\pstart_{\SPjs}=\pend_{\SPjs}=:\pstart_s, \zstart_{\SPjs}=\zend_{\SPjs}=:\zstart_s$ and $\ft_{\SPjs}=:0$.}
+	\item{For $i\in[n]\backslash\{1\}$ and $j\in[i-1]$, we define $P_{j,i}:=\left\{\SPjs|s\in\Ti\right\}$.}
+	\item{Partial Split Point Set: For $j\in[n-1]$, we define the partial split point set $P_j:=\Cupdot_{i=j+1}^n P_{j,i}$.}
+	\item{Split Point Set: We define the split point set $P:=\Cupdot_{j=1}^{n-1}P_j$.}
+\end{enumerate}
+
+Let $G=(V,A)$ the task graph, $\left\{\mathcal{V}_1,\dots,\mathcal{V}_n\right\}$ be a splitting of $\mathcal{V}$.
+
+\begin{enumerate}
+	\item{Transformed Task Graph: We define the transformed task graph $\overline{G}=\left(\overline{V},\overline{A}\right)$ with vertex set
+		\begin{align*}
+			\overline{V} := V\cup P = V\cup\left\{\operatorname{SP}_i(s)|i\in[n-1],j\in[n]\backslash[i],s\in\mathcal{T}_j\right\}
+		\end{align*}
+		and arc set
+		\begin{align*}
+			\overline{A} := & \left(\ds\times\mathcal{V}\right)\cupdot\bigcup_{i=1}^n\left\{(s,t)\in\left(\Vi\cupdot\Ti\right)\times\left(\Ti\cup P_i\right)|s\prec t\right\} \\
+			& \cupdot\bigcup_{i=1}^n\left\{(s,t)\in\left(\left(\bigcup_{j=1}^{i-1} P_{j,i}\right)\times\Ti\right)|s=\operatorname{SP}_i(t)\right\}\cupdot \left(\mathcal{V}\times\left\{\de\right\}\right)\cupdot\left(\Tcar\times\left\{\de\right\}\right)
+		\end{align*}}
+\end{enumerate}
+
+\end{definition}
+
+%---------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Costumer-dependent Splitting}
+
+In contrast to the splitting performed in (Knoll, cap. 8), the trips are not split according to their start times but according to their costumers' start times. This means, that all trips of a route and all routes of a costumer are in the same splitting. For each spitting, we apply (EMILP) to receive an optimal partial solution and connect the partial solutions to a feasible overall solution.
+
+\paragraph{Splitting} \parfill
+
+
+Given points in time $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$ for $i\in[n-1]$. We first define a splitting of the costumers $\mathcal{C}=\Cupdot_{i=1}^{n+1}\mathcal{C}_i$ as
+
+\begin{align*}
+	\mathcal{C}_i := \begin{cases}
+		\left\{c\in\mathcal{C}|\zstart_c\leq c_1\right\} & \text{for } i=1 \\
+		\left\{c\in\mathcal{C}|c_{i-1}<\zstart_c\leq c_i\right\} & \text{for } i\in[n]\backslash\{1\} \\
+		\left\{c\in\mathcal{C}|c_n<\zstart_c\right\} & \text{for } i=n+1.
+	\end{cases}
+\end{align*}
+
+Based on the costumer splitting, we define the splittings of $\Tcar$ and $\mathcal{V}$ as
+
+\begin{align*}
+	\Ti := \left\{t\in\Tcar|(M\circ C)(t)\in\mathcal{C}_i\right\} && \text{for } i\in[n+1]
+\end{align*}
+
+and
+
+\begin{align*}
+	\Vi := \begin{cases}
+		\left\{v\in\mathcal{V}|z_v\leq c_1\right\} & \text{for } i=1 \\
+		\left\{v\in\mathcal{V}|c_{i-1}<z_v\leq c_i\right\} & \text{for } i\in[n]\backslash\{1\} \\
+		\left\{v\in\mathcal{V}|c_n<z_v\right\} & \text{for } i=n+1.
+	\end{cases}
+\end{align*}
+
+\paragraph{Solving of the Partial Instances} \parfill
+
+Since for costumer $c\in\mathcal{C}_i$ all his trips are in splitting $\Ti$, costumer $c$ has to be satisfied only in the partial instance~$i$. For solving the partial instances, we modify the $(\operatorname{PLMILP}_i)$ from (Knoll, cap. 10) as follows: The constraint 
+
+\begin{align}
+	\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = 1 &&& \text{for all } t\in\hat{\mathcal{V}}_i\cup\Ti\cup\hat{P}_i \tag{10.1}
+\end{align}
+
+ensures that each trip in this partial instance is fulfilled. This constraint is replaced by
+
+\begin{align}
+	\sum_{m\in C^{-1}(c)} u_m = 1 &&& \text{for all } c\in\mathcal{C}_i \label{eq:EMILP:costumer} \\
+	\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m &&& \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \label{eq:EMILP:route} \\
+	\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = 1 &&& \text{for all } t\in\hat{\mathcal{V}}_i\cup\hat{P}_i \label{eq:EMILP:pv}
+\end{align}
+
+where $\eqref{eq:EMILP:pv}$ ensures that all vehicles and split points are considered. $\eqref{eq:EMILP:costumer}$ and $\eqref{eq:EMILP:route}$ guarantee that for every costumer in this partial instance exactly one route is chosen.
+
+The further procedure is similar to (Knoll, Cap. 10). For each solved partial instance~$i$, the partial split point set $\hat{P}_i$ is created. Therefore, only the chosen trips are considered. All trips that were not chosen in the partial instance, are neglected. The partial solutions are feasibly connected to a feasible overall solution according to (Knoll, cap. 10.2).
+
+\paragraph{Model Equivalence}
+
+This heuristic formulation is not equivalent to the original formulation $\eqref{eq:MMILP}$. This is shown by the following example.
+
+\begin{example}
+
+Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the following properties: 
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{c|cccc}
+		Trip & Start & End & Route & Costumer \\
+		\hline
+		$t_1$ & 8:00 & 8:15 & $m_1$ & $C_1$ \\
+		$t_2$ & 8:30 & 8:45 & $m_2$ & $C_2$ \\
+		$t_3$ & 9:00 & 9:15 & $m_1$ & $C_1$ \\
+	\end{tabular}
+	\caption{Trips}
+\end{table}
+
+In this case, costumer $C_1$ uses public transport between 8:15 and 9:00. The duty $\left(t_1,t_2,t_3\right)$ is a feasible result of the $\eqref{eq:MMILP}$.
+
+If there is a split point at 8:15 then the splittings are $\mathcal{T}_1=\left\{t_1,t_3\right\},\mathcal{T}_2=\left\{t_2\right\}$. Hence, there is one split point $\operatorname{SP}_1\left(t_2\right)$ with $\zstart_{\operatorname{SP}_1\left(t_2\right)} =$ 8:30. The partial solution of instance~$1$ is $\left(t_1,t_3\right)$ and $t_3\not\prec \operatorname{SP}_1\left(t_2\right)$. Thus, the partial solutions cannot be feasibly connected to the solution $\left(t_1,t_2,t_3\right)$.
+
+\end{example}
+
+With this example we have seen, that the formulations (EMILP) and $\eqref{eq:MMILP}$ are not equivalent. It is even possible, that an optimal solution of $\eqref{eq:MMILP}$ is not feasible in (EMILP).
+
+Although the formulations are not equivalent, we can give an estimation on the objective value when we make some restrictions.
+
+\begin{definition}
+
+Consider a costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$. We define the following values:
+
+\begin{itemize}
+	\item{Costumer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
+	\item{Costumer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} L_{\operatorname{C}}(c)}$}
+	\item{Splitting Length: $\displaystyle{L_{\operatorname{S}} := \min_{i\in[n-1]} c_{i+1}-c_i}$}
+\end{itemize}
+
+\end{definition}
+
+\begin{theorem}
+
+Consider the problem with costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$. Let
+
+\begin{align}
+	L_{\operatorname{C}}\leq L_{\operatorname{S}}
+\end{align}
+
+Let $d:=\left(t_1,\dots,t_k\right)$ be the duty of a vehicle of a feasible solution of the $\eqref{eq:MMILP}$. Then, there are duties $d_1\cupdot d_2=d$, where $d_1,d_2$ are part of a feasible solution of (EMILP). Moreover,
+
+\begin{align}
+	\operatorname{cost}\left(d_1\right)+\operatorname{cost}\left(d_2\right)\leq 2\cdot\operatorname{cost}\left(d\right).
+\end{align}
+
+\end{theorem}
+
+\begin{proof}
+
+We consider the vehicles duty $d=\left(t_1,\dots t_k\right)$. We write $s\prec t$ according to Definition $\ref{def:partial_order}$, i.e. $(s,t)$ is feasible in $\eqref{eq:MMILP}$. We write $s\to t$ iff $(s,t)$ is feasible in (EMILP).
+
+\paragraph{Feasibility}
+
+For arbitrary $i\in[k-2]$ holds: $t_i\prec t_{i+1}\prec t_{i+2}$, therefore also $t_i\prec t_{i+2}$.
+Assume $t_2\not\to t_3$. Then holds $t_3\in\mathcal{T}_l, t_2\in\mathcal{T}_{l+1}$ for some $l\in[k]$. Since $t_1\prec t_3$, $t_1\in\bigcup_{j=1}^{l+1}\mathcal{T_j}$. Therefore $t_1\to t_2$ or $t_1\to t_3$.
+
+\end{proof}

@@ -16,20 +16,28 @@ We are further given a set of trips $\mathcal{T}$; each trip $t\in\mathcal{T}$ i
 
 for some $i<j$.
 
-The start position and the starting time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$. The time, a vehicle needs from its start location to a trip or from one trip to another is $t_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}, t\in\mathcal{T}$.
+The start position and the starting time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$.
 
-We define the partial order $\preceq$ on $\mathcal{V}\times\mathcal{T}$. We say
+Additionally, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. In this model, a car is allowed to refuel at most once between two trips. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R},t\in\mathcal{T}\cup\mathcal{R}$ as the amount, the fuel level decreases along the deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cup\mathcal{R}$ is the amount of fuel, the car needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. $f^0_v$ for $v\in\mathcal{V}$ is the initial fuel state of a car. The fuel of a car is in the interval $[0,1]$ describing the relative fuel state.
 
-\begin{align*}
-	s\preceq t & & \text{if } \zend_s + t_{s,t} \leq \zend_t & & \text{for } s\in\mathcal{V}\times\mathcal{T}, t\in\mathcal{T}
-\end{align*}
+We define the time, a car needs to get from position $p_1$ to $p_2$, as $t_{p_1,p_2}$. We define
 
-The expression $s\preceq t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. If one of the trips is a public transport trip, one costumer can use both of these trips in a row.
+\begin{equation*}
+	t_{s,t} = 
+	\begin{cases}
+		t_{\pend_s,\pstart_t} & \text{if } s,t\in\Tcar \\
+		t_{p_s,\pstart_t} & \text{if } s\in\mathcal{V}\cup\mathcal{R}, t\in\Tcar \\
+		t_{\pend_s,p_t} & \text{if } s\in\Tcar, t\in\mathcal{R} \\
+		t_{p_s,p_t} & \text{if } s\in\mathcal{V},t\in\mathcal{R}
+	\end{cases}
+\end{equation*}
+
+as the time a car needs from one trip to another.
 
 We are given a set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_k\right)$ is a sequence of trips with the following properties:
 
 \begin{align*}
-	\pend_{t_i} = \pstart_{t_{i+1}} & & t_i\preceq t_{i+t} & & t_i\in\mathcal{T}_{\operatorname{car}}\Rightarrow t_{i+1}\in\mathcal{T}_{public} & & \text{for all } i\in[k-1].
+	\pend_{t_i} = \pstart_{t_{i+1}} & & \zend_{t_1} \leq \zstart_{t_{i+1}} & & t_i\in\mathcal{T}_{\operatorname{car}}\Rightarrow t_{i+1}\in\mathcal{T}_{public} & & \text{for all } i\in[k-1].
 \end{align*}
 
 We define the route start and end locations and times for $m\in\mathcal{M}$
@@ -38,9 +46,11 @@ We define the route start and end locations and times for $m\in\mathcal{M}$
 	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
 \end{align*}
 
-Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer. For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. 
+Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer. For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the costumer start and end times for $c\in\mathcal{C}$
 
-Additionally, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. In this model, a car is allowed to refuel at most once between two trips. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R},t\in\mathcal{T}\cup\mathcal{R}$ as the amount, the fuel level decreases along the deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cup\mathcal{R}$ is the amount of fuel, the car needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. The fuel of a car is in the interval $[0,1]$ describing the relative fuel state.
+\begin{align}
+	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m . \label{eq:costumer_time}
+\end{align}
 
 \paragraph{Problem Description} \parfill
 
@@ -76,12 +86,40 @@ Since the trip costs for public transport are connected with the choice of the r
 
 The route costs additionally include costumer preferences. This can be the total travel time, the number of changes or the costs for the costumers. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
 
-\subsection{Route Creation}
+\paragraph{Partial Order of the Trips} \parfill
 
-We are not given the set of routes $\mathcal{M}$ in advance. For each costumer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstart_c, \zend_c$. All the trips of the costumer lie in this interval, i.e.
+In order to decide whether a car can fulfill two trips in a row, we define a partial ordering of the car set and the set of car trips. The set of public transport trips is left out in this definition.
+
+\begin{definition}[Partial order of trips]
+\label{def:partial_order}
+
+The binary relation $\prec$ on $\mathcal{V}\times\Tcar$ is defined as follows:
 
 \begin{align*}
-	\zstart_c \leq \zstart_m && \zend_m \leq \zend_c && \text{for all } m\in C^{-1}(c).
+	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left(C(s)\neq C(t)\lor\exists m\in\mathcal{M}:s,t\in m\right) \\
+	&&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\Tcar \hphantom{\mathcal{V}} \\
+	s\not\prec t &&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\mathcal{V} \hphantom{\Tcar}
+\end{align*}
+
+The binary relation $\preceq$ on $\mathcal{V}\times\Tcar$ we define as:
+
+\begin{align*}
+	s\preceq t && :\Leftrightarrow && s=t \land s\prec t && \text{for all } s,t\in\mathcal{V}\cupdot\Tcar
+\end{align*}
+
+\end{definition}
+
+The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one trip is fulfilled. 
+
+
+%---------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Route Creation}
+
+We are not given the set of routes $\mathcal{M}$ in advance. For each costumer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstarto_c, \zendo_c$. All the trips of the costumer lie in this interval, i.e.
+
+\begin{align*}
+	\zstarto_c \leq \zstart_m && \zend_m \leq \zendo_c && \text{for all } m\in C^{-1}(c).
 \end{align*}
 
 \paragraph{Basic Restrictions} \parfill
@@ -92,32 +130,124 @@ To simplify the creation of the routes, we make some assumptions. For every rout
 	\item{There are not two car trips in a row.}
 	\item{There is no car trip between two public transport trips.}
 	\item{The number of public transport trips is restricted. Usually, one can reach every station with at most two changes.}
-	\item{We define a walking distance $d$. If the distance between the start position and the first station or between the last station and the end position, there is no car trip necessary.}
+	\item{We define a walking distance $d^{\operatorname{walk}}$. If the distance between the start position and the first station or between the last station and the end position, there is no car trip necessary.}
 \end{itemize}
 
 We assume that we have some oracle that provides the set of feasible public transport routes for costumer $c\in\mathcal{C}$:
 
 \begin{align*}
-	M_c & = && \left\{\left(s_1,z_1,s_2,z_2\right)|s_1,s_2\in\mathcal{S}, \zstart_c\leq t_1 < t_2 \leq \zend_c, \text{ there is a public} \right. \\
-	&&& \left.\vphantom{\zstart}\text{transport route from $s_1$ to $s_2$ with start time $z_1$ and end time $z_2$}\right\}
+	M_c & = && \left\{\left(s_1,z_1,s_2,z_2\right)|s_1,s_2\in\mathcal{S}, \zstarto_c\leq t_1 < t_2 \leq \zendo_c, \text{ there is a public} \right. \\
+	&&& \left.\vphantom{\zstarto}\text{transport route from $s_1$ to $s_2$ with start time $z_1$ and end time $z_2$}\right\}
 \end{align*}
 
 The fact, whether the costumer changes during his usage of public transport, has no effect on the model. Thus, we can consider each element in $M_c$ as a public transport trip.
 
-\paragraph{Route Creation}
+\paragraph{Route Creation} \parfill
 
-For each $\left(s_1,z_1,s_2,z_2\right)\in M_c$, we create a public transport trip $t$ with
+We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the costumer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in algorithm~\ref{alg:route_creation}.
+
+Until now, we do not consider any changing times between a car trip and a public transport trip.
+
+Further, we assume that the given costumer start and and times are feasible, i.e. $\zstarto_c+t_{\pstart_c,\pend_c}\leq\zendo_c$ for all $c\in\mathcal{C}$.
+
+\begin{algorithm}
+	\SetAlgoLined
+	\KwIn{costumer $\mathcal{C}$; $M_c, \pstart_c, \pend_c, \zstarto_c, \zendo_c$ for all $c\in\mathcal{C}$}
+	\KwOut{set of routes $\mathcal{M}$, set of trips $\Tcar,\Tpub$}
+	$\Tcar\gets\emptyset$\;
+	$\Tpub\gets\emptyset$\;
+	$\mathcal{M}\gets\emptyset$\;
+	\ForEach{$c\in\mathcal{C}$}{
+		determine $M_c$\;
+		\ForEach{$\left(s_1,z_1,s_2,z_2\right)\in M_c$}{
+			create public transport trip $t$\;
+			$\pstart_t\gets s_1,\pend_t\gets s_2,\zstart_t\gets z_1,\zend_t\gets z_2$\;
+			create car trips $t_1,t_2$\;
+			$\pstart_{t_1}\gets\pstart_c,\pend_{t_1}\gets s_1,\zstart_{t_1}\gets z_1 - t_{\pstart_c,s_1},\zend_{t_1}\gets z_1$\;
+			$\pstart_{t_2}\gets s_2,\pend_{t_2}\gets\pend_c,\zstart_{t_2}\gets z_2,\zend_{t_2}\gets z_2 + t_{s_2,\pend_c}$\;
+			\If{$\zstarto_c\leq\zstart_{t_1} \land \zend_{t_2}\leq \zendo_c$}{
+				create multimodal route $m$\;
+				$\Tpub\gets\Tpub\cup t$\;
+				\lIf{$d_{\pstart_c,s_1}\geq d^{\operatorname{walk}}$}{$m\gets\left(t_1,t\right)$; $\Tcar\gets\Tcar\cup\left\{t_1\right\}$}
+				\lElse{$m\gets\left(t\right)$}
+				\lIf{$d_{s_2,\pend_c}\geq d^{\operatorname{walk}}$}{append $t_2$ to $m$; $\Tcar\gets\Tcar\cup\left\{t_2\right\}$}
+				$C(m)\gets c$\;
+				$\mathcal{M}\gets\mathcal{M}\cup\left\{m\right\}$\;
+				}
+		}
+		create car trips $t_1,t_2$\;
+		$\pstart_{t_1}\gets\pstart_c,\pend_{t_1}\gets\pend_c,\zstart_{t_1}\gets\zstarto_c,\zend_{t_1}\gets\zstarto_c + t_{\pstart_c,\pend_c}$\;
+		$\pstart_{t_2}\gets\pstart_c,\pend_{t_2}\gets\pend_c,\zstart_{t_2}\gets\zendo_c - t_{\pstart_c,\pend_c},\zend_{t_2}\gets\zendo_c$\;
+		create multimodal routes $m_1,m_2$\;
+		$m_1\gets\left(t_1\right), m_2\gets\left(t_2\right)$\;
+		$\Tcar\gets\Tcar\cup\left\{t_1,t_2\right\}, \mathcal{M}\gets\mathcal{M}\cup\left\{m_1,m_2\right\}$\;
+	}
+	\Return{$\mathcal{M},\Tcar,\Tpub$}
+	\caption{Creation of the routes \label{alg:route_creation}}
+\end{algorithm}
+
+\paragraph{Further Restrictions} \parfill
+
+If the routes are created as described in algorithm~\ref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the costumer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
+
+\begin{example}
+
+Let $\mathcal{S}=\left\{s_1,\dots,s_n\right\}$ with a single public transport ride serving all stations. Let $\mathcal{C}=\left\{c_1,c_2\right\}$ with $\pend_{c_1}=s_n$ and $\pstart_{c_2}=s_k$ for a certain $k\in[n-1]$. The alternative routes are
 
 \begin{align*}
-	\pstart_t = s_1 && \pend_t = s_2 && \zstart_t = z_1 && \zend_t = z_2.
+	\mathcal{M} = \underbrace{\left\{\left(\left(\pstart_{c_1},s_i\right),\left(s_i,s_n\right)\right)|i\in[n-1]\right\}}_{\text{for }c_1}\cup\underbrace{\left\{\left(s_k,\pend_{c_2}\right)\right\}}_{\text{for }c_2}
 \end{align*}
 
-We create car trips $t_1, t_2$ with
+with $\left(\pstart_{c_1},s_k\right)\prec\left(s_k,\pend_{c_2}\right)$ and $\left(\pstart_{c_1},s_i\right)\not\prec\left(s_k,\pend_{c_2}\right)$ for all $i\in[n]\backslash\{k\}$. 
+
+We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other costumers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of pruning the optimal solution.
+	
+\end{example}
+
+It is not practicable to consider all possible multimodal routes due to computation reasons. But it is also not possible to reduce the number of routes without risking to lose the optimal solution. Hence, we try to make reasonable restrictions which keep the problem size small.
+
+\paragraph{Pareto Optimality} \parfill
+
+The idea is to choose only Pareto optimal multimodal routes (cf. Kaiser/Knoll, cap. 3.2.2) in order to determine good routes.
+
+\begin{definition}[Pareto optimality]
+
+Let $V$ in $\mathbb{R}^n$.
+
+\begin{enumerate}
+	\item{The partial order $\leq$ on $\mathbb{R}^n$ is given by
+		\begin{align*}
+			v\leq w && :\Leftrightarrow && v_i\leq w_i && \forall i\in[n] && \text{for all }v,w\in\mathbb{R}^n
+		\end{align*}}
+	\item{An element $w\in V$ is Pareto optimal in $V$ if it is minimal with respect to $\leq$ in $V$, i.e.
+		\begin{align*}
+			v\leq w && \Rightarrow && v=w && \text{for all } v\in V
+		\end{align*}}
+	\item{The Pareto frontier of $V$ with respect to $\leq$ is the set of Pareto optimal elements in $V$, i.e.
+		\begin{align*}
+			min_{\leq} V := \left\{w\in V|\forall v\in V: v\leq w \Rightarrow v=w\right\}
+		\end{align*}}
+\end{enumerate}
+
+\end{definition}
+
+Let $m\in\mathcal{M}$ be a multimodal route. We define
 
 \begin{align*}
-	\pstart_{t_1} & = \pstart_c & \pend_{t_1} & = s_1 & \zstart_{t_1} & = z_1 - t_{\pstart_c,s_1} & \zend_{t_1} & = z_1 \\
-	\pstart_{t_2} & = s_2 & \pend_{t_2} & = \pend_c & \zstart_{t_2} & = z_2 & \zend_{t_2} & = z_2 + t_{s_2,\pend_c}.
+	\varphi:\mathcal{M}\to\mathbb{R}^5 && m\mapsto\left(
+	\begin{array}{c}
+		\croute + \sum_{t\in m}\ct_t \\
+		\croute \\
+		|\Tcar\cap\{t\in m\}| \\
+		\sum_{t\in m\cap\Tcar} \zend_t - \zstart_t \\
+		\sum_{t\in m\cap\Tcar} \ft_t
+	\end{array} \right)
 \end{align*}
 
-To Do:
-Distinction between time for trips and time for positions
+The function $\varphi$ grades a route to their costs, their route costs, the number of cars needed, the time of a car needed and the fuel consumption.
+
+From now on, we will use the Pareto frontier of $\varphi\left(\mathcal{M}\right)$ as a restricted route set:
+
+\begin{align}
+	\hat{\mathcal{M}} := min_{\leq} \varphi\left(\mathcal{M}\right)
+\end{align}

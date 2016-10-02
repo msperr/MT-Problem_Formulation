@@ -11,13 +11,13 @@ MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
-NormalPos.right=1562
-NormalPos.bottom=647
+NormalPos.right=1554
+NormalPos.bottom=837
 Class=LaTeXView
 Document=Problem_Formulation.tex
 
 [Frame0_View0,0]
-TopLine=38
+TopLine=0
 Cursor=0
 
 [Frame1]
@@ -29,13 +29,13 @@ MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
-NormalPos.right=1562
-NormalPos.bottom=647
+NormalPos.right=1554
+NormalPos.bottom=837
 Class=LaTeXView
 Document=tex\Previous_Formulations.tex
 
 [Frame1_View0,0]
-TopLine=0
+TopLine=11
 Cursor=0
 
 [Frame2]
@@ -47,14 +47,14 @@ MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
-NormalPos.right=1562
-NormalPos.bottom=647
+NormalPos.right=1554
+NormalPos.bottom=837
 Class=LaTeXView
 Document=tex\LP_Ansatz.tex
 
 [Frame2_View0,0]
-TopLine=155
-Cursor=8999
+TopLine=61
+Cursor=3493
 
 [Frame3]
 Flags=0
@@ -65,13 +65,13 @@ MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
-NormalPos.right=1562
-NormalPos.bottom=647
+NormalPos.right=1554
+NormalPos.bottom=837
 Class=LaTeXView
 Document=tex\Problem_Formulation.tex
 
 [Frame3_View0,0]
-TopLine=113
+TopLine=103
 Cursor=0
 
 [Frame4]
@@ -83,16 +83,16 @@ MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
 NormalPos.top=32
-NormalPos.right=1562
-NormalPos.bottom=647
+NormalPos.right=1554
+NormalPos.bottom=837
 Class=LaTeXView
 Document=tex\Iterative_Heuristic.tex
 
 [Frame4_View0,0]
-TopLine=60
+TopLine=52
 Cursor=3943
 
 [SessionInfo]
 FrameCount=5
-ActiveFrame=3
+ActiveFrame=2
 

@@ -2,12 +2,13 @@
 
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
-	\usepackage{lmodern}
-	\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
 
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{multirow}
 \usepackage{hyperref}
+\usepackage[algoruled,linesnumbered]{algorithm2e}
 
 \setlength{\parindent}{0pt}
 
@@ -17,6 +18,8 @@
 \newcommand{\pend}{p^{\operatorname{end}}}
 \newcommand{\zstart}{z^{\operatorname{start}}}
 \newcommand{\zend}{z^{\operatorname{end}}}
+\newcommand{\zstarto}{\hat{z}^{\operatorname{start}}}
+\newcommand{\zendo}{\hat{z}^{\operatorname{end}}}
 \newcommand{\cv}{c^{\operatorname{v}}} %vehicle cost
 \newcommand{\cd}{c^{\operatorname{d}}} %deadhead cost
 \newcommand{\croute}{c^{\operatorname{r}}} %route cost
@@ -24,11 +27,22 @@
 \newcommand{\Rst}{\mathcal{R}_{s,t}}
 \newcommand{\Nout}{\operatorname{N}_G^+}
 \newcommand{\Nin}{\operatorname{N}_G^-}
+\newcommand{\Nouto}{\operatorname{N}_{\overline{G}}^+}
+\newcommand{\Nino}{\operatorname{N}_{\overline{G}}^-}
 \newcommand{\Tcar}{\mathcal{T}_{\operatorname{car}}}
 \newcommand{\Tpub}{\mathcal{T}_{\operatorname{public}}}
 \newcommand{\cupdot}{\mathop{\mathaccent\cdot\cup}}
+\newcommand{\Cupdot}{\bigcup}
+\newcommand{\ds}{d^{\operatorname{s}}}
+\newcommand{\de}{d^{\operatorname{e}}}
+\newcommand{\Ti}{\mathcal{T}_i}
+\newcommand{\Vi}{\mathcal{V}_i}
+\newcommand{\SPjs}{\operatorname{SP}_j(s)}
 
 \newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -39,16 +53,23 @@
 
 \author{Martin Sperr}
 \title{Master Thesis}
-\subtitle{Work Report}
+\subtitle{Optimal Integration of Autonomous Vehicles in Car Sharing: Development of a Heuristic considering Multimodal Transport and Integration in an Optimal Framework}
+%\subtitle{Work Report}
 \date{\today}
 
 \begin{document}
 
 \maketitle
+\tableofcontents
 
-\pagestyle{myheadings}
-
-\markright{\hfill \today}
+\pagestyle{headings}
 \include{tex2/Problem_Description}
 
-\end{document}s
+\include{tex2/Mathematical_Models}
+
+\include{tex2/Heuristics}
+
+\appendix
+\include{tex2/Previous_Formulations}
+
+\end{document}
