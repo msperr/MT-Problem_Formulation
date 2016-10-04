@@ -40,7 +40,7 @@ We are given a set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dot
 	\pend_{t_i} = \pstart_{t_{i+1}} & & \zend_{t_1} \leq \zstart_{t_{i+1}} & & t_i\in\mathcal{T}_{\operatorname{car}}\Rightarrow t_{i+1}\in\mathcal{T}_{public} & & \text{for all } i\in[k-1].
 \end{align*}
 
-We define the route start and end locations and times for $m\in\mathcal{M}$
+The mapping $M:\mathcal{T}\to\mathcal{M}$ shows to which route a trip belongs. We define the route start and end locations and times for $m\in\mathcal{M}$
 
 \begin{align*}
 	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
@@ -59,8 +59,8 @@ The problem is the following: Find a schedule of trips for every vehicle includi
 \begin{itemize}
 	\item{Each car is able to serve its scheduled trips, considering time and location.}
 	\item{The fuel state of each car is always in a feasible range.}
-	\item{Each costumer is able to complete his trip, considering time and location.}
-	\item{For each costumer, exactly one trip is chosen.}
+	\item{Each costumer is able to complete his route, considering time and location.}
+	\item{For each costumer, exactly one route is chosen.}
 \end{itemize}
 
 The goal is to find a cost-minimal feasible schedule considering all these constraints.
@@ -82,7 +82,11 @@ For public transport, we define either trip costs for each public transport trip
 	\item{Route-dependent costs $\croute_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
 \end{itemize}
 
-Since the trip costs for public transport are connected with the choice of the route, we easily add these costs $\sum_{t\in m\cap\Tpub}\ct_t$ to the trip costs.
+Since the trip costs for public transport are connected with the choice of the route, we easily add these costs to the trip costs.
+
+\begin{align*}
+	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
+\end{align*}
 
 The route costs additionally include costumer preferences. This can be the total travel time, the number of changes or the costs for the costumers. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
 
@@ -96,7 +100,7 @@ In order to decide whether a car can fulfill two trips in a row, we define a par
 The binary relation $\prec$ on $\mathcal{V}\times\Tcar$ is defined as follows:
 
 \begin{align*}
-	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left(C(s)\neq C(t)\lor\exists m\in\mathcal{M}:s,t\in m\right) \\
+	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left(	C(s)\neq C(t)\lor M(s)=M(t)\right) \\
 	&&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\Tcar \hphantom{\mathcal{V}} \\
 	s\not\prec t &&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\mathcal{V} \hphantom{\Tcar}
 \end{align*}
@@ -109,8 +113,30 @@ The binary relation $\preceq$ on $\mathcal{V}\times\Tcar$ we define as:
 
 \end{definition}
 
-The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one trip is fulfilled. 
+The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one route is fulfilled. 
 
+\paragraph{Assumptions} \parfill
+
+We make the following assumptions to our model: All costs are non-negative, i.e.
+
+\begin{align}
+\label{eq:nonnegativ}
+	\cv\geq 0 && \cd_{s,t}\geq 0 && \ct_t\geq 0 && \croute_m\geq 0 && \text{for all } s,t\in\mathcal{T}, m\in\mathcal{M}.
+\end{align}
+
+Further we assume the Triangle Inequality:
+
+\begin{align}
+\label{eq:triangle_inequality}
+	\cd_{t_1,t_3} \leq \cd_{t_1,t_2} + \cd_{t_2,t_3} && \text{for all } t_1,t_2,t_3\in\Tcar
+\end{align}
+
+From $\eqref{eq:nonnegativ}$ and $\eqref{eq:triangle_inequality}$ we get:
+
+\begin{align}
+\label{eq:triangle_inequality_ext}
+	\cd_{t_1,t_3} \leq \cd_{t_1,t_2} + \ct_{t_2} + \cd_{t_2,t_3} && \text{for all } t_1,t_2,t_3\in\Tcar
+\end{align}
 
 %---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -152,13 +178,12 @@ Further, we assume that the given costumer start and and times are feasible, i.e
 
 \begin{algorithm}
 	\SetAlgoLined
-	\KwIn{costumer $\mathcal{C}$; $M_c, \pstart_c, \pend_c, \zstarto_c, \zendo_c$ for all $c\in\mathcal{C}$}
+	\KwIn{costumer set $\mathcal{C}$; $\pstart_c, \pend_c, \zstarto_c, \zendo_c, M_c$ for all $c\in\mathcal{C}$}
 	\KwOut{set of routes $\mathcal{M}$, set of trips $\Tcar,\Tpub$}
 	$\Tcar\gets\emptyset$\;
 	$\Tpub\gets\emptyset$\;
 	$\mathcal{M}\gets\emptyset$\;
 	\ForEach{$c\in\mathcal{C}$}{
-		determine $M_c$\;
 		\ForEach{$\left(s_1,z_1,s_2,z_2\right)\in M_c$}{
 			create public transport trip $t$\;
 			$\pstart_t\gets s_1,\pend_t\gets s_2,\zstart_t\gets z_1,\zend_t\gets z_2$\;
@@ -167,7 +192,7 @@ Further, we assume that the given costumer start and and times are feasible, i.e
 			$\pstart_{t_2}\gets s_2,\pend_{t_2}\gets\pend_c,\zstart_{t_2}\gets z_2,\zend_{t_2}\gets z_2 + t_{s_2,\pend_c}$\;
 			\If{$\zstarto_c\leq\zstart_{t_1} \land \zend_{t_2}\leq \zendo_c$}{
 				create multimodal route $m$\;
-				$\Tpub\gets\Tpub\cup t$\;
+				$\Tpub\gets\Tpub\cup \{t$\}\;
 				\lIf{$d_{\pstart_c,s_1}\geq d^{\operatorname{walk}}$}{$m\gets\left(t_1,t\right)$; $\Tcar\gets\Tcar\cup\left\{t_1\right\}$}
 				\lElse{$m\gets\left(t\right)$}
 				\lIf{$d_{s_2,\pend_c}\geq d^{\operatorname{walk}}$}{append $t_2$ to $m$; $\Tcar\gets\Tcar\cup\left\{t_2\right\}$}
@@ -200,7 +225,7 @@ Let $\mathcal{S}=\left\{s_1,\dots,s_n\right\}$ with a single public transport ri
 
 with $\left(\pstart_{c_1},s_k\right)\prec\left(s_k,\pend_{c_2}\right)$ and $\left(\pstart_{c_1},s_i\right)\not\prec\left(s_k,\pend_{c_2}\right)$ for all $i\in[n]\backslash\{k\}$. 
 
-We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other costumers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of pruning the optimal solution.
+We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other costumers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of cutting off the optimal solution.
 	
 \end{example}
 
@@ -212,7 +237,7 @@ The idea is to choose only Pareto optimal multimodal routes (cf. Kaiser/Knoll, c
 
 \begin{definition}[Pareto optimality]
 
-Let $V$ in $\mathbb{R}^n$.
+Let $V\subset\mathbb{R}^n$.
 
 \begin{enumerate}
 	\item{The partial order $\leq$ on $\mathbb{R}^n$ is given by
@@ -225,7 +250,7 @@ Let $V$ in $\mathbb{R}^n$.
 		\end{align*}}
 	\item{The Pareto frontier of $V$ with respect to $\leq$ is the set of Pareto optimal elements in $V$, i.e.
 		\begin{align*}
-			min_{\leq} V := \left\{w\in V|\forall v\in V: v\leq w \Rightarrow v=w\right\}
+			\operatorname{min}_{\leq} V := \left\{w\in V|\forall v\in V: v\leq w \Rightarrow v=w\right\}
 		\end{align*}}
 \end{enumerate}
 
@@ -238,7 +263,7 @@ Let $m\in\mathcal{M}$ be a multimodal route. We define
 	\begin{array}{c}
 		\croute + \sum_{t\in m}\ct_t \\
 		\croute \\
-		|\Tcar\cap\{t\in m\}| \\
+		|\Tcar\cap\{t\in m\}|\\
 		\sum_{t\in m\cap\Tcar} \zend_t - \zstart_t \\
 		\sum_{t\in m\cap\Tcar} \ft_t
 	\end{array} \right)

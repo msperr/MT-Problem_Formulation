@@ -1,0 +1,189 @@
+\section{Optimal Approach}
+
+\subsection{Dantzig-Wolfe-Decomposition}
+
+We adapt the path flow formulation from (Kaiser, Knoll, cap. 3.3) by applying Dantzig-Wolfe-Decomposition. This can be used, if many of the constraints have only impact on a small number of variables and these variables can be grouped. The structure of the problem looks like:
+
+\begin{align*}
+	\left(\begin{array}{cccccccccccc}
+		\star  & \cdots & \star  & \star  & \cdots & \star  &        &        &        & \star  & \cdots & \star  \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots &        & \cdots &        & \vdots & \ddots & \vdots \\
+		\star  & \cdots & \star  & \star  & \cdots & \star  &        &        &        & \star  & \cdots & \star  \\
+		\hline
+		\star  & \cdots & \star  & 0      & \cdots & 0      &        &        &        & 0      & \cdots & 0      \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots &        & \cdots &        & \vdots & \ddots & \vdots \\
+		\star  & \cdots & \star  & 0      & \cdots & 0      &        &        &        & 0      & \cdots & 0      \\
+		0      & \cdots & 0      & \star  & \cdots & \star  &        &        &        &        &        &        \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots &        & \ddots &        &        & \vdots &        \\
+		0      & \cdots & 0      & \star  & \cdots & \star  &        &        &        &        &        &        \\
+		       &        &        &        &        &        &        &        &        & 0      &        & 0      \\
+		       & \vdots &        &        & \ddots &        &        & \ddots &        & \vdots & \ddots & \vdots \\
+		       &        &        &        &        &        &        &        &        & 0      &        & 0      \\
+		0      & \cdots & 0      &        &        &        & 0      & \cdots & 0      & \star  & \cdots & \star  \\
+		\vdots & \ddots & \vdots &        & \cdots &        & \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+		0      & \cdots & 0      &        &        &        & 0      & \cdots & 0      & \star  & \cdots & \star  \\
+	\end{array}\right)
+\end{align*}
+
+The constraints concerning more variables are called linking constraints.
+
+\paragraph{Identification of the Subproblems} \parfill
+
+Consider the $\eqref{eq:MMILP}$. A natural choice for the subproblem is the duty of each vehicle $v\in\mathcal{V}$. We define $\left(x^v,z^v,e^v\right)$ for $v\in\mathcal{V}$ as the specific variables for this vehicle. We can therefore define the set of feasible configurations for vehicle $v\in\mathcal{V}$ as follows:
+
+\begin{align}
+	X_v := \left\{\vphantom{\{0,1\}^A}\right. & \omit\rlap{$\displaystyle{(x,z,e)\in\left\{0,1\right\}^A \times\{0,1\}^{A\cap\left(\mathcal{V}\cupdot\Tcar\right)^2\times\mathcal{R}} \times[0,1]^{\mathcal{V}\cupdot\Tcar}|}$} \nonumber \\
+	& \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} && \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
+	& \sum_{s\in\Nin(t)} x_{s,v} = 1 \label{eq:Xv:vehicle} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} = 0 && \text{for all } t\in\mathcal{V}\backslash\{v\} \label{eq:Xv:other_vehicles} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.18} \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \tag{3.19} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.12} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.13} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.14} \\
+	& \left. \vphantom{\{0,1\}^A} \right\} \nonumber
+\end{align}
+
+We denote the set of feasible duties for any vehicle by $X:=\bigcup_{v\in\mathcal{V}}X_v$. We write the cost for configuration $\left(x^v,z^v,e^v\right)$ as $g\left(x^v,z^v,e^v\right)$. Putting all together, we can rewrite $\eqref{eq:MMILP}$ as
+
+\begin{align}
+	\min & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \hat{c}^{\operatorname{r}}_m \nonumber \\
+	\text{s.t.} & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
+	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking}\\
+	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
+	& u_m\in\{0,1\}^{\mathcal{M}} \nonumber
+\end{align}
+
+We can see that $\eqref{eq:MMILP:costumer}$ depends only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
+
+\begin{align*}
+	\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
+\end{align*}
+
+We introduce variable $\hat{u}$ and the route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
+
+\begin{align}
+	\min & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \hat{g}\left(\hat{u}\right) \nonumber \\
+	\text{s.t.} & \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \tag{\ref{eq:MMILP:linking}}\\
+	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
+	& \hat{u}\in\hat{X} \nonumber
+\end{align}
+
+The only linking constraints are $\eqref{eq:MMILP:linking}$.
+
+\paragraph{Reduction of the Master Problem} \parfill
+
+We define the linear mapping
+
+\begin{align*}
+	\psi:X\to\{0,1\}^{\Tcar} && (x,z,e)\mapsto\left(\sum_{s\in\Nin(t)}x_{s,t}\right)_{t\in\Tcar}
+\end{align*}
+
+and rewrite $\eqref{eq:MMILP}$ by using $y^v:=\psi\left(x^v,z^v,e^v\right)$:
+
+\begin{align*}
+	\min & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
+	& \sum_{v\in\mathcal{V}}y^v_t - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \\
+	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	& \hat{u}\in\hat{X}
+\end{align*}
+
+\paragraph{Column Generation} \parfill
+
+For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\Tcar\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{g}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{g}\hat{\lambda} \tag{IMMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
+	& \lambda^v\in\{0,1\}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	& \hat{\lambda}\in\{0,1\}^{\Ihat}
+\end{align*}
+
+We regard the LP-relaxation by dropping the integrality constraints:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{g}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
+	& \lambda^v\in\mathbb{R}_{\geq 0}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\Ihat}
+\end{align*}
+
+We reduce the size by considering only subsets $\mathcal{J}_v\subset\Iv$ and $\hat{\mathcal{J}}\subset\Ihat$ and formulate the relaxed restricted master problem:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v_{\mathcal{J}_v}\lambda^v + \hat{g}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\mathcal{J}_v}\lambda^v = \hat{Y}_{m,\hat{\mathcal{J}}}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{i\in\mathcal{J}_v}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \sum_{i\in\hat{\mathcal{J}}}\hat{\lambda}_i= 1 \\
+	& \lambda^v\in\mathbb{R}_{\geq 0}^{\mathcal{J}_v} && \text{for all } v\in\mathcal{V} \\
+	& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\hat{\mathcal{J}}}
+\end{align*}
+
+For the dual relaxed restricted master problem, we introduce dual variables $\gamma\in\mathbb{R}^{\Tcar}$, $\mu\in\mathbb{R}^{\mathcal{V}}$ and $\alpha\in\mathbb{R}$. The dual problem is:
+
+\begin{align*}
+	\max \quad & \sum_{v\in\mathcal{V}}\mu_v + \alpha \tag{DLRMMP} \label{eq:DLRMMP} \\
+	\text{s.t.} \quad & \sum_{t\in\Tcar} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\mathcal{J}_v \\
+	& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{g}_i && \text{for all } i\in\hat{\mathcal{J}} \\
+	& \gamma\in\mathbb{R}^{\Tcar} \\
+	& \mu\in\mathbb{R}^{\mathcal{V}} \\
+	& \alpha\in\mathbb{R}
+\end{align*}
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Solving the Relaxed Master Problem}
+
+Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\mathcal{J}_v\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
+
+We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of the $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
+
+\begin{align}
+	& \sum_{t\in\Tcar} Y^v_{t,i}\gamma^* + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMMP:vehicle} \\
+	& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{g}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
+\end{align}
+
+In order to find an optimal solution of $\eqref{eq:LMMP}$ we have to find indices $i\in\Iv$ or $j\in\Ihat$ where the previous constraints are violated. This leads to the following subproblems:
+
+\begin{enumerate}
+	\item{$\SPv_v$ for $\vinV$: Find $i\in\Iv\backslash\mathcal{J}_v $ s.t.}
+		\begin{align*}
+			\sum_{t\in\Tcar}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i
+		\end{align*}
+	\item{$\SPm$: Find $i\in\Ihat\backslash\hat{\mathcal{J}}$ s.t.}
+		\begin{align*}
+			\alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{g}_i
+		\end{align*}
+\end{enumerate}
+
+\paragraph{Vehicle Subproblem} \parfill
+
+The vehicle subproblem for finding violated constraints $\eqref{eq:DLMMP:vehicle}$ reads for $\vinV$ as follows:
+
+\begin{align*}
+	\min \quad & g\left(x^v,z^v,e^v\right)-\sum_{t\in\Tcar}\sum_{s\in\Nin(t)}x^v_{s,t}\gamma^*_t \tag{$\SPv_v$} \label{eq:SPv} \\
+	\text{s.t.} \quad & \left(x^v,z^v,e^v\right)\in X_v
+\end{align*}
+
+The constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure, that exactly vehicle $v$ is used and the others are not used. The subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). In (Kaiser, cap. 7) there is provided a way to solve the (SPPRC) efficiently.
+
+Let $\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)$ be an optimal solution of $\eqref{eq:SPv}$. If $\operatorname{value}\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)<\mu_v^*$ then add this to $\mathcal{J}_v$ and continue the master problem.
+
+\paragraph{Route Subproblem} \parfill
+
+The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ reads as follows:
+
+\begin{align*}
+	\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\hat{c}^{\operatorname{r}}_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
+	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)}u_m = 1 && \text{for all } c\in\mathcal{C} \\
+	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\hat{c}^{\operatorname{r}}_m + \sum_{t\in m}\gamma^*_t$. 
+
+Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{value}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.

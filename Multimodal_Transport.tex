@@ -12,6 +12,8 @@
 
 \setlength{\parindent}{0pt}
 
+\newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
+
 \newcommand{\fd}{f^{\operatorname{d}}} %deadhead fuel
 \newcommand{\ft}{f^{\operatorname{t}}} %trip fuel
 \newcommand{\pstart}{p^{\operatorname{start}}}
@@ -38,11 +40,17 @@
 \newcommand{\Ti}{\mathcal{T}_i}
 \newcommand{\Vi}{\mathcal{V}_i}
 \newcommand{\SPjs}{\operatorname{SP}_j(s)}
+\newcommand{\Iv}{\mathcal{I}_v}
+\newcommand{\Ihat}{\hat{\mathcal{I}}}
+\newcommand{\SPv}{\operatorname{SP}^{\operatorname{v}}}
+\newcommand{\SPm}{\operatorname{SP^m}}
+\newcommand{\vinV}{v\in\mathcal{V}}
 
-\newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -68,6 +76,8 @@
 \include{tex2/Mathematical_Models}
 
 \include{tex2/Heuristics}
+
+\include{tex2/Optimal_Approach}
 
 \appendix
 \include{tex2/Previous_Formulations}
