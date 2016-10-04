@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=62
-Cursor=2702
+TopLine=66
+Cursor=2724
 
 [Frame1]
 Flags=0
@@ -35,8 +35,8 @@ Class=LaTeXView
 Document=tex2\Previous_Formulations.tex
 
 [Frame1_View0,0]
-TopLine=0
-Cursor=420
+TopLine=46
+Cursor=5086
 
 [Frame2]
 Flags=0
@@ -53,8 +53,8 @@ Class=LaTeXView
 Document=tex2\Problem_Description.tex
 
 [Frame2_View0,0]
-TopLine=298
-Cursor=15500
+TopLine=152
+Cursor=7531
 
 [Frame3]
 Flags=0
@@ -71,8 +71,8 @@ Class=LaTeXView
 Document=tex2\Mathematical_Models.tex
 
 [Frame3_View0,0]
-TopLine=137
-Cursor=8663
+TopLine=65
+Cursor=6602
 
 [Frame4]
 Flags=0
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex2\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=425
-Cursor=21873
+TopLine=548
+Cursor=29563
 
 [Frame5]
 Flags=0
@@ -107,8 +107,8 @@ Class=LaTeXView
 Document=tex2\Optimal_Approach.tex
 
 [Frame5_View0,0]
-TopLine=140
-Cursor=9623
+TopLine=191
+Cursor=12581
 
 [SessionInfo]
 FrameCount=6

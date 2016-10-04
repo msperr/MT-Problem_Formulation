@@ -12,10 +12,10 @@ We define the splitting of the task graph similarly to (Knoll, cap. 8) with the 
 Let $n\in\mathbb{N}$ and let
 
 \begin{align*}
-	\Tcar=\Cupdot_{i=1}^{n+1}\Ti && \mathcal{V}=\Cupdot_{i=1}^{n+1}\Vi
+	\Tcar=\Cupdot_{i=1}^n\Ti && \mathcal{V}=\Cupdot_{i=1}^n\Vi
 \end{align*}
 
-be partitions of the set of car trips, respectively vehicles. Then we call $\left\{\Ti|i\in[n+1]\right\}$ and $\left\{\Vi|i\in[n+1]\right\}$ splitting of $\mathcal{T}$ and $\mathcal{V}$ and $\Ti$ and $\Vi$ partial trip respectively vehicle set.
+be partitions of the set of car trips, respectively vehicles. Then we call $\left\{\Ti|i\in[n]\right\}$ and $\left\{\Vi|i\in[n]\right\}$ splitting of $\mathcal{T}$ and $\mathcal{V}$ and $\Ti$ and $\Vi$ partial trip respectively vehicle set.
 
 \end{definition}
 
@@ -35,7 +35,7 @@ Let $G=(V,A)$ the task graph, $\left\{\mathcal{V}_1,\dots,\mathcal{V}_n\right\}$
 \begin{enumerate}
 	\item{Transformed Task Graph: We define the transformed task graph $\overline{G}=\left(\overline{V},\overline{A}\right)$ with vertex set
 		\begin{align*}
-			\overline{V} := V\cup P = V\cup\left\{\operatorname{SP}_i(s)|i\in[n-1],j\in[n]\backslash[i],s\in\mathcal{T}_j\right\}
+			\overline{V} := V\cup P = V\cup\left\{\operatorname{SP}_i(s)|i\in[n-1],j\in[n+1]\backslash[i],s\in\mathcal{T}_j\right\}
 		\end{align*}
 		and arc set
 		\begin{align*}
@@ -43,6 +43,23 @@ Let $G=(V,A)$ the task graph, $\left\{\mathcal{V}_1,\dots,\mathcal{V}_n\right\}$
 			& \cupdot\bigcup_{i=1}^n\left\{(s,t)\in\left(\left(\bigcup_{j=1}^{i-1} P_{j,i}\right)\times\Ti\right)|s=\operatorname{SP}_i(t)\right\}\cupdot \left(\mathcal{V}\times\left\{\de\right\}\right)\cupdot\left(\Tcar\times\left\{\de\right\}\right)
 		\end{align*}}
 \end{enumerate}
+
+\end{definition}
+
+\begin{definition}[Partial Transformed Task Graph]
+
+Let $i\in[n]$. For a set of start points $\Vhat_i$, a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task graph is the directed graph $\overline{G}_i=\left(\overline{A}_i,\overline{V}_i\right)$ with vertex set
+
+\begin{align*}
+	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Vhat_i\cupdot\Ti\cupdot\Phat_i
+\end{align*}
+
+and arc set
+
+\begin{align*}
+	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\Tcar\right)\times\left(\Ti\cupdot\Phat_i\right)|s\preceq t\right\} \\
+	& \cupdot\left(\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
+\end{align*}
 
 \end{definition}
 
@@ -54,20 +71,20 @@ In contrast to the splitting performed in (Knoll, cap. 8), the trips are not spl
 
 \paragraph{Splitting} \parfill
 
-Given points in time $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$ for $i\in[n-1]$. We first define a splitting of the costumers $\mathcal{C}=\Cupdot_{i=1}^{n+1}\mathcal{C}_i$ as
+Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We first define a splitting of the costumers $\mathcal{C}=\Cupdot_{i=1}^n\mathcal{C}_i$ as
 
 \begin{align*}
 	\mathcal{C}_i := \begin{cases}
 		\left\{c\in\mathcal{C}|\zstart_c\leq c_1\right\} & \text{for } i=1 \\
-		\left\{c\in\mathcal{C}|c_{i-1}<\zstart_c\leq c_i\right\} & \text{for } i\in[n]\backslash\{1\} \\
-		\left\{c\in\mathcal{C}|c_n<\zstart_c\right\} & \text{for } i=n+1.
+		\left\{c\in\mathcal{C}|c_{i-1}<\zstart_c\leq c_i\right\} & \text{for } i\in[n-1]\backslash\{1\} \\
+		\left\{c\in\mathcal{C}|c_{n-1}<\zstart_c\right\} & \text{for } i=n.
 	\end{cases}
 \end{align*}
 
 Based on the costumer splitting, we define the splittings of $\Tcar$ and $\mathcal{V}$ as
 
 \begin{align*}
-	\Ti := \left\{t\in\Tcar|(M\circ C)(t)\in\mathcal{C}_i\right\} && \text{for } i\in[n+1]
+	\Ti := \left\{t\in\Tcar|(M\circ C)(t)\in\mathcal{C}_i\right\} && \text{for } i\in[n]
 \end{align*}
 
 and
@@ -75,8 +92,8 @@ and
 \begin{align*}
 	\Vi := \begin{cases}
 		\left\{v\in\mathcal{V}|z_v\leq c_1\right\} & \text{for } i=1 \\
-		\left\{v\in\mathcal{V}|c_{i-1}<z_v\leq c_i\right\} & \text{for } i\in[n]\backslash\{1\} \\
-		\left\{v\in\mathcal{V}|c_n<z_v\right\} & \text{for } i=n+1.
+		\left\{v\in\mathcal{V}|c_{i-1}<z_v\leq c_i\right\} & \text{for } i\in[n-1]\backslash\{1\} \\
+		\left\{v\in\mathcal{V}|c_{n-1}<z_v\right\} & \text{for } i=n.
 	\end{cases}
 \end{align*}
 
@@ -100,15 +117,39 @@ where $\eqref{eq:EMILP:pv}$ ensures that all vehicles and split points are consi
 
 The further procedure is similar to (Knoll, Cap. 10). For each solved partial instance~$i$, the partial split point set $\hat{P}_i$ is created. Therefore, only the chosen trips are considered. All trips that were not chosen in the partial instance, are neglected. The partial solutions are feasibly connected to a feasible overall solution according to (Knoll, cap. 10.2).
 
+\begin{align}
+\label{eq:PCMILP}
+	\min & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m}$} \nonumber \\
+	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\de\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{PCMILP}_i$} \\
+	\text{s.t.} & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \\
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \tag{\ref{eq:EMILP:costumer}} \\
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \tag{\ref{eq:EMILP:route}} \\
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \tag{\ref{eq:EMILP:pv}} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{10.2} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_t \leq e_s-x_{s,t}\ft_t+\left(1-x_{s,t}\right) && \text{for all } s\in\Phat_i,t\in\Noutoi(s) \\
+	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \tag{10.3} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{10.4} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\Phat_i,r\in\Rst \\
+	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \\
+	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right)
+\end{align}
+
 \paragraph{Model Equivalence} \parfill
 
 This heuristic formulation is not equivalent to the original formulation $\eqref{eq:MMILP}$. This is shown by the following example.
 
 \begin{example}
 
-Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the following properties: 
+Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the properties shown in Table \ref{tab:costumer_heuristic_example}
 
-\begin{table}[ht]
+\begin{table}[hb]
 	\centering
 	\begin{tabular}{c|cccc}
 		Trip & Start & End & Route & Costumer \\
@@ -118,6 +159,7 @@ Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the following
 		$t_3$ & 9:00 & 9:15 & $m_1$ & $C_1$ \\
 	\end{tabular}
 	\caption{Trips}
+	\label{tab:costumer_heuristic_example}
 \end{table}
 
 In this case, costumer $C_1$ uses public transport between 8:15 and 9:00. The duty $\left(t_1,t_2,t_3\right)$ is a feasible result of the $\eqref{eq:MMILP}$.
@@ -132,7 +174,7 @@ Although the formulations are not equivalent, we can give an estimation on the o
 
 \begin{definition}
 
-Consider a costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$. We define the following values:
+For $n\geq 3$, consider a costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
 
 \begin{itemize}
 	\item{Costumer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
@@ -144,7 +186,7 @@ Consider a costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n]$ with 
 
 \begin{theorem}
 
-Consider the problem with costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n]$ with $c_i<c_{i+1}$. Let
+For $n\geq 3$, consider the problem with costumer set $\mathcal{C}$ and split points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. Let
 
 \begin{align}
 \label{eq:LCLS}
@@ -176,7 +218,7 @@ Since $\eqref{eq:LCLS}$, holds
 	\zstart_{C_t} \geq \zstart_t-L_{\operatorname{C}} > \zstart_s-L_{\operatorname{C}} \geq \zstart_{C_s}-L_{\operatorname{C}} > c_l-L_{\operatorname{C}}\geq c_l-L_{\operatorname{S}}\geq c_{l-1}
 \end{gather*}
 
-and therefore $t\in\mathcal{T}_l,s\in\mathcal{T}_{l+1}$. Here, we use $c_{-1}:=-\infty,c_{n+1}:=+\infty$.
+and therefore $t\in\mathcal{T}_l,s\in\mathcal{T}_{l+1}$. Here, we use $c_{0}:=-\infty,c_{n+1}:=+\infty$.
 
 \paragraph{Feasibility}
 
@@ -292,10 +334,16 @@ Remember, that $\mathcal{C}_i$ describes the splitting according to the first ap
 
 After solving the partial instance, all determined $u_m$ are fixed for the later processed partial instances. The fixed route decisions from the previous partial instances have an impact on the instance, too. 
 
-Let $\bar{u}_m\in[0,1]$ be the fixed route choices from the previous instances. Then, we introduce the constraint
+Let $\bar{u}_m\in[0,1]$ be the fixed route choices from the previous instances. Define
 
 \begin{align}
-	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\left\{c\in\mathcal{C}|\gamma\left(c\right)<\sigma(i)\right\}\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
+	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}|\gamma\left(c\right)<\sigma(i)\right\}
+\end{align}
+
+as the costumers that are already treated. Then, we introduce the constraint
+
+\begin{align}
+	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
 \end{align}
 
 which ensures that the previous route choices are considered.
@@ -306,22 +354,61 @@ In order to choose a route in a partial instance, we have to estimate the costs 
 
 \begin{align}
 \label{eq:estimated_route}
-	C_1(m) := \hat{c}^{\operatorname{r}}_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
+	C_1(m) := \croute_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
 \end{align}
 
 We use these costs in the $(\operatorname{TMILP}_i)$ to define the route costs
 
 \begin{align}
-	\tilde{c}^{\operatorname{r}}_m := \hat{c}^{\operatorname{r}}_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } m\in\mathcal{M}
+	\hat{c}^{\operatorname{r}}_m := \hat{c}^{\operatorname{r}}_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } m\in\mathcal{M}
 \end{align}
 
 and add 
 
 \begin{align*}
-	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \tilde{c}^{\operatorname{r}}_m
+	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m
 \end{align*}
 
-to the objective function. The trips $t\in\Ti$ are already part of the objective function.
+to the objective function.
+
+In $\hat{c}^{\operatorname{r}}_m$, the trips in the same splitting are not considered since they are already part of the objective function. The trips that are not in the same splitting are added to $\hat{c}^{\operatorname{r}}_m$, such that they have an impact on the choice of the routes.
+
+Consider a trip $t$ that is decided before this partial instance, i.e. $t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)$. Its trip costs $\ct_t$ arise twice in the objective functions. Once in the partial instance $\gamma\left((M\circ C)(t)\right)$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $i$ as $\ct_t$. But since in partial instance $i$, the trip has fulfilled anyway, these costs are only an additional factor that does not influence the solution.
+
+\paragraph{LP Formulation} \parfill
+
+For partial instance $i\in[n]\backslash\{1\}$, $\eqref{eq:PTMILP}$ is solved:
+
+\newpage
+\pagestyle{empty}
+
+\begin{align}
+\label{eq:PTMILP}
+	\min & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right) \cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m}$} \nonumber \\
+	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\de\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{PTMILP}_i$} \\
+	\text{s.t.} & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \\
+	&\sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \tag{\ref{eq:TMILP:costumer}} \\
+	&\sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \tag{\ref{eq:TMILP:route}} \\
+	&\sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\hat{\mathcal{V}}_i\cup\hat{P}_i \tag{\ref{eq:TMILP:pv}} \\
+	&\sum_{s\in\Ninoi(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \tag{\ref{eq:TMILP:route_fix}} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{10.2} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \\
+	& e_t \leq e_s-x_{s,t}\ft_t+\left(1-x_{s,t}\right) && \text{for all } s\in\Phat_i,t\in\Noutoi(s) \\
+	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \tag{10.3} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{10.4} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\Phat_i,r\in\Rst \\
+	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \\
+	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right)
+\end{align}
+
+\pagestyle{headings}
+\newpage
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -343,29 +430,45 @@ Given a solution of the problem, the subproblem is to find a costumer with a bad
 
 An initial idea is to compute the costs, one route in the solution contributes to the entire solution. Then, we can compare this to the cost, with which we estimated the route costs before. If the actual costs are considerably higher than the estimate costs, this costumer is a candidate for exchanging routes.
 
-Since we cannot determine the contributing costs exactly, we try to estimate these costs. Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u},\bar{v}\right)$ be a solution of the (TMILP). To determine the contributing costs for route $m\in\mathcal{M}$, we first define the following auxiliary costs for every trip $t\in\mathcal{T}$ of the solution:
+Since we cannot determine the contributing costs exactly, we try to estimate these costs.
 
-\begin{definition}
+Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the (TMILP). To determine the contributing costs for route $m\in\mathcal{M}$, we define the following auxiliary costs for every trip $t\in\mathcal{T}$ of the solution:
 
 Vehicle costs $\cv_t(S)$: Let $v\in\mathcal{V}$ be the vehicle covering $t$ and $k_v$ the number of trips covered by $v$:
-\begin{equation}
+\begin{align*}
 	\cv_t(S) := \frac{\cv}{k_v}
-\end{equation}
+\end{align*}
 
 Refueling costs $c^{\operatorname{refuel}}_t(S)$: Let $r\in\mathcal{R}$ be the next refuel station used after $t$ and $T_r$ all trips covered since the last station, let $\bar{z}_{s,r,s'} = 1$:
-\begin{equation}
+\begin{align*}
 	c^{\operatorname{refuel}}_t(S) := \frac{\ft_t}{\sum_{t'\in T_r} \ft_t}\left(\cd_{s,r}+\cd_{r,s'}-\cd_{s,s'}\right)
-\end{equation}
+\end{align*}
 If the vehicle is not refueled after $t$, then $c^{\operatorname{refuel}}_t(S) := 0$.
 
 Deadhead costs $\cd_t(S)$: Let $s\in\mathcal{V}\cup\Tcar,s'\in\Tcar$ be the trips covered directly before and after $t$ by vehicle $v$, i.e. $\bar{x}_{s,t}=\bar{x}_{t,s'}=1$:
-\begin{equation}
+\begin{align*}
 	\cd_t(S) := \frac 1 2 \left(\cd_{s,t}+\cd_{t,s'}\right)
-\end{equation}
+\end{align*}
 If $t$ is the last trip of the duty, i.e. $\bar{x}_{s,t}=\bar{x}_{t,d^{\operatorname{e}}}=1$, then $\cd_t(S) := \frac 1 2 \cd_{s,t}$.
+
+With these auxiliary costs we can define new route costs which describe the contribution of a multimodal route to the entire solution better:
+
+\begin{definition}[Improved Cost Estimation]
+
+Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the (TMILP). With the auxiliary costs described before, we define the improved cost estimation for all multimodal routes $\left\{m\in\mathcal{M}|\bar{u}_m=1\right\}$:
+
+\begin{align*}
+	C_2(S,m) := C_1(m) + \sum_{t\in m}\left(\cv_t(S) + c^{\operatorname{refuel}}_t(S) + \cd_t(S)\right)
+\end{align*}
+
+We further define
+
+\begin{align*}
+	C_2(S,c) := C_2(S,m) && \text{for } c\in\mathcal{C},m\in C^{-1}(c) \text{ with } \bar{u}_m = 1
+\end{align*}
 
 \end{definition}
 
-... to be continued.
+Now we can evaluate our previous for the route contribution. If the value of $\frac{C_2(S,c)}{C_1(c)}$ is bad then the probability is high, the we made a bad route choice for costumer $c\in\mathcal{C}$.
 
 %----------------------------------------------------------------------------------------------------------------------------------------

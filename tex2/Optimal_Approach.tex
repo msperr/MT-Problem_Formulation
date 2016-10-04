@@ -48,8 +48,8 @@ Consider the $\eqref{eq:MMILP}$. A natural choice for the subproblem is the duty
 We denote the set of feasible duties for any vehicle by $X:=\bigcup_{v\in\mathcal{V}}X_v$. We write the cost for configuration $\left(x^v,z^v,e^v\right)$ as $g\left(x^v,z^v,e^v\right)$. Putting all together, we can rewrite $\eqref{eq:MMILP}$ as
 
 \begin{align}
-	\min & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \hat{c}^{\operatorname{r}}_m \nonumber \\
-	\text{s.t.} & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
+	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
+	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
 	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking}\\
 	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
 	& u_m\in\{0,1\}^{\mathcal{M}} \nonumber
@@ -64,8 +64,8 @@ We can see that $\eqref{eq:MMILP:costumer}$ depends only on $u_m$. Therefore, we
 We introduce variable $\hat{u}$ and the route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
 
 \begin{align}
-	\min & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \hat{g}\left(\hat{u}\right) \nonumber \\
-	\text{s.t.} & \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \tag{\ref{eq:MMILP:linking}}\\
+	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \hat{g}\left(\hat{u}\right) \nonumber \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \tag{\ref{eq:MMILP:linking}}\\
 	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
 	& \hat{u}\in\hat{X} \nonumber
 \end{align}
@@ -83,8 +83,8 @@ We define the linear mapping
 and rewrite $\eqref{eq:MMILP}$ by using $y^v:=\psi\left(x^v,z^v,e^v\right)$:
 
 \begin{align*}
-	\min & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
-	& \sum_{v\in\mathcal{V}}y^v_t - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \\
+	\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y^v_t - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \\
 	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
 	& \hat{u}\in\hat{X}
 \end{align*}
@@ -179,11 +179,11 @@ Let $\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)$ be an optimal solution of $\eqr
 The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ reads as follows:
 
 \begin{align*}
-	\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\hat{c}^{\operatorname{r}}_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
+	\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\croute_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)}u_m = 1 && \text{for all } c\in\mathcal{C} \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
 \end{align*}
 
-This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\hat{c}^{\operatorname{r}}_m + \sum_{t\in m}\gamma^*_t$. 
+This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\croute_m + \sum_{t\in m}\gamma^*_t$. 
 
 Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{value}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.

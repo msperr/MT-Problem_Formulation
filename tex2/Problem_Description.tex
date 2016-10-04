@@ -79,13 +79,13 @@ For public transport, we define either trip costs for each public transport trip
 
 \begin{itemize}
 	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{public}}$: costs for using public transport}
-	\item{Route-dependent costs $\croute_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
+	\item{Route-dependent costs $\bar{c}^{\operatorname{r}}_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
 \end{itemize}
 
 Since the trip costs for public transport are connected with the choice of the route, we easily add these costs to the trip costs.
 
 \begin{align*}
-	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
+	\croute_m := \bar{c}^{\operatorname{r}}_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
 The route costs additionally include costumer preferences. This can be the total travel time, the number of changes or the costs for the costumers. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
@@ -121,7 +121,7 @@ We make the following assumptions to our model: All costs are non-negative, i.e.
 
 \begin{align}
 \label{eq:nonnegativ}
-	\cv\geq 0 && \cd_{s,t}\geq 0 && \ct_t\geq 0 && \croute_m\geq 0 && \text{for all } s,t\in\mathcal{T}, m\in\mathcal{M}.
+	\cv\geq 0 && \cd_{s,t}\geq 0 && \ct_t\geq 0 && \bar{c}^{\operatorname{r}}_m\geq 0 && \text{for all } s,t\in\mathcal{T}, m\in\mathcal{M}.
 \end{align}
 
 Further we assume the Triangle Inequality:
@@ -261,7 +261,7 @@ Let $m\in\mathcal{M}$ be a multimodal route. We define
 \begin{align*}
 	\varphi:\mathcal{M}\to\mathbb{R}^5 && m\mapsto\left(
 	\begin{array}{c}
-		\croute + \sum_{t\in m}\ct_t \\
+		\croute + \sum_{t\in m\cap\Tcar}\ct_t \\
 		\croute \\
 		|\Tcar\cap\{t\in m\}|\\
 		\sum_{t\in m\cap\Tcar} \zend_t - \zstart_t \\

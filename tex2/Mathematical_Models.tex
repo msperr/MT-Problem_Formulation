@@ -96,16 +96,10 @@ The objective function in $\eqref{eq:Knoll:MILP}$ is given by
 	\sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv	+ \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]
 \end{align*}
 
-considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\Tcar$ and the deadhead costs $\cd$. What is missing, are the route-dependent costs $\croute$ and the public transport trip costs $\ct_t$ for $t\in\Tpub$. Since the route is fixed in advance, we can easily add the public transport costs to the route costs. Thus, we define
+considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\Tcar$ and the deadhead costs $\cd$. What is missing, are the route-dependent costs $\croute$. Thus, we add
 
 \begin{align*}
-	\hat{c}^{\operatorname{r}}_m := \croute + \sum_{t\in m\cap\Tpub}\ct_t && \text{for all } m\in\mathcal{M}
-\end{align*}
-
-and add
-
-\begin{align*}
-	\sum_{m\in\mathcal{M}} u_m\hat{c}^{\operatorname{r}}_m
+	\sum_{m\in\mathcal{M}} u_m \croute_m
 \end{align*}
 
 to the objective function.
@@ -115,9 +109,9 @@ to the objective function.
 Putting all this together, we get the following formulation, called $\eqref{eq:MMILP}$:
 
 \begin{align}
-	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{m\in\mathcal{M}} u_m\hat{c}^{\operatorname{r}} \nonumber \\
+	\min \quad & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MMILP} \label{eq:MMILP} \\
-	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
+	\text{s.t.} \quad & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \tag{3.16} \\
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = u_m && \text{for all } m\in\mathcal{M}, t\in m \tag{\ref{eq:MMILP:route}} \\
