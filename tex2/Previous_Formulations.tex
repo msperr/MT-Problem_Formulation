@@ -1,6 +1,6 @@
-\section{Previous Formulations}
+\section*{Previous Formulations}
 
-\paragraph{(MILP)} \parfill
+\subsection*{(MILP)}
 
 \begin{align}
 	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv \nonumber \\
@@ -20,7 +20,7 @@
 \end{align}
 
 \newpage
-\paragraph{(AMILP)} \parfill
+\subsection*{(AMILP)}
 
 \begin{align}
 	\min & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv \nonumber \\
@@ -39,10 +39,10 @@
 \end{align}
 
 \newpage
-\paragraph{(LMILP)} \parfill
+\subsection*{(LMILP)}
 
 \begin{align}
-	\min & \omit\rlap{$\displaystyle{\sum_{s\in\mathcal{V}} \sum_{t\in\Nouto(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{s\in P}\sum_{t\in\Nino(s)} x_{s,t} \ct_t}$} \nonumber \\
+	\min & \omit\rlap{$\displaystyle{\sum_{s\in\mathcal{V}} \sum_{t\in\Nouto(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{s\in P}\sum_{t\in\Nouto(s)} x_{s,t} \ct_t}$} \nonumber \\
 	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}\cup P} \sum_{s\in\Nino(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_t\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{LMILP} \label{eq:Knoll:LMILP} \\
 	\text{s.t.} & \sum_{t\in\Nino(s)} x_{t,s} = \sum_{t\in\Nouto(s)} x_{s,t} & & \text{for all } s\in \overline{V}\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{8.1} \\
 	& \sum_{s\in\Nino(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{T}\cup\mathcal{V} \tag{8.2} \\
