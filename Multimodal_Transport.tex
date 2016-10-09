@@ -6,9 +6,9 @@
 \usepackage[utf8]{inputenc}
 
 \usepackage{amsmath, amssymb, amsthm}
-\usepackage{multirow}
 \usepackage{hyperref}
 \usepackage[algoruled,linesnumbered]{algorithm2e}
+\usepackage{scrextend}
 
 \setlength{\parindent}{0pt}
 
@@ -49,6 +49,10 @@
 \newcommand{\SPv}{\operatorname{SP}^{\operatorname{v}}}
 \newcommand{\SPm}{\operatorname{SP}^{\operatorname{m}}}
 \newcommand{\vinV}{v\in\mathcal{V}}
+\newcommand{\CR}{\mathcal{C}^{\operatorname{R}}}
+\newcommand{\MR}{\mathcal{M}^{\operatorname{R}}}
+\newcommand{\LC}{L_{\operatorname{C}}}
+\newcommand{\LS}{L_{\operatorname{S}}}
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -66,9 +70,8 @@
 \newtheorem{remark}{Remark}
 
 \author{Martin Sperr}
-\title{Master Thesis}
+\title{Work Report}
 \subtitle{Optimal Integration of Autonomous Vehicles in Car Sharing: Development of a Heuristic considering Multimodal Transport and Integration in an Optimal Framework}
-%\subtitle{Work Report}
 \date{\today}
 
 \begin{document}
@@ -87,6 +90,9 @@
 
 \appendix
 \pagestyle{plain}
+
+\include{tex2/Notation}
+
 \include{tex2/Previous_Formulations}
 
 \end{document}

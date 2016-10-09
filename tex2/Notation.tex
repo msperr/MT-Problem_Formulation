@@ -1,0 +1,131 @@
+\section*{Notation}
+
+\begin{labeling}{$\psi:X\to\{0,1\}^{\Tcar}$}
+	\item[$\mathcal{V}$]{Set of vehicles}
+	\item[$\mathcal{C}$]{Set of costumers}
+	\item[$\mathcal{S}$]{Set of public transport stations}
+	\item[$\mathcal{P}$]{Set of public transport rides}
+	\item[$\mathcal{T}$]{Set of trips}
+	\item[$\Tcar$]{Set of car trips}
+	\item[$\Tpub$]{Set of public transport trips}
+	\item[$\pstart_t$]{Start position for $t\in\mathcal{T}\cupdot\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$\pend_t$]{End position for $t\in\mathcal{T}\cupdot\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$\zstart_t$]{Start time for $t\in\mathcal{T}\cupdot\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$\zend_t$]{End time for $t\in\mathcal{T}\cupdot\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$p_v$]{Start position for $\vinV\cupdot\mathcal{R}$}
+	\item[$z_v$]{Start time for $\vinV$}
+	\item[$\mathcal{R}$]{Set of refuel stations}
+	\item[$\fd_{s,t}$]{Fuel for deadhead trip from $s\in\mathcal{V}\cupdot\Tcar\cupdot\mathcal{R}$ to $t\in\Tcar\cupdot\mathcal{R}$}
+	\item[$\ft_t$]{Fuel for trip $t\in\Tcar\cupdot\mathcal{R}$}
+	\item[$f^0_v$]{Initial fuel state for $\vinV$}
+	\item[$t_{s,t}$]{Time between two trips $s\in\mathcal{V}\cupdot\Tcar\cupdot\mathcal{R}$ and $t\in\Tcar\cupdot\mathcal{R}$}
+	\item[$\mathcal{M}$]{Set of multimodal routes}
+	\item[$M:\mathcal{T}\to\mathcal{M}$]{Mapping of trips to multimodal routes}
+	\item[$\mathcal{C}$]{Set of costumers}
+	\item[$C:\mathcal{M}\to\mathcal{C}$]{Mapping of multimodal routes to costumers}
+	\item[$\cv$]{Unit vehicle cost}
+	\item[$\cd_{s,t}$]{Cost for deadhead trip from $s\in\mathcal{V}\cupdot\Tcar\cupdot\mathcal{R}$ to $t\in\Tcar\cupdot\mathcal{R}$}
+	\item[$\ct_t$]{Cost for trip $t\in\mathcal{T}$}
+	\item[$\bar{c}^{\operatorname{r}}_m$]{Cost for multimodal route $m\in\mathcal{M}$}
+	\item[$\croute_m$]{Total cost for multimodal route $m\in\mathcal{M}$}
+	\item[$\hat{z}^{\operatorname{start}}_c$]{Earliest start time for $c\in\mathcal{C}$}
+	\item[$\hat{z}^{\operatorname{end}}_c$]{Latest end time for $c\in\mathcal{C}$}
+	\item[$d^{\operatorname{walk}}$]{Walking distance}
+	\item[$M_c$]{Set of feasible public transport trips for $c\in\mathcal{C}$}
+	\item[$\operatorname{min}_{\leq}V$]{Pareto frontier for $V\subset\mathbb{R}^n$}
+	\item[$\varphi:\mathcal{M}\to\mathbb{R}^5$]{Grading multimodal routes for Pareto optimality}
+	\item[$\hat{\mathcal{M}}$]{Restricted set of multimodal routes}
+	\item[$\ds$]{Source node in the task graph}
+	\item[$\de$]{Sink node in the task graph}
+	\item[$\hat{G}=\left(\hat{V},\hat{A}\right)$]{Task graph without refuel nodes, with vertex set $\hat{V}$ and arc set $\hat{A}$}
+	\item[$\Rst$]{Copy of $\mathcal{R}$ for $s,t\in\mathcal{V}\cupdot\Tcar$}
+	\item[$G=(V,A)$]{Extended task graph with vertex set $G$ and arc set $A$}
+	\item[$x_{s,t}$]{Decision variable for fulfilling trips}
+	\item[$z_{s,r,t}$]{Decision variable for refueling for $r\in\Rst$}
+	\item[$e_s$]{Decision variable for fuel state after trip $s$}
+	\item[$u_m$]{Decision variable for fulfilling route $m\in\mathcal{M}$}
+	\item[$\Nin(t)$]{Set of ingoing arcs in $t\in V$}
+	\item[$\Nout(t)$]{Set of outgoing arcs from $t\in V$}
+	\item[$(\operatorname{MMILP})$]{ILP for solving VSP with refuel constraints and alternative trips considering multimodal transport}
+	\item[$\Ti$]{Splitting of $\mathcal{T}$}
+	\item[$\mathcal{V}_i$]{Splitting of $\mathcal{V}$}
+	\item[$\SPjs$]{Split point for $s\in\Ti$}
+	\item[$P_j$]{Partial split point set}
+	\item[$P$]{Split point set}
+	\item[$\overline{G}=\left(\overline{V},\overline{A}\right)$]{Transformed task graph with vertex set $\overline{V}$ and arc set $\overline{A}$}
+	\item[$(\operatorname{SMILP})$]{Adaption of (MMILP) with $\overline{G}$ as underlying graph}
+	\item[$\sigma\in S_n$]{Order for solving the partial instances}
+	\item[$\hat{\mathcal{V}}_i$]{Set of start points for partial instance~$i$}
+	\item[$\hat{\mathcal{P}}_i$]{Set of end points for partial instance~$i$}
+	\item[$\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$]{Partial transformed task graph with vertex set $\overline{V}_i$ and arc set $\overline{A}_i$}
+	\item[$(\operatorname{CMILP}_i)$]{ILP for solving partial instance~$i$ with costumer-dependent splitting}
+	\item[$c_i$]{Time point for splitting}
+	\item[$\mathcal{C}_i$]{Splitting of $\mathcal{C}$}
+	\item[$(\operatorname{CMILP})$]{Adaption of (SMILP) with costumer-dependent splitting}
+	\item[$f^{\max}_s$]{Maximal fuel level at start of a duty in partial instance~$i$ for $s\in\Ti$}
+	\item[$f^{\min}_s$]{Minimal fuel level at end of a duty in partial instance~$i$ for $s\in\Ti$}
+	\item[$\LC(c)$]{Costumer extension for costumer $c\in\mathcal{C}$}
+	\item[$\LC$]{Maximal costumer extension}
+	\item[$\LS$]{Minimal splitting length}
+	\item[$\operatorname{val}(S)$]{Value of the objective function for solution $S$}
+	\item[$(\operatorname{TMILP})$]{Adaption of (SMILP) with time-dependent splitting}
+	\item[$\gamma:\mathcal{C}\to\lbrack n\rbrack$]{Earliest solved partial instance where $c\in\mathcal{C}$ is represented}
+	\item[$(\operatorname{TMILP}_i)$]{ILP for solving partial instance~$i$ with time-dependent splitting}
+	\item[$\overline{\mathcal{C}}_i$]{Set of costumers solved before partial instance~$i$}
+	\item[$\bar{u}_m$]{Fixed route choice from earlier solved partial instances for $m\in\mathcal{M}$}
+	\item[$C_1(m)$]{Cost estimation for $m\in\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$\hat{c}^{\operatorname{r}}_m$]{Modified route cost including estimated cost}
+	\item[$S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$]{Feasible solution of a problem formulation}
+	\item[$\cv_t(S)$]{Auxiliary vehicle cost for $t\in\Tcar$ and solution $S$}
+	\item[$c^{\operatorname{refuel}}_t(S)$]{Auxiliary refuel cost for $t\in\Tcar$ and solution $S$}
+	\item[$\cd_t(S)$]{Auxiliary deadhead cost for $t\in\Tcar$ and solution $S$}
+	\item[$C_2(S,m)$]{Improved cost estimation for solution $S$, $m\in\mathcal{M}\cupdot\mathcal{C}$}
+	\item[$c^*$]{Candidate for bad route choice}
+	\item[$(\operatorname{HSP}_c)$]{Subproblem for finding a better route choice for costumer $c\in\mathcal{C}$}
+	\item[$\mathcal{T}^c$]{Set of trips for $c\in\mathcal{C}$ in subproblem $(\operatorname{HSP}_c)$}
+	\item[$\mathcal{T}^c_i$]{Splitting of $\mathcal{T}^c$ in subproblem $(\operatorname{HSP}_c)$}
+	\item[$\mathcal{V}^c_i$]{Splitting of $\mathcal{V}$ in subproblem $(\operatorname{HSP}_c)$}
+	\item[$\CR_i$]{Set of costumers represented in partial instance~$i$ but solved before}
+	\item[$\MR_i$]{Set of multimodal routes with all trips in $\Ti$ but the costumer is solved before}
+	\item[$\bar{m}(c)$]{Multimodal route chosen for costumer $c\in\mathcal{C}$}
+	\item[$s_1(t)$]{Preceding trip in the same duty for $t\in\Tcar$}
+	\item[$s_2(t)$]{Succeeding trip in the same duty for $t\in\Tcar$}
+	\item[$(\operatorname{RTMILP}_i)$]{ILP for solving partial instance~$i$ with time-dependent splitting and route replacement}
+	\item[$u^c$]{Decision variable for route choice confirmation for $c\in\mathcal{C}$}
+	\item[$x^v$]{Decision variables for fulfilling trips of $\vinV$}
+	\item[$z^v$]{Decision variables for refueling of $\vinV$}
+	\item[$e^v$]{Decision variables for fuel states of $\vinV$}
+	\item[$X_v$]{Set of feasible duties of $\vinV$}
+	\item[$X$]{Set of feasible vehicle duties}
+	\item[$g\left(x^v,z^v,e^v\right)$]{Cost for vehicle duty}
+	\item[$\psi:X\to\{0,1\}^{\Tcar}$]{Mapping of a vehicle duty to an incidence vector of fulfilled trips}
+	\item[$y^v$]{Incidence vector of fulfilled trips}
+	\item[$\Iv$]{Index set of feasible trip combinations of $\vinV$}
+	\item[$Y^v$]{Incidence matrix for trip combinations of $\Iv$}
+	\item[$G^v$]{Cost vector for trip combinations of $\Iv$}
+	\item[$\lambda^v$]{Decision variable for trip combination of $\vinV$}
+	\item[$(\operatorname{IMP})$]{Adaption of (MMILP) to index set $\Iv$}
+	\item[$(\operatorname{LMP})$]{Relaxed version of (IMP)}
+	\item[$\mathcal{J}_v$]{Restriction of index set $\Iv$}
+	\item[$(\operatorname{RLMP})$]{Restricted version of (LMP) with index set $\mathcal{J}_v$}
+	\item[$(\operatorname{DLRLMP})$]{Dual problem of (RLMP)}
+	\item[$\gamma_t$]{Dual variable for $t\in\Tcar$}
+	\item[$\mu_v$]{Dual variable for $\vinV$}
+	\item[$\eta_c$]{Dual variable for $c\in\mathcal{C}$}
+	\item[$\SPv_v$]{Subproblem for finding a better trip combination for $\vinV$}
+	\item[$(\operatorname{SPPRC})$]{Shortest path problem with resource constraints}
+	\item[$\hat{X}$]{Set of feasible multimodal route combinations}
+	\item[$\hat{u}$]{Decision variable for multimodal route combination}
+	\item[$\hat{g}$]{Cost for multimodal route combination}
+	\item[$\Ihat$]{Index set for feasible multimodal route combinations}
+	\item[$\hat{Y}$]{Incidence matrix for multimodal route combinations}
+	\item[$\hat{G}$]{Cost vector for multimodal route combinations}
+	\item[$\hat{\lambda}$]{Decision variable for multimodal route combinations}
+	\item[$(\operatorname{IMMP})$]{Adaption of (MMILP) to index sets $\Iv$ and $\Ihat$}
+	\item[$(\operatorname{LMMP})$]{Relaxed version of (IMMP)}
+	\item[$\hat{\mathcal{J}}$]{Restriction of index set $\Ihat$}
+	\item[$(\operatorname{RLMMP})$]{Restricted version of (LMMP) with index sets $\mathcal{J}_v$ and $\hat{\mathcal{J}}$}
+	\item[$(\operatorname{DRLMMP})$]{Dual problem of (RLMMP)}
+	\item[$\alpha$]{Dual variable}
+	\item[$\SPm$]{Subproblem for finding a better multimodal route combination}
+\end{labeling}		

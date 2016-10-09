@@ -50,51 +50,147 @@ We denote the set of feasible duties for any vehicle by $X:=\bigcup_{v\in\mathca
 \begin{align}
 	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
-	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking}\\
+	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} = u_m && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking}\\
 	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
 	& u_m\in\{0,1\}^{\mathcal{M}} \nonumber
 \end{align}
-
-We can see that $\eqref{eq:MMILP:costumer}$ depends only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
-
-\begin{align*}
-	\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
-\end{align*}
-
-We introduce variable $\hat{u}$ and the route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
-
-\begin{align}
-	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \hat{g}\left(\hat{u}\right) \nonumber \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \tag{\ref{eq:MMILP:linking}}\\
-	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
-	& \hat{u}\in\hat{X} \nonumber
-\end{align}
-
-The only linking constraints are $\eqref{eq:MMILP:linking}$.
 
 \paragraph{Reduction of the Master Problem} \parfill
 
 We define the linear mapping
 
-\begin{align*}
-	\psi:X\to\{0,1\}^{\Tcar} && (x,z,e)\mapsto\left(\sum_{s\in\Nin(t)}x_{s,t}\right)_{t\in\Tcar}
-\end{align*}
+\begin{align}
+	\psi:X\to\{0,1\}^{\Tcar} && (x,z,e)\mapsto\left(\sum_{s\in\Nin(t)}x_{s,t}\right)_{t\in\Tcar} \label{eq:psi}
+\end{align}
 
 and rewrite $\eqref{eq:MMILP}$ by using $y^v:=\psi\left(x^v,z^v,e^v\right)$:
 
 \begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y^v_t - u_m = 0 && \text{for all } m\in\mathcal{M},t\in m \\
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m}$} \\
+	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
+	& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+We can see that $\eqref{eq:MMILP:costumer}$ depends only on $u_m$. Therefore, we create two different versions of this formulation: One with restriction of the route choice and one without restriction.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Master Problem without Route Choice Restriction}
+
+\paragraph{Column Generation} \parfill
+
+For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\Tcar\times\Iv}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$. Then we can reformulate the master problem as
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \sum_{m\in\mathcal{M}}u_m\croute_m \tag{IMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \\
+	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \lambda^v\in\{0,1\}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+We regard the LP-relaxation by dropping the integrality constraints:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \sum_{m\in\mathcal{M}}u_m\croute_m \tag{LMP} \label{eq:LMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \\
+	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \lambda^v\in\mathbb{R}_{\geq 0}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	& u_m\geq 0 && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+We reduce the size by considering only subsets $\mathcal{J}_v\subset\Iv$ and formulate the relaxed restricted master problem:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}G^v_{\mathcal{J}_v}\lambda^v + \sum_{m\in\mathcal{M}}u_m\croute_m \tag{LRMP} \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\mathcal{J}_v}\lambda^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \\
+	& \sum_{i\in\mathcal{J}_v}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	& \lambda^v\in\mathbb{R}_{\geq 0}^{\mathcal{J}_v} && \text{for all } v\in\mathcal{V} \\
+	& u_m\geq 0 && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+For the dual relaxed restricted master problem, we introduce dual variables $\gamma\in\mathbb{R}^{\Tcar}$, $\mu\in\mathbb{R}^{\mathcal{V}}$ and $\eta\in\mathbb{R}^{\mathcal{C}}$. The dual problem is:
+
+\begin{align*}
+	\max \quad & \sum_{c\in\mathcal{C}}\eta_c + \sum_{v\in\mathcal{V}}\mu_v \tag{DLRMP} \label{eq:DLRMP} \\
+	\text{s.t.} \quad & \sum_{t\in\Tcar} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\mathcal{J}_v \\
+	& \eta_{C(m)} - \sum_{t\in m}\gamma_t \leq \croute_m && \text{for all } m\in\mathcal{M} \\
+	& \gamma\in\mathbb{R}^{\Tcar} \\
+	& \mu\in\mathbb{R}^{\mathcal{V}} \\
+	& \eta\in\mathbb{R}^{\mathcal{C}}
+\end{align*}
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Solving the Relaxed Master Problem}
+
+Let $\left(\gamma^*,\mu^*,\eta^*\right)$ be a solution of $\eqref{eq:DLRMP}$ with $\mathcal{J}_v\subset\Iv$ for all $\vinV$. We want to find out whether $\left(\gamma^*,\mu^*,\eta^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire set $\Iv$. This means, the following equation holds for $\left(\gamma^*,\mu^*,\eta^*\right)$:
+
+\begin{align}
+	\sum_{t\in\Tcar} Y^v_{t,i}\gamma^*_t + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMP:vehicle}
+\end{align}
+
+In order to find an optimal solution of $\eqref{eq:LMP}$ we have to find indices $i\in\Iv$ where the previous constraints are violated. This leads to the following subproblem:
+
+\begin{align*}
+	\text{Find } i\in\Iv\backslash\mathcal{J}_v \text{ s.t.} && \sum_{t\in\Tcar}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV
+\end{align*}
+
+We call this problem vehicle subproblem $\eqref{eq:SPv}$.
+
+\paragraph{Vehicle Subproblem} \parfill
+
+The vehicle subproblem for finding violated constraints $\eqref{eq:DLMP:vehicle}$ reads for $\vinV$ as follows:
+
+\begin{align*}
+	\min \quad & g\left(x^v,z^v,e^v\right)-\sum_{t\in\Tcar}\sum_{s\in\Nin(t)}x^v_{s,t}\gamma^*_t \tag{$\SPv_v$} \label{eq:SPv} \\
+	\text{s.t.} \quad & \left(x^v,z^v,e^v\right)\in X_v
+\end{align*}
+
+The constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure, that exactly vehicle $v$ is used and the others are not used. The subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). In (Kaiser, cap. 7) there is provided a way to solve the (SPPRC) efficiently.
+
+Let $\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)$ be an optimal solution of $\eqref{eq:SPv}$. If $\operatorname{val}\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)<\mu_v^*$ then add this to $\mathcal{J}_v$ and repeat the master problem.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Master Problem with Route Choice Restriction}
+
+Remember the formulation from before:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m \\
+	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
+	& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+\end{align*}
+
+The constraints $\eqref{eq:MMILP:costumer}$ depend only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
+
+\begin{align*}
+	\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
+\end{align*}
+
+We introduce variable $\hat{u}$ and the respective route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
+
+\begin{align*}
+	\min \quad & \sum_{v\in\mathcal{V}} \min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
+	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y_t^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
 	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
 	& \hat{u}\in\hat{X}
 \end{align*}
 
 \paragraph{Column Generation} \parfill
 
-For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\Tcar\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{g}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
+For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\Tcar\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{G}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
 
 \begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{g}\hat{\lambda} \tag{IMMP} \\
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{IMMP} \\
 	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
 	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
 	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
@@ -105,7 +201,7 @@ For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many poi
 We regard the LP-relaxation by dropping the integrality constraints:
 
 \begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{g}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
+	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
 	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
 	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
 	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
@@ -116,7 +212,7 @@ We regard the LP-relaxation by dropping the integrality constraints:
 We reduce the size by considering only subsets $\mathcal{J}_v\subset\Iv$ and $\hat{\mathcal{J}}\subset\Ihat$ and formulate the relaxed restricted master problem:
 
 \begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v_{\mathcal{J}_v}\lambda^v + \hat{g}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
+	\min \quad & \sum_{v\in\mathcal{V}}G^v_{\mathcal{J}_v}\lambda^v + \hat{G}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
 	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\mathcal{J}_v}\lambda^v = \hat{Y}_{m,\hat{\mathcal{J}}}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
 	& \sum_{i\in\mathcal{J}_v}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
 	& \sum_{i\in\hat{\mathcal{J}}}\hat{\lambda}_i= 1 \\
@@ -129,7 +225,7 @@ For the dual relaxed restricted master problem, we introduce dual variables $\ga
 \begin{align*}
 	\max \quad & \sum_{v\in\mathcal{V}}\mu_v + \alpha \tag{DLRMMP} \label{eq:DLRMMP} \\
 	\text{s.t.} \quad & \sum_{t\in\Tcar} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\mathcal{J}_v \\
-	& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{g}_i && \text{for all } i\in\hat{\mathcal{J}} \\
+	& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{G}_i && \text{for all } i\in\hat{\mathcal{J}} \\
 	& \gamma\in\mathbb{R}^{\Tcar} \\
 	& \mu\in\mathbb{R}^{\mathcal{V}} \\
 	& \alpha\in\mathbb{R}
@@ -141,38 +237,21 @@ For the dual relaxed restricted master problem, we introduce dual variables $\ga
 
 Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\mathcal{J}_v\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
 
-We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of the $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
+We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
 
 \begin{align}
 	& \sum_{t\in\Tcar} Y^v_{t,i}\gamma^* + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMMP:vehicle} \\
-	& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{g}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
+	& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{G}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
 \end{align}
 
 In order to find an optimal solution of $\eqref{eq:LMMP}$ we have to find indices $i\in\Iv$ or $j\in\Ihat$ where the previous constraints are violated. This leads to the following subproblems:
 
-\begin{enumerate}
-	\item{$\SPv_v$ for $\vinV$: Find $i\in\Iv\backslash\mathcal{J}_v $ s.t.}
-		\begin{align*}
-			\sum_{t\in\Tcar}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i
-		\end{align*}
-	\item{$\SPm$: Find $i\in\Ihat\backslash\hat{\mathcal{J}}$ s.t.}
-		\begin{align*}
-			\alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{g}_i
-		\end{align*}
-\end{enumerate}
-
-\paragraph{Vehicle Subproblem} \parfill
-
-The vehicle subproblem for finding violated constraints $\eqref{eq:DLMMP:vehicle}$ reads for $\vinV$ as follows:
-
 \begin{align*}
-	\min \quad & g\left(x^v,z^v,e^v\right)-\sum_{t\in\Tcar}\sum_{s\in\Nin(t)}x^v_{s,t}\gamma^*_t \tag{$\SPv_v$} \label{eq:SPv} \\
-	\text{s.t.} \quad & \left(x^v,z^v,e^v\right)\in X_v
+	& \text{Find } i\in\Iv\backslash\mathcal{J}_v \text{ s.t.} && \sum_{t\in\Tcar}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \\
+	& \text{Find } i\in\Ihat\backslash\hat{\mathcal{J}} \text{ s.t.} && \alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{G}_i
 \end{align*}
 
-The constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure, that exactly vehicle $v$ is used and the others are not used. The subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). In (Kaiser, cap. 7) there is provided a way to solve the (SPPRC) efficiently.
-
-Let $\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)$ be an optimal solution of $\eqref{eq:SPv}$. If $\operatorname{value}\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)<\mu_v^*$ then add this to $\mathcal{J}_v$ and continue the master problem.
+The vehicle subproblem $\eqref{eq:SPv}$ was already considered before. For the route choice, an additional subproblem arises.
 
 \paragraph{Route Subproblem} \parfill
 
@@ -186,4 +265,4 @@ The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ r
 
 This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\croute_m + \sum_{t\in m}\gamma^*_t$. 
 
-Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{value}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.
+Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{val}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.
