@@ -1,60 +1,121 @@
-\section{Problem Formulation}
+\chapter{Problem Description and Classification}
 
-\subsection{Problem Description and Notation}
+In this chapter, the problem is stated in detail and the notation is introduced. The problem is classified by relating it to known problems in literature and its complexity is determined. Finally, known approaches to similar problems are regarded. Most of the following considerations are already part of the underlying theses \cite{Kaiser_Knoll}, except for the fact that multiple leg is allowed. For better clarity to the reader, all crucial results are repeated here.
 
-This formulation models the problem of optimal integration of autonomous vehicles in car sharing, considering multimodal transport.
+\section{Situation and Issue}
 
-\paragraph{Notation} \parfill
+We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a costumer can rent an available car wherever and whenever there is one and use it as long as he needs it. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles. An autonomous vehicle behaves the same as if a human being drives it, but without that a human being is necessarily present. Instead of looking for a car, a costumer books a car via a smartphone application and gets picked up by the car at the desired start location and at the desired start time. For the costumer, this seems similar to a taxi service. 
 
-We are given a set of vehicles $\mathcal{V}$ and a set of costumers $\mathcal{C}$. For public transport, we have a set of available stations $\mathcal{S}$ and a set of public transport rides $\mathcal{P}$. A ride $p\in \mathcal{P}$ is a finite sequence of stations at time points $p=\left(\left(s_1,z_1\right),\dots,\left(s_k,z_k\right)\right)$ with $s_i\in\mathcal{S}$ and $z_i$ a time point for $i\in[k]$. 
+The car sharing issue is combined with public transport as it is known today. There is a fixed schedule, according to which the bus or train visits public transport stations in a row at certain time points. A possible route for a costumer may look as follows: The costumer is picked up at his start position by a car and is brought to a station where he gets on a train. After finishing the train trip, he is picked up again by another car and is brought to his destination. It is also possible to change trains during this public transport trip. This behavior is very advantageous for the costumer. While an in-between train trip is cheaper than a pure car trip, the combination of car and train is faster than a pure public transport trip since does not have walking and changing time.
 
-We are further given a set of trips $\mathcal{T}$; each trip $t\in\mathcal{T}$ is either a car trip or a public transport trip and has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$. Accordingly, we define $\mathcal{T} = \mathcal{T}_{\operatorname{car}}\cupdot\mathcal{T}_{\operatorname{public}}$. A public transport trip $t\in\Tpub$ is a connected subsequence of a public transport ride $p\in\mathcal{P}$ and it holds
+%----------------------------------------------------------------------------------------------------------------------------------------
 
+\section{Problem Description and Notation}
+\label{sec:problem_description}
+
+In order to realize the previously described problem, we introduce a formal notation for the problem. We have a set of costumers with known travel requests. Each of those can be realized by a number of precomputed multimodal routes. Each route consists of a sequence of trips. A trip is either a car trip or a public transport trip and has a fixed start and end position, as well as a fixed start and end time. Fulfilling a route means that the costumer takes all the trips of this route in a row, \ie he starts at the start point of the first trip and is finished at the end point of the last trip. The transition between two subsequent trips is the changing from a car to a train or the other way round. Each costumer has to be satisfied, \ie he has to be able to fulfill one of his alternative routes.
+
+Although we formally define public transport trips here, we regard only the car trips in detail. Public transport is maintained by an own schedule and is not of interest for this issue. The availability of suitable public transport trips has to be respected while creating the routes (Chapter \ref{ch:instance_creation}). There, the car trips are created in such a way that they are suitable to the existing public transport trips. Here, we assume the existence of feasible routes and therefore only control the behavior of the cars.
+
+For fulfilling the car trips, we have a set of vehicles. For each vehicle, we have a position where it starts and a time from when it is available. A vehicle can drive from its start point to a trip's start point, execute this trip, and then drive from the trip's end point to the next trip's start point. After fulfilling its last trip, the car stays at the end point of the last trip. The sequence, in which the vehicle executes the trips, is called the duty of the vehicle. 
+
+A further restriction to the problem is that the vehicles have a maximal range that they can drive without refueling. In the model, refueling points are included.
+
+The objective is to create a schedule for the vehicles, such that for each costumer exactly one route is fulfilled, \ie every trip of this route is fulfilled. Further, each vehicle has a feasible fuel state all the time and visits a refuel station when necessary.
+
+\paragraph{Costumers, Trips and Vehicles} \parfill
+
+We are given a set of car trips $\mathcal{T}$. Each trip $t\in\mathcal{T}$ has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$. For the sake of completeness, we define the set of public transport trips $\Tpub$ with the same properties for $t\in\Tpub$.
+
+The set of vehicles is denoted by $\mathcal{V}$. The start position and the start time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$.
+
+We have the set of costumers $\mathcal{C}$ and the set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_{k_m}\right)$ is a finite sequence of trips with the following properties:
 \begin{align*}
-	\pstart_t = s^p_i & &  \pend_t = s^p_j & & \zstart_t = z^p_i & & \zend_t = z^p_j
+	\pend_{t_i} = \pstart_{t_{i+1}} && \zend_{t_i} \leq \zstart_{t_{i+1}} && \text{for all } i\in[k-1].
 \end{align*}
 
-for some $i<j$.
-
-The start position and the starting time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$.
-
-Additionally, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. In this model, a car is allowed to refuel at most once between two trips. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R},t\in\mathcal{T}\cup\mathcal{R}$ as the amount, the fuel level decreases along the deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cup\mathcal{R}$ is the amount of fuel, the car needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. $f^0_v$ for $v\in\mathcal{V}$ is the initial fuel state of a car. The fuel of a car is in the interval $[0,1]$ describing the relative fuel state.
-
-We define the time, a car needs to get from position $p_1$ to $p_2$, as $t_{p_1,p_2}$. We define
-
-\begin{equation*}
-	t_{s,t} = 
-	\begin{cases}
-		t_{\pend_s,\pstart_t} & \text{if } s,t\in\Tcar \\
-		t_{p_s,\pstart_t} & \text{if } s\in\mathcal{V}\cup\mathcal{R}, t\in\Tcar \\
-		t_{\pend_s,p_t} & \text{if } s\in\Tcar, t\in\mathcal{R} \\
-		t_{p_s,p_t} & \text{if } s\in\mathcal{V},t\in\mathcal{R}
-	\end{cases}
-\end{equation*}
-
-as the time a car needs from one trip to another.
-
-We are given a set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_k\right)$ is a sequence of trips with the following properties:
-
-\begin{align*}
-	\pend_{t_i} = \pstart_{t_{i+1}} & & \zend_{t_1} \leq \zstart_{t_{i+1}} & & t_i\in\mathcal{T}_{\operatorname{car}}\Rightarrow t_{i+1}\in\mathcal{T}_{public} & & \text{for all } i\in[k-1].
-\end{align*}
-
-The mapping $M:\mathcal{T}\to\mathcal{M}$ shows to which route a trip belongs. We define the route start and end locations and times for $m\in\mathcal{M}$
-
+We define the route start and end locations and times for $m\in\mathcal{M}$ as
 \begin{align*}
 	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
 \end{align*}
 
-Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer. For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the costumer start and end times for $c\in\mathcal{C}$
+The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs. Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer.
 
-\begin{align}
-	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m . \label{eq:costumer_time}
-\end{align}
+We use the notation
+\begin{align*}
+	C^{-1}(c) & := C^{-1}\left(\{c\}\right) = \left\{m\in\mathcal{M}\mid C(m)=c\right\} && \text{for } c\in\mathcal{C} \\
+	M^{-1}(m) & := M^{-1}\left(\{m\}\right) = \left\{t\in\mathcal{T}\mid M(t)=m\right\} && \text{for } m\in\mathcal{M} \\
+	\left(M\circ C\right)^{-1}(c) & := M^{-1}\left(C^{-1}(c)\right) = \left\{t\in\mathcal{T}\mid C\left(M(t)\right)=c\right\} && \text{for } c\in\mathcal{C}
+\end{align*}
+
+for all routes of a costumer, all trips of a route and all trips of a costumer, respectively.
+
+For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the costumer start and end times for $c\in\mathcal{C}$
+\begin{align*}
+	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m .
+\end{align*}
+
+\paragraph{Fuel and Refueling} \parfill
+
+We have to consider fuel restrictions. Fuel can be any form of energy the considered vehicle is powered with. For each vehicle, the fuel level is in the interval $[0,1]$, where $1$ means full capacity and $0$ is empty. We call a trip without a costumer, \ie a trip between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time on the same station.
+
+For refueling, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$, $t\in\mathcal{T}\cupdot\mathcal{R}$ as the amount, the fuel level decreases along a deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cupdot\mathcal{R}$ is the amount of fuel, a vehicle needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. $f^0_v$ for $v\in\mathcal{V}$ is the initial fuel state of a car.
+
+\paragraph{Ordering of the Trips} \parfill
+
+We define the time, a vehicle needs to get from position $p_1$ to $p_2$ as $t_{p_1,p_2}$. We define
+\begin{equation*}
+	t_{s,t} = 
+	\begin{cases}
+		t_{\pend_s,\pstart_t} & \text{if } s,t\in\mathcal{T} \\
+		t_{p_s,\pstart_t} & \text{if } s\in\mathcal{V}\cupdot\mathcal{R}, t\in\mathcal{T} \\
+		t_{\pend_s,p_t} & \text{if } s\in\mathcal{T}, t\in\mathcal{R} \\
+		t_{p_s,p_t} & \text{if } s\in\mathcal{V},t\in\mathcal{R}
+	\end{cases}
+\end{equation*}
+as the time a vehicle needs from one trip to another.
+
+In order to decide whether a vehicle is able to fulfill two trips in a row, we define a partial ordering on the set of vehicles and trips. The set of public transport trips is left out in this definition.
+
+\begin{definition}[Order of trips]
+\label{def:partial_order}
+
+The binary relation $\prec$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as follows:
+\begin{align*}
+	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left((M\circ C)(s)\neq (M\circ C)(t)\lor M(s)=M(t)\right) \\
+	&&&& \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{T} \hphantom{\mathcal{V}} \\
+	s\not\prec t &&&& \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{V} \hphantom{\mathcal{T}}
+\end{align*}
+
+The binary relation $\preceq$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as:
+\begin{align*}
+	s\preceq t && :\Leftrightarrow && s=t \land s\prec t && \text{for all } s,t\in\mathcal{V}\cupdot\mathcal{T}
+\end{align*}
+
+\end{definition}
+
+The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one route is fulfilled. 
+
+\begin{remark}
+
+Note, that $\preceq$ is not a partial order on $\mathcal{V}\cupdot\mathcal{T}$ since the transitivity is missing. Let $t_1,t_2,t_3\in\mathcal{T}$ with 
+\begin{align*}
+	\zend_{t_1} + t_{t_1,t_2} \leq \zstart_{t_2} && \zend_{t_2} + t_{t_2,t_3} \leq \zstart_{t_3}
+\end{align*}
+\begin{align*}
+	(M\circ C)\left(t_1\right) = (M\circ C)\left(t_3\right) && (M\circ C)\left(t_1\right) \neq (M\circ C)\left(t_2\right) && M\left(t_1\right)\neq M\left(t_3\right)
+\end{align*}
+
+Then,
+\begin{align*}
+	t_1 \preceq t_2 \preceq t_3 && t_1 \not\preceq t_3
+\end{align*}
+
+\end{remark}
 
 \paragraph{Problem Description} \parfill
 
-The problem is the following: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every costumer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
+We define the considered problem as follows: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every costumer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
 
 \begin{itemize}
 	\item{Each car is able to serve its scheduled trips, considering time and location.}
@@ -67,212 +128,142 @@ The goal is to find a cost-minimal feasible schedule considering all these const
 
 \paragraph{Costs} \parfill
 
-We have the following types of costs:
-
+We introduce the following types of costs:
 \begin{itemize}
-	\item{Vehicles costs $\cv$: unit costs for each used car}
-	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cup\mathcal{T}\cup\mathcal{R}, t\in\mathcal{T}\cup\mathcal{R}$: costs, if a car drives to a trip or a refuel station without a costumer using it}
-	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{car}}$: costs for fulfilling a trip}
+	\item{Vehicles costs $\cv$: unit costs for each used vehicle}
+	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}, t\in\mathcal{T}\cupdot\mathcal{R}$: costs, if a vehicle drives to a trip or a refuel station without a costumer using it}
+	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}$: costs for fulfilling a trip}
 \end{itemize}
 
 For public transport, we define either trip costs for each public transport trip or fixed costs for each costumer using public transport. Finally, we define costs to consider the costumer preferences.
-
 \begin{itemize}
 	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{public}}$: costs for using public transport}
 	\item{Route-dependent costs $\bar{c}^{\operatorname{r}}_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
 \end{itemize}
 
 Since the trip costs for public transport are connected with the choice of the route, we easily add these costs to the trip costs.
-
 \begin{align*}
 	\croute_m := \bar{c}^{\operatorname{r}}_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-The route costs additionally include costumer preferences. This can be the total travel time, the number of changes or the costs for the costumers. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
+The route costs additionally include costumer preferences. Each costumer has a set of alternative routes. He does not choose the route by himself, but this is decided by the problem whatever fits best into the system. The user preference costs work as penalty terms for an inconvenient route choice. This means, a route that is disadvantageous for the costumer is penalized. Then, either the less favorable route is chosen (if it fits better into the system) and this is penalized. Or the more favorable route is chosen although it is not so good for the system. With this, a realistic costumer behavior is modeled.
 
-\paragraph{Partial Order of the Trips} \parfill
+The costumer preferences are \eg the total travel time, the number of changes or the costs for the costumer. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
 
-In order to decide whether a car can fulfill two trips in a row, we define a partial ordering of the car set and the set of car trips. The set of public transport trips is left out in this definition.
+\paragraph{Additional Assumptions} \parfill
 
-\begin{definition}[Partial order of trips]
-\label{def:partial_order}
+In the following, we summarize all the assumptions we made on the input data.
 
-The binary relation $\prec$ on $\mathcal{V}\times\Tcar$ is defined as follows:
-
-\begin{align*}
-	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left(	C(s)\neq C(t)\lor M(s)=M(t)\right) \\
-	&&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\Tcar \hphantom{\mathcal{V}} \\
-	s\not\prec t &&&& \text{for all } s\in\mathcal{V}\cupdot\Tcar, t\in\mathcal{V} \hphantom{\Tcar}
-\end{align*}
-
-The binary relation $\preceq$ on $\mathcal{V}\times\Tcar$ we define as:
-
-\begin{align*}
-	s\preceq t && :\Leftrightarrow && s=t \land s\prec t && \text{for all } s,t\in\mathcal{V}\cupdot\Tcar
-\end{align*}
-
-\end{definition}
-
-The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one route is fulfilled. 
-
-\paragraph{Assumptions} \parfill
-
-We make the following assumptions to our model: All costs are non-negative, i.e.
-
+All costs are non-negative.
 \begin{align}
-\label{eq:nonnegativ}
+\label{eq:nonnegativ_cost}
 	\cv\geq 0 && \cd_{s,t}\geq 0 && \ct_t\geq 0 && \bar{c}^{\operatorname{r}}_m\geq 0 && \text{for all } s,t\in\mathcal{T}, m\in\mathcal{M}.
 \end{align}
 
-Further we assume the Triangle Inequality:
+The fuel consumption is non-negative, except for refueling.
+\begin{align}
+	& \ft_t\geq 0 && \ft_r\leq 0 && \text{for all } t\in\mathcal{T}, r\in\mathcal{R} \\
+	& \fd_{s_1,s_2} \geq 0 &&&& \text{for all } s_1\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R},s_2\in\mathcal{T}\cupdot\mathcal{R}
+\end{align}
 
+There are no zero-time rentals.
+\begin{align}
+\label{eq:notime_trip}
+	\zstart_t < \zend_t && \text{for all } t\in\mathcal{T}
+\end{align}
+
+We assume the Triangle Inequalities for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$ and $r,t\in\mathcal{T}\cupdot\mathcal{R}$:
 \begin{align}
 \label{eq:triangle_inequality}
-	\cd_{t_1,t_3} \leq \cd_{t_1,t_2} + \cd_{t_2,t_3} && \text{for all } t_1,t_2,t_3\in\Tcar
+	t_{s,t} \leq t_{s,r} + t_{r,t} && \cd_{s,t} \leq \cd_{s,r} + \cd_{r,t} && \fd_{s,t} \leq \fd_{s,r} + \fd_{r,t}
 \end{align}
 
-From $\eqref{eq:nonnegativ}$ and $\eqref{eq:triangle_inequality}$ we get:
-
+From $\eqref{eq:nonnegativ_cost}$ and $\eqref{eq:triangle_inequality}$ we get:
 \begin{align}
 \label{eq:triangle_inequality_ext}
-	\cd_{t_1,t_3} \leq \cd_{t_1,t_2} + \ct_{t_2} + \cd_{t_2,t_3} && \text{for all } t_1,t_2,t_3\in\Tcar
+	\cd_{s,t} \leq \cd_{s,r} + \ct_{r} + \cd_{r,t} && \text{for all } s,r,t\in\mathcal{T}	
 \end{align}
 
-%---------------------------------------------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Route Creation}
+\section{Classification}
+\label{sec:classification}
 
-We are not given the set of routes $\mathcal{M}$ in advance. For each costumer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstarto_c, \zendo_c$. All the trips of the costumer lie in this interval, i.e.
+We want to classify our problem in relation to other known problems in literature and state the difficulty of these problems.
 
+\paragraph{Vehicle Scheduling Problems} \parfill
+
+According to the structure of the problem stated in Section \ref{sec:problem_description}, we regard the field of vehicles scheduling problems (VSP). \cite{Bunte_Kliewer} define the (VSP) as follows: ``Given a set of timetabled trips with fixed travel (departure and arrival) times and start and end locations as well as traveling times between all pairs of end stations, the objective is to find an assignment of trips to vehicles such that each trip is covered exactly once, each vehicle performs a feasible sequence of trips and the overall costs are minimized.'' The complexity of some different variants of the (VSP) is regarded by \cite{Lenstra_Kan}.
+
+A similar problem formulation is the dial-a-ride problem (DARP). \cite{Cordeau_Laporte} discuss the differences of the (DARP) to other vehicle routing problems and write: ``What makes the DARP different from most such routing problems is the human perspective. When transporting passengers, reducing user inconvenience must be balanced against minimizing operating costs.'' The basic formulations of (VSP) and (DARP) are the same, therefore we use the formulation (VSP).
+
+\paragraph{Depot Variants} \parfill 
+
+In \cite{Bunte_Kliewer}, there are two main variants for the (VSP) with respect to the fact where vehicles start and return. In the single depot case (SD-VSP), there is one depot from where all vehicles start. After usage, all vehicles return to this depot. The multiple depot case (MD-VSP) means that there is more than one depot and from each depot starts a certain number of vehicles. After usage, each vehicle returns to the depot from where it has started. 
+
+In order to make our problem more realistic, we have more than one depot. We have more than one vehicle and each vehicle starts from its start position. The vehicles do not have a certain point, where there have to return after usage,  \ie they can stay, wherever the last trip of their duty ends. \cite{Daduna_Paixao} claim that ``if the vehicle[s] are allowed to return to a depot different from its origin depot, [...] the problem can be solved as a single depot instance.'' We see, that our problem is in the single depot case (SD-VSP) concerning the depot variant.
+
+In \cite{Dantzig_Fulkerson} is proven that (SD-VSP) can be solved in polynomial time, \ie (SD-VSP) is in $\mathcal{P}$. In contrast, the multidepot case (MD-VSP) is $\mathcal{NP}$-hard as shown in \cite{Bertossi_Carraresi}.
+
+\paragraph{Additional Constraints} \parfill
+
+In the basic (SD-VSP), all existing trips have to be fulfilled. For more generality, there were additional cover constraints introduced in the underlying master theses. There are ``costumers with sets of alternative trips out of which exactly one trip shall be fulfilled, respectively.'' (\cite[p.10]{Kaiser_Knoll}) In our problem, even more general cover constraints are required. We have costumers with sets of alternative routes, consisting of trips; for each costumer, exactly one route has to be fulfilled, \ie each of its trips is fulfilled. We call these constraints ``multi-leg'' cover constraints and write the problem (VSP-MC). This is a generalization to the previous cover constraints, as can be seen easily by rewriting them: There are costumers with sets of alternative routes, where each route consists of exactly one trip. According to this reformulation, we call the primary constraints ``single-leg'' cover constraints and write the problem (VSP-SC). We see in Section \ref{sec:complexity} that (VSP-SC) is already $\mathcal{NP}$-hard.
+
+We further have to respect the fuel constraints. In literature, there are named general resources like time, mileage or fuel, summarized in the general term ``route constraints'' (cf. \cite[p. 16]{Bunte_Kliewer}, \cite{Raff}). The respective problems with route constraints are called (SD-VSP-RC) and (MD-VSP-RC). \cite{Freling_Paixao} describe  the (VSP) with time constraints, \cite{Raff} presents the (VSP) with path constraints, what is a more general formulation. In these models, a vehicle returns to the depot after the respective resource is exhausted, while the vehicle has the possibility to refuel in our model. The problem with not refilling the resource is a special case of the problem with the possibility to refill the resource. We see in Section \ref{sec:complexity} that (SD-VSP-RC) is already $\mathcal{NP}$-hard.
+
+In summary, we have a problem with two types of constraints where each individually makes the problem $\mathcal{NP}$-hard. The first one is the multi-leg cover constraint and the second one is the fuel constraint. The only difference to \cite{Kaiser_Knoll} is that the single-leg cover constraint is replaced by the multi-leg cover constraint. Their solution methods are extended to the requirements in this thesis. To the knowledge of the author, a combination of these constraints, as well as these constraints on their own, are not treated in literature so far.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Complexity}
+\label{sec:complexity}
+
+We regard the complexity of our problem. As we have seen in Section \ref{sec:classification}, the problem can be modeled as a single depot vehicle scheduling problem (SD-VSP) with resource constraints, the possibility of refueling and multi-leg cover constraints. The (SD-VSP) itself can be solved in polynomial time, which is proven by \cite{Dantzig_Fulkerson}. It can be formulated as minimum-cost flow problem. If we extend the basic formulation with one of the additional constraints, it gets $\mathcal{NP}$-hard.
+
+\begin{theorem}[VSP with resource constraints]
+\label{th:complexity_VSPRC}
+
+The vehicle scheduling problem with resource constraints and the special objective of minimizing the number of used vehicles is $\mathcal{NP}$-hard.
+
+\end{theorem}
+
+This theorem is proven in \cite[p. 11]{Kaiser_Knoll} by a polynomial reduction of the bin packing problem. This theorem holds for the case of resource constraints without the possibility of refilling the resources. Since this is a special case of resource constraints with refueling, this problem is also $\mathcal{NP}$-hard. 
+
+\begin{theorem}[VSP with cover constraints]
+\label{th:complexity_VSPSC}
+
+The vehicle scheduling problem with cover constraints and the special objective of minimizing the number of used vehicles is $\mathcal{NP}$-hard.
+
+\end{theorem}
+
+This theorem is proven in \cite[p. 12]{Kaiser_Knoll} by a polynomial reduction of the set cover problem. This theorem treats the case of single-leg cover constraints.
+
+\begin{theorem}[VSP with multi-leg cover constraints]
+\label{th:complexity_VSPMC}
+
+The vehicle scheduling problem with multi-leg cover constraints and the special objective of minimizing the number of used vehicles is $\mathcal{NP}$-hard.
+
+\end{theorem}
+
+\begin{proof}
+
+We prove this statement by a polynomial reduction of the (VSP-SC). Consider a (VSP-SC) with vehicles $\hat{\mathcal{V}}$, costumers $\hat{\mathcal{C}}$, trips $\hat{\mathcal{T}}$ and the function $\hat{C}:\hat{\mathcal{T}}\to\hat{\mathcal{C}}$ that maps trips to their respective costumers. The problem is defined in detail in \cite[pp. 5-8]{Kaiser_Knoll}. We create the corresponding (VSP-MC) as follows: $\mathcal{V}:=\hat{\mathcal{V}}$, $\mathcal{C}:=\hat{\mathcal{C}}$, $\mathcal{T}:=\hat{\mathcal{T}}$ stay the same. We define the multimodal routes as one-element sequence for each trip
 \begin{align*}
-	\zstarto_c \leq \zstart_m && \zend_m \leq \zendo_c && \text{for all } m\in C^{-1}(c).
+	\mathcal{M}:=\left\{(t)\mid t\in\hat{\mathcal{T}}\right\}
+\end{align*}
+and the mappings
+\begin{align*}
+	M:\mathcal{T}\to\mathcal{M} \text{, } M(t) = (t), && C:\mathcal{M}\to\mathcal{C} \text{, } C(m) = \hat{C}(t) && \text{for } t\in m \text{ unique.}
 \end{align*}
 
-\paragraph{Basic Restrictions} \parfill
+The solution of (VSP-SC) can easily be mapped to a solution of the corresponding (VSP-MC) and vice versa. If a trip is chosen in (VSP-SC), the respective route is chosen in (VSP-MC). Then, every trip of this route is fulfilled and the costumer is satisfied. The other way round, if a route is chosen in (VSP-MC), the trip contained in this route is chosen in (VSP-SC) and the costumer is satisfied. The feasibility of the vehicle duties is not affected by this procedure.
 
-To simplify the creation of the routes, we make some assumptions. For every route $m\in\mathcal{M}$ holds:
+This is a polynomial reduction, (VSP-SC) is is $\mathcal{NP}$-hard by Theorem \ref{th:complexity_VSPSC} and hence (VSP-MC) is $\mathcal{NP}$-hard.
 
-\begin{itemize}
-	\item{There are not two car trips in a row.}
-	\item{There is no car trip between two public transport trips.}
-	\item{The number of public transport trips is restricted. Usually, one can reach every station with at most two changes.}
-	\item{We define a walking distance $d^{\operatorname{walk}}$. If the distance between the start position and the first station or between the last station and the end position, there is no car trip necessary.}
-\end{itemize}
+\end{proof}
 
-We assume that we have some oracle that provides the set of feasible public transport routes for costumer $c\in\mathcal{C}$:
+With the Theorems \ref{th:complexity_VSPRC} and \ref{th:complexity_VSPMC} we can see, that our problem gets $\mathcal{NP}$-hard only with cover constraints or with resource constraints and considering the number of vehicles.
 
-\begin{align*}
-	M_c & = && \left\{\left(s_1,z_1,s_2,z_2\right)|s_1,s_2\in\mathcal{S}, \zstarto_c\leq t_1 < t_2 \leq \zendo_c, \text{ there is a public} \right. \\
-	&&& \left.\vphantom{\zstarto}\text{transport route from $s_1$ to $s_2$ with start time $z_1$ and end time $z_2$}\right\}
-\end{align*}
+The problem gets even harder, as we do not only consider the number of vehicles but include the operational cost and penalty terms for costumer preferences. Further, we want to have the possibility to refuel during the process, \ie we have negative resource cost. Finally, we want to apply both of these constraints simultaneously. 
 
-The fact, whether the costumer changes during his usage of public transport, has no effect on the model. Thus, we can consider each element in $M_c$ as a public transport trip.
-
-\paragraph{Route Creation} \parfill
-
-We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the costumer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in algorithm~\ref{alg:route_creation}.
-
-Until now, we do not consider any changing times between a car trip and a public transport trip.
-
-Further, we assume that the given costumer start and and times are feasible, i.e. $\zstarto_c+t_{\pstart_c,\pend_c}\leq\zendo_c$ for all $c\in\mathcal{C}$.
-
-\begin{algorithm}
-	\SetAlgoLined
-	\KwIn{costumer set $\mathcal{C}$; $\pstart_c, \pend_c, \zstarto_c, \zendo_c, M_c$ for all $c\in\mathcal{C}$}
-	\KwOut{set of routes $\mathcal{M}$, set of trips $\Tcar,\Tpub$}
-	$\Tcar\gets\emptyset$\;
-	$\Tpub\gets\emptyset$\;
-	$\mathcal{M}\gets\emptyset$\;
-	\ForEach{$c\in\mathcal{C}$}{
-		\ForEach{$\left(s_1,z_1,s_2,z_2\right)\in M_c$}{
-			create public transport trip $t$\;
-			$\pstart_t\gets s_1,\pend_t\gets s_2,\zstart_t\gets z_1,\zend_t\gets z_2$\;
-			create car trips $t_1,t_2$\;
-			$\pstart_{t_1}\gets\pstart_c,\pend_{t_1}\gets s_1,\zstart_{t_1}\gets z_1 - t_{\pstart_c,s_1},\zend_{t_1}\gets z_1$\;
-			$\pstart_{t_2}\gets s_2,\pend_{t_2}\gets\pend_c,\zstart_{t_2}\gets z_2,\zend_{t_2}\gets z_2 + t_{s_2,\pend_c}$\;
-			\If{$\zstarto_c\leq\zstart_{t_1} \land \zend_{t_2}\leq \zendo_c$}{
-				create multimodal route $m$\;
-				$\Tpub\gets\Tpub\cup \{t$\}\;
-				\lIf{$d_{\pstart_c,s_1}\geq d^{\operatorname{walk}}$}{$m\gets\left(t_1,t\right)$; $\Tcar\gets\Tcar\cup\left\{t_1\right\}$}
-				\lElse{$m\gets\left(t\right)$}
-				\lIf{$d_{s_2,\pend_c}\geq d^{\operatorname{walk}}$}{append $t_2$ to $m$; $\Tcar\gets\Tcar\cup\left\{t_2\right\}$}
-				$C(m)\gets c$\;
-				$\mathcal{M}\gets\mathcal{M}\cup\left\{m\right\}$\;
-				}
-		}
-		create car trips $t_1,t_2$\;
-		$\pstart_{t_1}\gets\pstart_c,\pend_{t_1}\gets\pend_c,\zstart_{t_1}\gets\zstarto_c,\zend_{t_1}\gets\zstarto_c + t_{\pstart_c,\pend_c}$\;
-		$\pstart_{t_2}\gets\pstart_c,\pend_{t_2}\gets\pend_c,\zstart_{t_2}\gets\zendo_c - t_{\pstart_c,\pend_c},\zend_{t_2}\gets\zendo_c$\;
-		create multimodal routes $m_1,m_2$\;
-		$m_1\gets\left(t_1\right), m_2\gets\left(t_2\right)$\;
-		$\Tcar\gets\Tcar\cup\left\{t_1,t_2\right\}, \mathcal{M}\gets\mathcal{M}\cup\left\{m_1,m_2\right\}$\;
-	}
-	\Return{$\mathcal{M},\Tcar,\Tpub$}
-	\caption{Creation of the routes \label{alg:route_creation}}
-\end{algorithm}
-
-\paragraph{Further Restrictions} \parfill
-
-If the routes are created as described in algorithm~\ref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the costumer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
-
-\begin{example}
-
-Let $\mathcal{S}=\left\{s_1,\dots,s_n\right\}$ with a single public transport ride serving all stations. Let $\mathcal{C}=\left\{c_1,c_2\right\}$ with $\pend_{c_1}=s_n$ and $\pstart_{c_2}=s_k$ for a certain $k\in[n-1]$. The alternative routes are
-
-\begin{align*}
-	\mathcal{M} = \underbrace{\left\{\left(\left(\pstart_{c_1},s_i\right),\left(s_i,s_n\right)\right)|i\in[n-1]\right\}}_{\text{for }c_1}\cup\underbrace{\left\{\left(s_k,\pend_{c_2}\right)\right\}}_{\text{for }c_2}
-\end{align*}
-
-with $\left(\pstart_{c_1},s_k\right)\prec\left(s_k,\pend_{c_2}\right)$ and $\left(\pstart_{c_1},s_i\right)\not\prec\left(s_k,\pend_{c_2}\right)$ for all $i\in[n]\backslash\{k\}$. 
-
-We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other costumers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of cutting off the optimal solution.
-	
-\end{example}
-
-It is not practicable to consider all possible multimodal routes due to computation reasons. But it is also not possible to reduce the number of routes without risking to lose the optimal solution. Hence, we try to make reasonable restrictions which keep the problem size small.
-
-\paragraph{Pareto Optimality} \parfill
-
-The idea is to choose only Pareto optimal multimodal routes (cf. Kaiser/Knoll, cap. 3.2.2) in order to determine good routes.
-
-\begin{definition}[Pareto optimality]
-
-Let $V\subset\mathbb{R}^n$.
-
-\begin{enumerate}
-	\item{The partial order $\leq$ on $\mathbb{R}^n$ is given by
-		\begin{align*}
-			v\leq w && :\Leftrightarrow && v_i\leq w_i && \forall i\in[n] && \text{for all }v,w\in\mathbb{R}^n
-		\end{align*}}
-	\item{An element $w\in V$ is Pareto optimal in $V$ if it is minimal with respect to $\leq$ in $V$, i.e.
-		\begin{align*}
-			v\leq w && \Rightarrow && v=w && \text{for all } v\in V
-		\end{align*}}
-	\item{The Pareto frontier of $V$ with respect to $\leq$ is the set of Pareto optimal elements in $V$, i.e.
-		\begin{align*}
-			\operatorname{min}_{\leq} V := \left\{w\in V|\forall v\in V: v\leq w \Rightarrow v=w\right\}
-		\end{align*}}
-\end{enumerate}
-
-\end{definition}
-
-Let $m\in\mathcal{M}$ be a multimodal route. We define
-
-\begin{align*}
-	\varphi:\mathcal{M}\to\mathbb{R}^5 && m\mapsto\left(
-	\begin{array}{c}
-		\croute + \sum_{t\in m\cap\Tcar}\ct_t \\
-		\croute \\
-		|\Tcar\cap\{t\in m\}|\\
-		\sum_{t\in m\cap\Tcar} \zend_t - \zstart_t \\
-		\sum_{t\in m\cap\Tcar} \ft_t
-	\end{array} \right)
-\end{align*}
-
-The function $\varphi$ grades a route to their costs, their route costs, the number of cars needed, the time of a car needed and the fuel consumption.
-
-From now on, we will use the Pareto frontier of $\varphi\left(\mathcal{M}\right)$ as a restricted route set:
-
-\begin{align}
-	\hat{\mathcal{M}} := min_{\leq} \varphi\left(\mathcal{M}\right)
-\end{align}
+We will model our problem as a mixed-integer linear program in a size polynomial in the input size. Therefore, it is possible to verify a solution in polynomial time. This means, our problem is $\mathcal{NP}$-complete.

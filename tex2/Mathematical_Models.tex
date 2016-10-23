@@ -1,85 +1,125 @@
-\section{Mathematical Models}
+\chapter{Mathematical Models}
 
-We introduce the mathematical model, with which the previously described problem is solved.
+We introduce the mathematical model, with which we want to solve the previously described problem. First we define the underlying task graph and afterwards we develop an arc flow formulation on this graph. The main idea is that we model a flow of the vehicles to the trips with additional requirements in order to fulfill the cover constraints and the fuel constraints. As mentioned before, we totally neglect public transport trips. They have only an indirect effect on the model by contribution to the trip creation and the route cost.
 
-\subsection{Task Graph}
+\section{Task Graph}
 
-For tackling the problem, we introduce a task graph, on which the model is based. The graph is basically the same as in (Kaiser, Knoll, cap. 3.1) with the restriction, that only car trips $t\in\Tcar$ are considered.
+We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in Section \ref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the costumer and route considerations are adapted here.
 
 \begin{definition}[Task Graph]
 
 Let $\ds,\de$ be special vertices describing the source and sink of the vehicle flow. We define the task graph as $\hat{G}=(\hat{V},\hat{A})$, where
-
 \begin{align*}
-	\hat{V}:=\left\{\ds,\de\right\}\cupdot\mathcal{V}\cupdot\Tcar
+	\hat{V}:=\left\{\ds,\de\right\}\cupdot\mathcal{V}\cupdot\mathcal{T}
 \end{align*}
 
-is the vertex set consisting of the source, the sink, the vehicle set $\mathcal{V}$ and the set of car trips $\Tcar$. The arc set is
-
+is the vertex set consisting of the source, the sink, the vehicle set $\mathcal{V}$ and the trip set $\mathcal{T}$. The arc set is
 \begin{align*}
-	\hat{A} & :=\left(\left\{\ds\right\}\times\mathcal{V}\right)\cupdot\left\{(s,t)\in\left(\mathcal{V}\cupdot\Tcar\right)^2|s\prec t\right\}\cupdot\left(\left(\mathcal{V}\cupdot\Tcar\right)\times\left\{\de\right\}\right).
+	\hat{A} & :=\left(\left\{\ds\right\}\times\mathcal{V}\right)\cupdot\left\{(s,t)\in\left(\mathcal{V}\cupdot\mathcal{T}\right)^2|s\prec t\right\}\cupdot\left(\left(\mathcal{V}\cupdot\mathcal{T}\right)\times\left\{\de\right\}\right).
 \end{align*}
 
 \end{definition}
 
-A vertex $s\in\mathcal{V}$ represents the initial state of a vehicle $s$ where it becomes available for the first time. Each $\ds -\de$-path in $\hat{G}$ is the duty of one vehicle, i.e. this vehicle fulfills the trips in the order given by the path. Hence, two trips are connected only if it is possible that one car fulfills both trips, i.e. the relation $\prec$ holds.
+A vertex $s\in\mathcal{V}$ represents the initial state of a vehicle $s$ where it becomes available for the first time. Each $\ds$-$\de$-path in $\hat{G}$ is the duty of one vehicle, i.e. this vehicle fulfills the trips in the order given by the path. Hence, two trips are connected only if it is possible that one car fulfills both trips, i.e. the relation $\prec$ holds.
 
-To consider the refuel stations, we introduce an extended task graph.
+\begin{lemma}
+\label{lem:taskgraph_cyclefree}
+
+$\hat{G}$ is a directed acyclic graph.
+
+\end{lemma}
+
+\begin{proof}
+
+Assume there is a cycle in $\hat{G}$. The source $\ds$ and sink $\de$ have only ingoing, respectively outgoing arcs and are therefore not part of the cycle. For $\vinV$, all ingoing arcs come from $\ds$, hence $\vinV$ are not part of the cycle, too. This means, a cycle consists only of trips.
+
+Consider an arbitrary cycle of trips $t_1,\dots,t_k\in\mathcal{T}$, $k\geq 2$. These trips form a cycle, \ie ${t_1\prec\dots\prec t_k}$ and ${t_k\prec t_1}$. With Definition \ref{def:partial_order} and the assumptions $\eqref{eq:notime_trip}$ and $\eqref{eq:triangle_inequality}$ holds:
+\begin{align*}
+	\zstart_i < \zend_i \leq \zend_i + t_{t_i,t_{i+1}} \leq \zstart_{i+1} < \zend_{i+1} && \text{for all } i\in[k-1]
+\end{align*}
+\begin{align*}
+	\Rightarrow && \zstart_1 < \zend_k && \Rightarrow && \zend_k + t_{t_1,t_k} > \zstart_1 && \Rightarrow && t_k\not\prec t_1
+\end{align*}
+
+This is a contradiction to the existence of a cycle.
+
+\end{proof}
+
+In order to consider refueling and refuel stations, we introduce an extended task graph.
 
 \begin{definition}[Extended Task Graph]
 
-For every $s,t\in \mathcal{V}\cupdot\Tcar$ with $s\prec t$ we create a copy of $\left\{r\in\mathcal{R}|\zend_s+t_{s,r}+t_{r,t}\leq\zstart_t\right\}$ denoted by $\Rst$. This means, various copied sets are pairwise disjoint. We define the extended task graph $G=(V,A)$ with vertex set
+For every $s,t\in \mathcal{V}\cupdot\mathcal{T}$ with $s\prec t$ we create a copy of $\left\{r\in\mathcal{R}|\zend_s+t_{s,r}+t_{r,t}\leq\zstart_t\right\}$ denoted by $\Rst$. This means, various copied sets are pairwise disjoint. The expression $r\in\Rst$ means that a vehicle is able to finish trip $s$, then drive to refuel station $r$ and then start trip $t$ in time.
 
+We define the extended task graph $G=(V,A)$ with vertex set
 \begin{align*}
-	V:=\hat{V}\cupdot\Cupdot_{\substack{s,t\in\mathcal{V}\cupdot\Tcar \\ s\prec t}} \Rst
+	V:=\hat{V}\cupdot\Cupdot_{\substack{s,t\in\mathcal{V}\cupdot\mathcal{T} \\ s\prec t}} \Rst
 \end{align*}
 
 and arc set
-
 \begin{align*}
-	A:=\hat{A}\cupdot\left\{(s,r)|s,t\in\mathcal{V}\cupdot\Tcar,s\prec t,r\in\Rst\right\}\cupdot\left\{(r,t)|s,t\in\mathcal{V}\cupdot\Tcar,s\prec t,r\in\Rst\right\}.
+	A:=\hat{A}\cupdot\left\{(s,r)|s,t\in\mathcal{V}\cupdot\mathcal{T},s\prec t,r\in\Rst\right\}\cupdot\left\{(r,t)|s,t\in\mathcal{V}\cupdot\mathcal{T},s\prec t,r\in\Rst\right\}.
 \end{align*}
 
-In this graph, each feasible refuel station is considered for each feasible pair of trips. There is a method to reduce the size of $\Rst$ significantly without losing the optimal solution. This method is described in (Kaiser, Knoll, cap. 3.2.2). From now on, we will use $G=(V,A)$ with restricted $\Rst$.
+It is possible that there is a copy of each refuel station for each feasible pair of trips. This leads to an enormous size of the task graph and thus a bad solution behavior is expected. \cite[pp. 24-30]{Kaiser_Knoll} describe a method to reduce the size of $\Rst$ without cutting the optimal solution. This method only considers Pareto optimal refuel station \wrt a suitable function. From now on, we will use $G=(V,A)$ with restricted $\Rst$.
 
 \end{definition}
 
+\begin{lemma}
+
+$\hat{G}$ is a directed acyclic graph.
+
+\end{lemma}
+
+\begin{proof}
+
+Assume there is a cycle in $G$. In comparison to $\hat{G}$, only arcs $(s,r)$ and $(r,t)$ for ${r\in\Rst, s\prec t}$ were added. Assume there is a cycle containing $r\in\Rst$. $r$ has only one ingoing arc $(s,r)$ and one outgoing arc $(r,t)$ and only if the arc $(s,t)$ exists. There is no cycle on the vertices $\left\{s,r,t\right\}$. Every other cycle containing $r$ is also a cycle using the arc $(s,t)$. This is a contradiction to the fact that $\hat{G}$ is cycle-free as proven in Lemma~\ref{lem:taskgraph_cyclefree}.
+
+\end{proof}
+
+In the extended task graph $G$, a $\ds$-$\de$-path further represents the duty of a vehicle. The additional arcs $(s,r),(r,t)$ for $r\in\Rst$ describe a possible detour between the trips $s$ and $t$ in order to refuel at refuel station $r$.
+
+We introduce the following frequently used notation:
+\begin{align*}
+	\Nin(t) := \left\{s\in V\mid (s,t)\in A\right\} && \Nout(t) := \left\{t\in V\mid (s,t)\in A\right\}
+\end{align*}
+
+$\Nin(t)$ is the set of in-neighbors of $t\in V$, $\Nout(s)$ is the set of out-neighbors of $s\in V$.
+
 %---------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Arc Flow Formulation}
+\section{Arc Flow Formulation}
 
-We develop a model for solving the problem via a flow of the cars. The multimodal routes are given in advance. The car trips are adjusted in such a way, that they fit to the public transport routes (in location and time). It is not possible to model each route as a trip because then the car availabilities are not considered.
-
-We model a flow of the cars. The public transport trips work only as constraints for this flow. Constraints are the fulfilling of one multimodal route per costumer and the fuel constraints.
+In the following, we model the problem via a flow of the vehicles on the extended task graph. The trips and multimodal routes are given in advance. The fact, whether two trips can be fulfilled subsequently in one duty, is already given by the underlying task graph. We additionally have to model the cover constraints and the fuel constraints. Since the duties of various vehicles are disjoint \wrt $\mathcal{T}$, we are able to use one common set of variables for the flow of one vehicle. From the flow, we can easily extract the individual $\ds$-$\de$-paths in order to identify the duties of the respective vehicles.
 
 \paragraph{Basic Model} \parfill
 
-We model the arc flow as an ILP. The formulation is basically built on $\eqref{eq:Knoll:MILP}$, described in (Kaiser, Knoll, cap. 3.2). We use the following decision variables:
+We model the arc flow as a mixed-integer linear program. The formulation is basically built on the $\eqref{eq:MILP}$ formulation as described in \cite[p. 34]{Kaiser_Knoll}. We use the following decision variables:
 \begin{itemize}
-	\item{$x_{s,t}\in\{0,1\}$ for $(s,t)\in A$: indicates, whether trip $t\in\Tcar$ is fulfilled after $s\in \mathcal{V}\cupdot\Tcar$}
-	\item{$z_{s,r,t}\in\{0,1\}$ for $t\in\Tcar,s\in\Nin(t),r\in\Rst$: indicates, whether refuel station $r\in\mathcal{R}$ is visited between $s$ and $t$}
-	\item{$e_s\in[0,1]$ for $s\in V\backslash\left\{\ds,\de\right\}$: states the fuel of the respective car after fulfilling trip $s\in\Tcar$}
+	\item{$x_{s,t}\in\{0,1\}$ for $(s,t)\in A$: indicates, whether trip $t\in\mathcal{T}$ is fulfilled after ${s\in \mathcal{V}\cupdot\mathcal{T}}$}
+	\item{$z_{s,r,t}\in\{0,1\}$ for $t\in\mathcal{T},s\in\Nin(t),r\in\Rst$: indicates, whether refuel station $r\in\mathcal{R}$ is visited between $s$ and $t$}
+	\item{$e_s\in[0,1]$ for $s\in V\backslash\left\{\ds,\de\right\}$: states the fuel of the respective vehicle after fulfilling trip $s\in\mathcal{T}$}
 \end{itemize}
 
-If $s\in\mathcal{V}$, then $x_{s,t}$ determines, whether trip $t$ is the first trip fulfilled by $s$ and $e_s$ is the initial fuel state $f^0_s$ of vehicle $s$.
+If $s\in\mathcal{V}$, then $x_{s,t}$ determines whether trip $t$ is the first trip fulfilled by $s$ and $e_s$ is the initial fuel state $f^0_s$ of vehicle $s$.
 
-Additionally to $\eqref{eq:Knoll:MILP}$ we introduce decision variables to determine the fulfilling of routes:
+Additionally to $\eqref{eq:MILP}$, we introduce decision variables in order to ensure the cover constraints:
 
 \begin{itemize}
 	\item{$u_m\in\{0,1\}$ for $m\in\mathcal{M}$: indicates whether multimodal route $m$ is fulfilled}
 \end{itemize}
 
-The basic constraints are developed in detail in (Kaiser, Knoll, cap. 3.2) and not shown in detail here. The basic constraints are the flow conservation constraint, the constraint for considering every car and the constraints guaranteeing feasible fuel states all the time.
+The basic constraints are developed in \cite[pp. 21-34]{Kaiser_Knoll} and not explained in detail here. The basic constraints are the flow conservation constraint, the constraint for considering every car and the constraints ensuring feasible fuel states all the time.
 
 \paragraph{Costumer and Route Constraints} \parfill
 
-In $\eqref{eq:Knoll:MILP}$, each costumer has a set of alternative trips and from this set, exactly one trips has to be fulfilled. This is modeled as follows:
+In $\eqref{eq:MILP}$, each costumer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. This is modeled as follows:
 
 \begin{align*}
-	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \tag{\ref{eq:Knoll:costumer}}
+	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \tag{\ref{eq:MILP:costumer}}
 \end{align*}
 
-In contrast to $\eqref{eq:Knoll:MILP}$, here each costumer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:Knoll:costumer}$ by the following formulation:
+In contrast to $\eqref{eq:MILP}$, here each costumer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:costumer}$ by the following formulation:
 
 \begin{align}
 	\sum_{m\in C^{-1}(c)} u_m = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MMILP:costumer} \\
@@ -90,13 +130,13 @@ The constraint $\eqref{eq:MMILP:costumer}$ says, that for every costumer exactly
 
 \paragraph{Objective Function} \parfill
 
-The objective function in $\eqref{eq:Knoll:MILP}$ is given by
+The objective function in $\eqref{eq:MILP}$ is given by
 
 \begin{align*}
 	\sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv	+ \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]
 \end{align*}
 
-considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\Tcar$ and the deadhead costs $\cd$. What is missing, are the route-dependent costs $\croute$. Thus, we add
+considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\mathcal{T}$ and the deadhead costs $\cd$. What is missing, are the route-dependent costs $\croute$. Thus, we add the term
 
 \begin{align*}
 	\sum_{m\in\mathcal{M}} u_m \croute_m
@@ -111,18 +151,18 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 \begin{align}
 	\min \quad & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MMILP} \label{eq:MMILP} \\
-	\text{s.t.} \quad & \sum_{s\in\Nin(t)} x_{s,t} = \sum_{s\in\Nout(t)} x_{t,s} & & \text{for all } t\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.15} \label{eq:MMILP:flow} \\
-	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \tag{3.16} \label{eq:MMILP:vehicles} \\
+	\text{s.t.} \quad & \sum_{s\in\Nin(t)} x_{s,t} = \sum_{s\in\Nout(t)} x_{t,s} & & \text{for all } t\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:flow} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \label{eq:MMILP:vehicles} \\
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = u_m && \text{for all } m\in\mathcal{M}, t\in m \tag{\ref{eq:MMILP:route}} \\
-	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.18} \label{eq:MMILP:refuel} \\
-	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \tag{3.19} \label{eq:MMILP:initial_fuel} \\
-	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.12} \label{eq:MMILP:min_fuel} \\
-	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.13} \label{eq:MMILP:max_fuel} \\
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:refuel} \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \label{eq:MMILP:initial_fuel} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:min_fuel} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:max_fuel} \\
 	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
-	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{3.14} \label{eq:MMILP:fuel_consumption} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \tag{3.20} \label{eq:MMILP_xst} \\
-	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\mathcal{T},s\in\Nin(t),r\in\Rst \tag{3.21} \label{eq:MMILP:zsrt} \\
-	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{3.22} \label{eq:MMILP:es} \\
+	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:fuel_consumption} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \label{eq:MMILP_xst} \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\mathcal{T},s\in\Nin(t),r\in\Rst \label{eq:MMILP:zsrt} \\
+	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:es} \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:MMILP:um}
 \end{align}

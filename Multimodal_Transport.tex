@@ -1,4 +1,4 @@
-\documentclass[fontsize=11pt,paper=a4,headsepline,numbers=noenddot]{scrartcl}
+\documentclass[fontsize=11pt,paper=a4,headsepline,chapterprefix,numbers=noenddot,BCOR=5mm]{scrbook}
 
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
@@ -8,7 +8,7 @@
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{hyperref}
 \usepackage[algoruled,linesnumbered]{algorithm2e}
-\usepackage{scrextend}
+\usepackage{bm}
 
 \setlength{\parindent}{0pt}
 
@@ -60,6 +60,7 @@
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -69,17 +70,33 @@
 \newtheorem{question}{Question}
 \newtheorem{remark}{Remark}
 
+\providecommand{\wlog}{w.\,l.\,o.\,g.\xspace}
+\providecommand{\ie}{i.\,e.\xspace}
+\providecommand{\eg}{e.\,g.\xspace}
+\providecommand{\st}{s.\,t.\xspace}%
+\providecommand{\wrt}{w.\,r.\,t.\xspace}%
+\providecommand{\ai}{a.\,i.\xspace}%
+\providecommand{\li}{l.\,i.\xspace}%
+\providecommand{\cf}{cf.\xspace}%
+
 \author{Martin Sperr}
-\title{Work Report}
-\subtitle{Optimal Integration of Autonomous Vehicles in Car Sharing: Development of a Heuristic considering Multimodal Transport and Integration in an Optimal Framework}
+\title{Optimal Integration of Autonomous Vehicles in Car Sharing}
+\subtitle{Development of a Heuristic considering Multimodal Transport and Integration in an Optimal Framework}
 \date{\today}
 
 \begin{document}
 
+\pagestyle{empty}
+\frontmatter
 \maketitle
+
 \tableofcontents
 
+\mainmatter
 \pagestyle{headings}
+
+\include{tex2/Introduction}
+
 \include{tex2/Problem_Description}
 
 \include{tex2/Mathematical_Models}
@@ -88,11 +105,15 @@
 
 \include{tex2/Optimal_Approach}
 
-\appendix
-\pagestyle{plain}
+\include{tex2/Instance_Creation}
 
-\include{tex2/Notation}
+\backmatter
+
+\appendix
 
 \include{tex2/Previous_Formulations}
+
+\bibliography{Literatur}
+\bibliographystyle{alpha}
 
 \end{document}

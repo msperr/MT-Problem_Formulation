@@ -1,6 +1,6 @@
-\section{Optimal Approach}
+\chapter{Optimal Approach}
 
-\subsection{Dantzig-Wolfe-Decomposition}
+\section{Dantzig-Wolfe-Decomposition}
 
 We adapt the path flow formulation from (Kaiser, Knoll, cap. 3.3) by applying Dantzig-Wolfe-Decomposition. This can be used, if many of the constraints have only impact on a small number of variables and these variables can be grouped. The structure of the problem looks like:
 
@@ -77,7 +77,7 @@ We can see that $\eqref{eq:MMILP:costumer}$ depends only on $u_m$. Therefore, we
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Master Problem without Route Choice Restriction}
+\section{Master Problem without Route Choice Restriction}
 
 \paragraph{Column Generation} \parfill
 
@@ -127,7 +127,7 @@ For the dual relaxed restricted master problem, we introduce dual variables $\ga
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Solving the Relaxed Master Problem}
+\section{Solving the Relaxed Master Problem}
 
 Let $\left(\gamma^*,\mu^*,\eta^*\right)$ be a solution of $\eqref{eq:DLRMP}$ with $\mathcal{J}_v\subset\Iv$ for all $\vinV$. We want to find out whether $\left(\gamma^*,\mu^*,\eta^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire set $\Iv$. This means, the following equation holds for $\left(\gamma^*,\mu^*,\eta^*\right)$:
 
@@ -158,7 +158,7 @@ Let $\left(\bar{x}^v,\bar{z}^v,\bar{e}^v\right)$ be an optimal solution of $\eqr
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Master Problem with Route Choice Restriction}
+\section{Master Problem with Route Choice Restriction}
 
 Remember the formulation from before:
 
@@ -233,7 +233,7 @@ For the dual relaxed restricted master problem, we introduce dual variables $\ga
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Solving the Relaxed Master Problem}
+\section{Solving the Relaxed Master Problem}
 
 Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\mathcal{J}_v\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
 
