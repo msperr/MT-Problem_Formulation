@@ -1,0 +1,29 @@
+\contentsline {definition}{{Definition}{1}{Order of trips}}{6}{definition.1}
+\contentsline {remark}{{Remark}{1}{}}{6}{remark.1}
+\contentsline {theorem}{{Theorem}{1}{VSP with resource constraints}}{10}{theorem.1}
+\contentsline {theorem}{{Theorem}{2}{VSP with cover constraints}}{10}{theorem.2}
+\contentsline {theorem}{{Theorem}{3}{VSP with multi-leg cover constraints}}{10}{theorem.3}
+\contentsline {proof}{{Proof}{1}{}}{10}{proof.1}
+\contentsline {definition}{{Definition}{2}{Task Graph}}{13}{definition.2}
+\contentsline {lemma}{{Lemma}{1}{}}{13}{lemma.1}
+\contentsline {proof}{{Proof}{2}{}}{14}{proof.2}
+\contentsline {definition}{{Definition}{3}{Extended Task Graph}}{14}{definition.3}
+\contentsline {lemma}{{Lemma}{2}{}}{14}{lemma.2}
+\contentsline {proof}{{Proof}{3}{}}{14}{proof.3}
+\contentsline {definition}{{Definition}{4}{Splitting}}{20}{definition.4}
+\contentsline {definition}{{Definition}{5}{Transformed Task Graph}}{20}{definition.5}
+\contentsline {remark}{{Remark}{2}{}}{24}{remark.2}
+\contentsline {definition}{{Definition}{6}{Partial Transformed Task Graph}}{26}{definition.6}
+\contentsline {definition}{{Definition}{7}{Costumer-dependent Splitting}}{29}{definition.7}
+\contentsline {example}{{Example}{1}{}}{30}{example.1}
+\contentsline {definition}{{Definition}{8}{}}{31}{definition.8}
+\contentsline {theorem}{{Theorem}{4}{}}{31}{theorem.4}
+\contentsline {proof}{{Proof}{4}{}}{31}{proof.4}
+\contentsline {corollary}{{Corollary}{1}{}}{32}{corollary.1}
+\contentsline {definition}{{Definition}{9}{Time-dependent Splitting}}{33}{definition.9}
+\contentsline {remark}{{Remark}{3}{}}{35}{remark.3}
+\contentsline {definition}{{Definition}{10}{Improved Cost Estimation}}{37}{definition.10}
+\contentsline {remark}{{Remark}{4}{}}{37}{remark.4}
+\contentsline {remark}{{Remark}{5}{}}{38}{remark.5}
+\contentsline {example}{{Example}{2}{}}{54}{example.2}
+\contentsline {definition}{{Definition}{11}{Pareto optimality}}{56}{definition.11}

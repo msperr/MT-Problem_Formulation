@@ -1,6 +1,6 @@
 \chapter{Successive Heuristics}
 
-In this chapter, successive heuristics are introduced in order to solve our problem. As seen in Section \ref{sec:complexity}, the problem is ${\mathcal{NP}\text{-hard}}$ even if we apply one of the restrictions, the cover constraints or the fuel constraints, individually. Our goal is to develop a heuristic that can cope with both multi-leg cover constraints and fuel constraints. We build our heuristic on a heuristic for a simpler version of the problem, developed in the underlying theses. \cite{Knoll} present heuristical solution methods for the problem only with fuel constraints. The problem settings assumes that there is a set of trips where each of these trips shall be fulfilled. They already claim, that solving a complete instance of 24 hours to optimality is not possible with their respective computing capacity. Therefore it is a plausible assumption that an optimal solution for our problem cannot be expected in reasonable time. 
+In this chapter, successive heuristics are introduced in order to solve our problem. As seen in \Cref{sec:complexity}, the problem is ${\mathcal{NP}\text{-hard}}$ even if we apply one of the restrictions, the cover constraints or the fuel constraints, individually. Our goal is to develop a heuristic that can cope with both multi-leg cover constraints and fuel constraints. We build our heuristic on a heuristic for a simpler version of the problem, developed in the underlying theses. \cite{Knoll} present heuristical solution methods for the problem only with fuel constraints. The problem settings assumes that there is a set of trips where each of these trips shall be fulfilled. They already claim, that solving a complete instance of 24 hours to optimality is not possible with their respective computing capacity. Therefore it is a plausible assumption that an optimal solution for our problem cannot be expected in reasonable time. 
 
 Their solution methods are based on the idea of splitting the complete instance according to several time intervals. For each interval, only the trips starting in the respective interval are considered. From this formulation emerge several separate partial instances that are still loosely connected to each other. Each of these partial instances is solved separately and then the partial solutions are connected to a complete feasible solution. Two different approaches are presented in order to solve the problem: The constraints connecting the partial instances are relaxed by using Lagrange Relaxation. With suitable computation of Lagrange multipliers, the partial instances are solved in parallel. In the other one, the partial instances are solved successively, where the respective connecting constraints are fixed beginning from the end.
 
@@ -12,13 +12,13 @@ We first define the splitting of the instance and the arising adaptions of task 
 
 %########################################################################################################################################
 %#
-%#   Splitting the Problem
+%#   Successive Heuristics
 %#
 %########################################################################################################################################
 
-\section{Splitting the Problem}
+\section{Successive Heuristics}
 
-\subsection{Splitting Trip and Vehicle Set}
+\subsection{Splitting the Problem}
 
 In order to create the partial instances, we define splittings of $\mathcal{V}$ and $\mathcal{T}$. In contrast to \cite{Knoll}, we define the splittings in a general way.
 
@@ -36,11 +36,11 @@ be partitions of the set of trips, respectively vehicles. Then we call $\left\{\
 
 \paragraph{Adaption of the Task Graph} \parfill
 
-We transform our task graph such that it contains the splittings as defined in Definition~\ref{def:splitting}. For this, we introduce so called split points connecting the partial sets. Arcs that connected two partial sets before, take a detour over the respective split point in the transformed graph.
+We transform our task graph such that it contains the splittings as defined in \Cref{def:splitting}. For this, we introduce so called split points connecting the partial sets. Arcs that connected two partial sets before, take a detour over the respective split point in the transformed graph.
 
 \begin{definition}[Transformed Task Graph]
 
-Let $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ be a splitting of $\mathcal{T}$ according to Definition \ref{def:splitting}. Then we define:
+Let $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ be a splitting of $\mathcal{T}$ according to \Cref{def:splitting}. Then we define:
 \begin{enumerate}
 	\item{Split Point: Let $s\in\Ti$ for $i\in[n]\backslash\{1\}$. For $j\in[i-1]$, we define the split point $\SPjs$ with $\pstart_{\SPjs}=\pend_{\SPjs}=:\pstart_s, \zstart_{\SPjs}=\zend_{\SPjs}=:\zstart_s$ and $\ft_{\SPjs}=:0$.}
 	\item{For $i\in[n]\backslash\{1\}$ and $j\in[i-1]$, we define $\mathcal{P}_{j,i}:=\left\{\SPjs\mid s\in\Ti\right\}$.}
@@ -125,36 +125,8 @@ Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Identifying the Subproblems}
-
-Given a splitting of $\mathcal{T}$ and $\mathcal{V}$, we describe how the subproblems of $\eqref{eq:SMILP}$ are created. For each partial trip and vehicle set $\mathcal{T}_i$, $\mathcal{V}_i$, we solve a partial instance $\mathcal{I}_i$. We call the solution of a partial instance $I_i$ partial solution $S_i$. 
-
-\paragraph{Partial Instances} \parfill
-
-First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains the partial split sets from the splittings of $\mathcal{V}$ and $\mathcal{T}$. This graph only contains the respective partial trip and vehicle set. It additionally contains a start point set $\hat{\mathcal{V}}_i$ and an end point set $\hat{\mathcal{P}}_i$. How these sets are defined is explained later.
-
-\begin{definition}[Partial Transformed Task Graph]
-
-Let $i\in[n]$. For a set of start points $\Vhat_i$, a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task graph is the directed graph $\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$ with vertex set
-\begin{align*}
-	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Vhat_i\cupdot\Ti\cupdot\Phat_i
-\end{align*}
-
-and arc set
-\begin{align*}
-	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\mathcal{T}\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\preceq t\right\} \\
-	& \cupdot\left(\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
-\end{align*}
-
-\end{definition}
-
-%########################################################################################################################################
-%#
-%#   General Setting
-%#
-%########################################################################################################################################
-
-\section{General Setting}
+\subsection{General Setting}
+\label{sec:general_setting}
 
 In this section, we describe the general setting of the Successive Heuristics. First we describe how the partial task graph is created, given a splitting of $\mathcal{V}$ and $\mathcal{T}$. It is based on $\overline{G}$ and contains start and end points, which are created in the partial instances solved before this. Then we treat the order in which the partial instances are solved. The first partial instance is a special instance since there the vehicles come into play. Therefore, this instance is solved last. We explain how start and end points are are created out of a partial solution. Finally, we describe the feasible connection of the partial instances to an overall solution.
 
@@ -178,6 +150,8 @@ where $e_s$ is the respective value of decision variable $e$ in the partial solu
 
 where $e_s$ is the respective value of decision variable $e$ in the partial solution. We add $t$ to the start point set $\Vhat_{\sigma(j)}$.
 
+For each start or end point $s$, we call the respective trip $t$ from where it is created, the trip representing $t$. If a start point $t$ is created from a start point $s$, the trip representing $t$ is the trip representing $s$. Note, that each start point ${s\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${t\in\mathcal{T}}$ representing it. This works analogously for end points.
+
 \begin{remark}
 
 Since $\sigma(n)=1$, the set ${\left\{k>i\mid\sigma(k)<\sigma(i)\right\}}$ is never empty for $i\in[n-1]$. Therefore, it is always possible to create an end point. If there is no later partial instance left, which is not yet solved, \ie ${\left\{j>i\mid\sigma(j)>\sigma(i)\right\}=\emptyset}$, then we create no start points out of $\sigma(i)$.
@@ -186,9 +160,7 @@ If a duty consists of exactly one trip, then for this trip we create both a star
 
 \end{remark}
 
-\paragraph{Solving Partial Instance $\boldsymbol{\sigma(n)=1}$} \parfill
-
-\paragraph{Feasible Connection of Partial Solutions} \parfill
+The partial instance $I_1$ has a special role. In this instance, we have no start points, but we include the vehicle set $\mathcal{V}$. Therefore, we set ${\Vhat_1:=\mathcal{V}}$. Since $I_1$ is solved last, here is decided which vehicles are actually used. 
 
 \begin{algorithm}
 	\SetAlgoLined
@@ -204,31 +176,153 @@ If a duty consists of exactly one trip, then for this trip we create both a star
 		\ForEach{$D_{\sigma(i)}\ni d=\left(s_1,\dots,s_l\right)$}{
 			\If{$s_1\in\mathcal{T}_{\sigma(i)}\cupdot\Phat_{\sigma(i)}$}{
 				create end point $t$\;
-				%$\pstart_t = \pend_t\gets\pstart_{s_1}, \zstart_t = \zend_t\gets\zstart_{s_1}, f_t^0\gets e_{s_1} + \ft_{s_1}$\;
 				$\pstart_t\gets\pstart_{s_1}, \pend_t\gets\pstart_{s_1}, \zstart_t\gets\zstart_{s_1}, \zend_t\gets\zstart_{s_1}, f_t^0\gets e_{s_1} + \ft_{s_1}$\;
 				$\Phat_{\sigma(k)}\gets\Phat_{\sigma(k)}\cup\{t\}$\;
 			}
 			\If{$s_l\in\Vhat_{\sigma(i)}\cupdot\mathcal{T}_{\sigma(i)}$}{
 				create start point $t$\;
-				$\pstart_t = \pend_t\gets\pend_{s_l}, \zstart_t = \zend_t\gets\zend_{s_l}, f_t^0 := e_{s_l}$\;
+				$\pstart_t\gets\pend_{s_l}, \pend_t\gets\pend_{s_l}, \zstart_t\gets\zend_{s_l}, \zend_t\gets\zend_{s_l}, f_t^0 := e_{s_l}$\;
 				$\Vhat_{\sigma(j)}\gets\Vhat_{\sigma(j)}\cup\{t\}$\;
 			}
 		}
 	}
 	$\Vhat_1\gets\mathcal{V}$\;
 	solve partial instance $1$, receive partial solution~$1$ with duty set~$D_1$\;
-	feasibly connect $\left\{S_1,\dots,S_n\right\}$ to $S$\;
-	\Return{$S$}
+	\ForEach{$D_1\ni d = \left(s_1,\dots,s_l\right)$}{
+		\Repeat{Duty finished}{
+			\If{$s_l\in\bigcup_{i=1}^{n}\Phat_i$}{
+				determine duty $d'=\left(t_1,\dots,t_{l'}\right)$ with $t_1$ representing $s_l$\;
+				$d\gets\left(s_1,\dots,s_{l-1},t_1,\dots,t_{l'}\right)$\;
+			}
+			\ElseIf{$\exists d'\in\bigcup_{i=1}^{n} D_i$ \st $s_l$ represents $t_1\in\bigcup_{i=1}^{n}\Vhat_i$}{
+				determine duty $d'=\left(t_1,\dots,t_{l'}\right)$\;
+				$d\gets\left(s_1,\dots,s_l,t_2,\dots,t_{l'}\right)$\;
+			}
+			\lElse{Duty finished}
+		}
+	}
+	\Return{$S$ with duties $d\in D_1$}
 	\caption{Successive Heuristic (general setting) \label{alg:successive_heuristic}}
 \end{algorithm}
 
-%----------------------------------------------------------------------------------------------------------------------------
+\paragraph{Feasible Connection of Partial Solutions} \parfill
+
+In order to generate an overall solution which is feasible for $\eqref{eq:MMILP}$, we connect the partial solutions. Let ${\left\{S_1,\dots\S_n\right\}}$ be the partial solutions, solved as described before with the start and end points created as before. The connection works as follows:
+
+For each duty of $S_1$, we check whether it ends with an end point $t\in\bigcup_{i=1}^n\Phat_i$. We call this duty start duty.
+\begin{itemize}
+	\item{If it does, we delete the end point and append the duty of $S_i$ for ${i\in[n]\backslash\{1\}}$, that starts with the trip representing $t$, to the start duty. We then restart this procedure with the new end of the start duty.}
+	\item{If it does not, it ends with a trip or start point ${t\in\left(\mathcal{T}\cupdot\bigcup_{i=1}^n\Vhat_i\right)}$. We check whether there is a duty in $S_i$ for ${i\in[n]\backslash\{1\}}$, that starts with a start point represented by $t$. If such a duty exists, we append it without the start point to the start duty. We then restart this procedure with the new end of the start duty. If no such duty exists, this start duty is finished}.
+\end{itemize}
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Identifying the Subproblems}
+
+Given a splitting of $\mathcal{T}$ and $\mathcal{V}$, we describe how the subproblems of $\eqref{eq:SMILP}$ are created. For each partial trip and vehicle set $\mathcal{T}_i$, $\mathcal{V}_i$, we solve a partial instance $I_i$. We call the solution of a partial instance $I_i$ partial solution $S_i$. 
+
+\paragraph{Partial Instances} \parfill
+
+First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains the partial sets from the splittings of $\mathcal{V}$ and $\mathcal{T}$. The partial task graph $\overline{G}_i$ only contains the respective partial trip and vehicle set. It additionally contains a start point set $\hat{\mathcal{V}}_i$ and an end point set $\hat{\mathcal{P}}_i$. How these sets are defined is explained later.
+
+\begin{definition}[Partial Transformed Task Graph]
+
+Let $i\in[n]$. For a set of start points $\Vhat_i$, a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task graph is the directed graph $\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$ with vertex set
+\begin{align*}
+	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Vhat_i\cupdot\Ti\cupdot\Phat_i
+\end{align*}
+
+and arc set
+\begin{align*}
+	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\mathcal{T}\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \\
+	& \cupdot\left(\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
+\end{align*}
+
+\end{definition}
+
+\paragraph{Solving of the Partial Instances} \parfill
+
+In order to solve each partial instance, we create a formulation which is based on the partial transformed task graph $\overline{G}_i$. The flow constraints and the fuel constraints are basically the same as in $\eqref{eq:SMILP}$, restricted to $\overline{G}_i$. This formulation is only a basic structure for the partial instances. Some details are depending on the actual choice of the splitting and left out here. These details are inserted later.
+
+In the partial instance, there is no vehicle set anymore. Instead we ensure that each start and each end point is visited. Therefore we replace $\eqref{eq:MMILP:vehicles}$ by
+\begin{align}
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \label{eq:CMILP:start_end_points}
+\end{align}
+
+For start and end points, we are given initial fuel levels. The initial fuel level for a start point indicates the still available fuel from the end of the previous partial duty. The initial fuel level for an end point indicates the required fuel for the start of the next partial duty. Therefore, these fuel levels work as boundaries for the duties considered in this partial instance. In order to guarantee this, we introduce the constraints
+\begin{align}
+	& e_s \leq f^0_s && \text{for all } s\in\Vhat_i \label{eq:CMILP:initial_fuel} \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \label{eq:CMILP:final_fuel}
+\end{align}
+
+Since there are no vehicles in the partial instance, the constraint $\eqref{eq:MMILP:initial_fuel}$ is dropped.
+
+We introduce two additional constraints. If a duty starts or ends with a trip, then the fuel at the start or at the end of this duty has to be in certain boundaries $f^{\min}$ or $f^{\max}$, respectively. How these boundaries are actually defined, is part of the heuristic. The constraints are the following:
+\begin{align}
+	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmax} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmin}
+\end{align}
+
+As mentioned before, it requires some additional work to include the cover constraints into the partial instances. The fulfilling of the cover constraints is also part of the respective heuristics and therefore $\eqref{eq:MMILP:costumer}$ and $\eqref{eq:MMILP:route}$ are left out in this formulation.
+
+\paragraph{Cost Function} \parfill
+
+The trip costs are handled as before. If a trip is fulfilled, it is fulfilled in exactly one partial instance and the trip cost is included there. The deadhead costs between two trips $s,t\in\Ti$ are the same as before. If start and end points are included, the behavior is as follows: Each start and end point represents a trip of an already solved partial instance. The deadhead cost after this trip (if it is a start point) or before this trip (if it is an end point) has not occurred up to now. The deadhead cost including a start or an end point is therefore the same as the deadhead cost with the trip representing it.
+
+The fixed vehicle costs require a different treatment. If a duty begins at a start point or finishes at an end point, the vehicles cost of this duty arises already in the partial instance where the start point is created. Therefore, the arcs ${\left\{\ds\right\}\times\Vhat_i}$ have no vehicle cost, the arcs ${\left\{\ds\right\}\times\left(\Ti\cupdot\Phat_i\right)}$ have vehicles cost $\cv$. Since the vehicle cost for an end point are already paid in the other partial instance, the arcs ${\Phat_i\times\left\{\de\right\}}$ have negative vehicle cost. This means, a duty beginning at a start point and finishing at an end point has negative vehicle cost, since the vehicle cost has already occurred twice, in the partial instance where start, respectively end point was created.
+
+Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for $i\in[n]\backslash\{1\}$.
+
+\newpage
+
+\begin{align}
+	\min \quad & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv}$} \nonumber \\
+	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
+	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
+	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \tag{\ref{eq:CMILP:initial_fuel}} \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
+	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
+	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
+\end{align}
+
+\paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
+
+As mentioned before, the partial instance $I_1$ plays a special role since here the vehicles are introduced. We have ${\Vhat_1=\mathcal{V}}$. This requires some changes in the formulation. All duties have to start with a vehicle node, therefore all nodes out of ${\left\{\ds\right\}\times\left(\mathcal{T}_1\cupdot\Vhat_1\right)}$ are deleted. This graph is denoted as ${\overline{G}_1 = \left(\overline{V}_1,\overline{A}_1\right)}$.
+The objective function is modified, too. Each vehicles causes vehicle costs $\cv$. Thus, the term 
+\begin{align*}
+	\left(\sum_{s\in\Ti\cupdot\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv
+\end{align*}
+
+in the objective function is replaced by
+\begin{align*}
+	\left(\sum_{s\in\Vhat_1} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv
+\end{align*}
+
+We call this formulation $(\operatorname{SMILP}_1)$.
+
+%########################################################################################################################################
+%#
+%#   Costumer-dependent Splitting
+%#
+%########################################################################################################################################
 
 \section{Costumer-dependent Splitting}
+\label{sec:costumer_dependent_splitting}
 
-In contrast to the splitting performed in (Knoll, cap. 8), the trips are not split according to their start times but according to their costumers' start times. This means, that all trips of a route and all routes of a costumer are in the same splitting. For each spitting, we apply $\eqref{eq:CMILPi}$ to receive an optimal partial solution and connect the partial solutions to a feasible overall solution.
+In this section, we introduce costumer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their costumers' start times. This means, that all trips of a route and all routes of a costumer are in the same splitting. This has the advantage, that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is potentially not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
 
 \paragraph{Splitting} \parfill
+
+The costumer-dependent splitting is defined as follows:
 
 \begin{definition}[Costumer-dependent Splitting]
 \label{def:costumer_dependent_splitting}
@@ -258,60 +352,23 @@ and
 
 \end{definition}
 
-We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to Definition~\ref{def:costumer_dependent_splitting} as (CMILP).
+We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:costumer_dependent_splitting} as (CMILP).
 
 \paragraph{Solving of the Partial Instances} \parfill
 
-Since for costumer $c\in\mathcal{C}_i$ all his trips are in splitting $\Ti$, costumer $c$ has to be satisfied only in the partial instance~$i$. For solving the partial instances, we modify $\eqref{eq:SMILP}$ as follows:
-
-Instead of $\eqref{eq:MMILP:costumer}$ and $\eqref{eq:MMILP:route}$ we have the constraints
+The formulation is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints are not considered so far. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since for a costumer $c\in\mathcal{C}_i$ all trips are in the splitting $\Ti$, only the cover constraints concerning these costumers are included in partial instance $I_i$. We therefore add the following constraints:
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:CMILP:costumer} \\
-	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \label{eq:CMILP:route}
+	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \label{eq:CMILP:route} \\
+	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \label{eq:CMILP:um}
 \end{align}
 
-We do not have vehicles in the partial split set any more. Instead we have to ensure that each start and end point is visited. Therefore we modify $\eqref{eq:MMILP:vehicles}$ to 
-\begin{align}
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \label{eq:CMILP:start_end_points}
-\end{align}
+The route cost is not considered in $\eqref{eq:SMILPi}$ so far. Again, we have to consider only the route costs belonging to $c\in\mathcal{C}_i$. We therefore add the following term to the objective function
+\begin{align*}
+	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m
+\end{align*}
 
-To guarantee the fuel level $f^0$ in $\hat{\mathcal{P}}_i$ we introduce the constraint
-\begin{align}
-	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \label{eq:CMILP:final_fuel}
-\end{align}
-
-We introduce two additional constraints. The first one guarantees that the fuel level at the beginning of a duty, if it starts with $s\in\Ti$ is at most $f_s^{\max}$. The second one guarantees that the fuel level at the end of a duty, if it ends with $s\in\Ti$ is at least $f_s^{\max}$.
-\begin{align}
-	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmax} \\
-	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmin}
-\end{align}
-
-Restricting all other constraints to vertices of the partial task graph, we have the following formulation:
-
-\newpage
-
-\begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m}$} \nonumber \\
-	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{CMILP}_i$} \label{eq:CMILPi} \\
-	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\
-	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \tag{\ref{eq:CMILP:costumer}} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \tag{\ref{eq:CMILP:route}} \\
-	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \label{eq:CMILP:refuel} \\
-	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \label{eq:CMILP:initial_fuel} \\
-	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
-	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \label{eq:CMILP:min_fuel} \\
-	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \label{eq:CMILP:max_fuel} \\
-	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
-	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \label{eq:CMILP:fuel_consumption} \\
-	& e_t \leq e_s-x_{s,t}\ft_t+\left(1-x_{s,t}\right) && \text{for all } s\in\Phat_i,t\in\Noutoi(s) \label{eq:CMILP:fuel_splitpoint} \\
-	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
-	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
-	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\Phat_i,r\in\Rst \label{eq:CMILP:zsrt} \\
-	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es} \\
-	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \tag{\ref{eq:MMILP:um}}
-\end{align}
+We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$.
 
 \paragraph{Model Equivalence} \parfill
 
@@ -319,9 +376,9 @@ This heuristic formulation is not equivalent to the original formulation $\eqref
 
 \begin{example}
 
-Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the properties shown in Table \ref{tab:costumer_heuristic_example}
+Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the properties shown in \Cref{tab:costumer_heuristic_example}
 
-\begin{table}[hb]
+\begin{table}[htb]
 	\centering
 	\begin{tabular}{c|cccc}
 		Trip & Start & End & Route & Costumer \\
@@ -372,7 +429,7 @@ Let $d:=\left(t_1,\dots,t_k\right)$ be the duty of a vehicle of a feasible solut
 
 \begin{proof}
 
-We consider the vehicle duty $d=\left(t_1,\dots t_k\right)$. We write $s\prec t$ according to Definition~$\ref{def:partial_order}$, i.e. $(s,t)$ is feasible in $\eqref{eq:MMILP}$. We write $s\to t$ iff $(s,t)$ is feasible in (CMILP).
+We consider the vehicle duty $d=\left(t_1,\dots t_k\right)$. We write $s\prec t$ according to \Cref{def:partial_order}, i.e. $(s,t)$ is feasible in $\eqref{eq:MMILP}$. We write $s\to t$ iff $(s,t)$ is feasible in (CMILP).
 
 Consider $s\prec t$ with $s\not\to t$ and costumers $C_s:=(M\circ C)(s)$ and $C_t:=(M\circ C)(t)$. Then $s$ is in a later splitting than $t$. There are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n]$ with
 \begin{align*}
@@ -428,14 +485,21 @@ Consider the problem with $L_{\operatorname{C}}\leq L_{\operatorname{S}}$. Let $
 
 \end{corollary}
 
-%----------------------------------------------------------------------------------------------------------------------------------------
+%########################################################################################################################################
+%#
+%#   Time-dependent Splitting
+%#
+%########################################################################################################################################
 
 \section{Time-dependent Splitting}
+\label{sec:time_dependent_splitting}
 
-The developed formulation (CMILP) based on a costumer-dependent splitting is not equivalent to the original formulation $\eqref{eq:MMILP}$. The goal now is to develop a splitting that is equivalent and create a heuristic based on this splitting. Therefore, it is necessary that trips of the same costumer may be in different splittings. This leads to the following problem: When the partial instances are solved successively, we need a possibility to still guarantee the costumer satisfaction for the entire problem. This has to be applied already in the partial instance, although we do not have any knowledge about the trips of the same costumer in the later solved partial instances.
+The developed formulation (CMILP) based on a costumer-dependent splitting is not equivalent to the original formulation $\eqref{eq:MMILP}$. The goal now is to develop a splitting that is equivalent and create a heuristic based on this splitting. Therefore, it is necessary that trips of the same costumer may be in different splittings. This leads to the following problem: When the partial instances are solved successively, we need a possibility to still guarantee the costumer satisfaction for the entire problem. This has to be applied already in the first partial instance where a certain costumer is concerned, although we do not have any knowledge about the trips of the same costumer in the later solved partial instances.
 
 \subsection{Basic Idea}
 \label{sec:basic_idea}
+
+We define time-dependent splitting similar to \cite{Knoll}. Based on this splitting, we adapt the model and describe the necessary cost estimation.
 
 \paragraph{Splitting} \parfill
 
@@ -464,13 +528,13 @@ and
 
 \end{definition}
 
-We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to Definition~\ref{def:time_dependent_splitting} as (TMILP).
+We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:time_dependent_splitting} as (TMILP).
 
 \paragraph{Solving of the Partial Instances} \parfill
 
-Since the trips of the same costumer may be in different splittings, we cannot easily guarantee the costumer satisfaction only in just one partial instance. We have to put great effort in this issue. For this, we first define the earliest partial instance in which a trip of a costumer arises as follows: Let $\sigma\in S_n$ with $\sigma(1)=n$ be the order in which the partial instances are solved.
+Since the trips of the same costumer may be in different splittings, we cannot easily guarantee the costumer satisfaction only in just one partial instance. We have to put great effort in this issue. Let $\sigma\in S_n$ with $\sigma(n)=1$ be the order in which the partial instances are solved. We first define the earliest solved partial instance, in which a trip of a costumer arises, as follows: 
 \begin{align*}
-	\gamma: \mathcal{C}\to[n] && \gamma(c):=\argmin_{i\in[n]}\left\{\sigma(i)\in[n]\mid \left((M\circ C)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
+	\gamma: \mathcal{C}\to[n] && \gamma(c):=\sigma\left(\min\left\{i\in[n]\mid\left((M\circ C)^{-1}(c)\cap\mathcal{T}_{\sigma(i)}\right)\neq\emptyset\right\}\right)
 \end{align*}
 
 Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we define a partition $\mathcal{C}=\left\{\mathcal{C}_1,\dots\mathcal{C}_n\right\}$ as
@@ -478,26 +542,25 @@ Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we d
 	\mathcal{C}_i := \left\{c\in\mathcal{C}\mid \gamma(c)=i\right\} && \text{for } i\in[n]
 \end{align*}
 
-Consider costumer $c\in\mathcal{C}$ and the partial instance $\gamma(c)\in[n]$. In this partial instance, a multimodal route $m\in C^{-1}(c)$ for the costumer is chosen and this choice is definite. This means, in all subsequent processed partial instances, all trips $t\in m$ are fixed to be chosen before solving and all trips $t\in\left((M\circ C)^{-1}(c)\backslash m\right)$ are fixed to be neglected.
+Consider costumer $c\in\mathcal{C}$. In partial instance $I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be chosen in advance and all trips ${t\in\left((M\circ C)^{-1}(c)\backslash m\right)}$ are fixed to be neglected.
 
-In partial instance $\gamma(c)$ we have at least one trip of this costumer. But there are also trips that are in other splittings. There are even multimodal routes with no trip in this splitting at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes $m\in C^{-1}(c)$ are considered. Therefore, we try to estimate the costs of the routes in advance.
+In partial instance $\gamma(c)$ we have at least one trip of $c$. But there are also trips of $c$ that are in other splittings. There are even multimodal routes with no trip in this splitting at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes $m\in C^{-1}(c)$ are considered. Therefore, we try to estimate the costs of the routes in advance. The solving of the partial instances is again based on $\eqref{eq:SMILPi}$.
 
-The solving of the partial instances is again based on $\eqref{eq:SMILP}$. In comparison the $\eqref{eq:CMILPi}$ there are only few changes. 
-
-The costumer constraint $\eqref{eq:CMILP:costumer}$ is basically the same. Notice, that the definition of $\mathcal{C}_i$ has changed. The route constraint $\eqref{eq:CMILP:route}$ is restricted to the trips that are actually in this splitting. So the new constraints are
+For the cover constraints, we again introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$.  Notice that the definition of $\mathcal{C}_i$ is different to the definition in \Cref{sec:costumer_dependent_splitting}. In the costumer constraints, only the costumers in this splitting are considered. The route constraints are restricted to the trips that are actually in this splitting. The cover constraints read as follows:
 \begin{align}
-	&\sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:TMILP:costumer} \\
-	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:TMILP:route}
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:TMILP:costumer} \\
+	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:TMILP:route} \\
+	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \label{eq:TMILP:um}
 \end{align}
 
-For the costumer constraint it is irrelevant if there are trips of the considered routes in this splitting.
+For the constraint $\eqref{eq:TMILP:costumer}$ it is irrelevant, if the considered route has a trip in this splitting.
 
-After solving the partial instance, all determined $u_m$ are fixed for the later processed partial instances. The fixed route decisions from the previous partial instances have an impact on the instance, too. 
+After solving the partial instance, all determined $u_m$ are fixed for the later solved partial instances. The fixed route decisions from the previous partial instances have an impact on this instance, too. 
 
 Let $\bar{u}_m\in[0,1]$ be the fixed route choices from the previous instances. Define
-\begin{align}
+\begin{align*}
 	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)<\sigma(i)\right\}
-\end{align}
+\end{align*}
 
 as the costumers that are already treated. Then, we introduce the constraint
 \begin{align}
@@ -508,84 +571,52 @@ which ensures that the previous route choices are considered.
 
 \paragraph{Cost Estimation} \parfill
 
-In order to choose a route in a partial instance, we have to estimate the costs for these routes in advance in all subsequent instances. The entire cost for the problem consists of vehicle costs $\cv$, trip costs $\ct$, deadhead costs $\cd$ and route costs $\croute$. While we can determine the trip costs and route costs easily for a route, the vehicle costs and trip costs strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route costs and define the estimated route costs as follows:
+In order to choose a route in a partial instance, we have to estimate the costs for all routes of the same costumer in all subsequently solved partial instances in advance. The entire cost for the problem consists of vehicle costs $\cv$, trip costs $\ct$, deadhead costs $\cd$ and route costs $\croute$. While we can determine the trip costs and route costs easily for a route, the vehicle costs and trip costs strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route costs and define the estimated route cost as follows:
 \begin{align*}
 	C_1(m) := \croute_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-We use these costs in the $\eqref{eq:TMILPi}$ to define the modified route costs
+We use these costs in order to define the modified route costs
 \begin{align*}
 	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-and add 
+and add the following term to the objective function:
 \begin{align*}
 	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m
 \end{align*}
 
-to the objective function.
-
 \begin{remark}
 
-The trips in the same splitting $t\in \left(m\cap\Ti\right)$ are not considered in $\hat{c}^{\operatorname{r}}_m$ since they are already part of the objective function. The other trips $t\in\left(m\backslash\Ti\right)$ are added to $\hat{c}^{\operatorname{r}}_m$, such that they have an impact on the choice of the routes.
+The trips in the considered splitting $t\in \left(m\cap\Ti\right)$ are not considered in $\hat{c}^{\operatorname{r}}_m$ since they are already part of the objective function. The other trips $t\in\left(m\backslash\Ti\right)$ are added to $\hat{c}^{\operatorname{r}}_m$, such that they have an impact on the choice of the routes.
 
-Consider a trip $t$ that is decided before this partial instance, i.e. $t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)$. Its trip costs $\ct_t$ arise twice in the objective functions. Once in the partial instance $\gamma\left((M\circ C)(t)\right)$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $i$ as $\ct_t$. But since in partial instance $i$, the trip has fulfilled anyway, these costs are only an additional factor that does not influence the solution. 
+Consider a trip $t$ that is decided before this partial instance, i.e. $t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)$. Its trip costs $\ct_t$ arise twice in the objective functions. Once in the partial instance $\gamma\left((M\circ C)(t)\right)$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $I_i$ as $\ct_t$. But since in partial instance $I_i$ the trip has fulfilled anyway, this cost is only an additional constant that does not influence the solution. 
 
 \end{remark}
 
-\paragraph{LP Formulation} \parfill
-
-The entire formulation $\eqref{eq:TMILPi}$ reads as follows:
-
-\newpage
-
-\begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right) \cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m}$} \nonumber \\
-	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{TMILP}_i$} \label{eq:TMILPi} \\
-	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \tag{\ref{eq:CMILP:flow}} \\
-	&\sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\hat{\mathcal{V}}_i\cup\hat{P}_i \tag{\ref{eq:CMILP:start_end_points}} \\
-	&\sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \tag{\ref{eq:TMILP:costumer}} \\
-	&\sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \tag{\ref{eq:TMILP:route}} \\
-	&\sum_{s\in\Ninoi(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \tag{\ref{eq:TMILP:route_fix}} \\
-	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \tag{\ref{eq:CMILP:refuel}} \\
-	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \tag{\ref{eq:CMILP:initial_fuel}} \\
-	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
-	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \tag{\ref{eq:CMILP:min_fuel}} \\
-	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \tag{\ref{eq:CMILP:max_fuel}} \\
-	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
-	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\Phat_i \tag{\ref{eq:CMILP:fuel_consumption}} \\
-	& e_t \leq e_s-x_{s,t}\ft_t+\left(1-x_{s,t}\right) && \text{for all } s\in\Phat_i,t\in\Noutoi(s) \tag{\ref{eq:CMILP:fuel_splitpoint}} \\
-	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) \qquad \text{for all } s\in\Ti}$} \tag{\ref{eq:CMILP:fmax}} \\
-	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \tag{\ref{eq:CMILP:xst}} \\
-	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\Phat_i,r\in\Rst \tag{\ref{eq:CMILP:zsrt}} \\
-	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \tag{\ref{eq:CMILP:es}} \\
-	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \tag{\ref{eq:MMILP:um}}
-\end{align}
+We denote the formulation $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:costumer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:route_fix}$ and $\eqref{eq:TMILP:um}$ and the new objective function including modified route costs as $(\operatorname{TMILP}_i)$ for $i\in[n]$.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Iterative Approach}
 \label{sec:iterative_approach}
 
-We use the previously developed heuristic for an iterative approach. We compute an initial solution while we choose the routes with cost function $C_1$. Then we determine the actual cost of this route in the entire solution and compare the estimated cost with the actual cost.
+We use the previously developed heuristic for an iterative approach. First, we compute an initial solution while we choose the routes according to cost function $C_1$. Based on this solution, we determine the actual costs of the routes. With this, we can estimate the contribution of a route to the objective function. We compare the estimated route cost to the actual route cost. If the actual route cost is considerably higher than the estimated route cost, it is likely that this route choice was bad. We identify the costumer with the worst route choice and solve a subproblem, where we fix all route choices except for the considered costumer. Regarding one costumer after another, we can iteratively improve the solution.
 
 \paragraph{Initial Solution} \parfill
 
-We determine a solution with the heuristic developed in Section~\ref{sec:basic_idea}. Given a solution $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ of the (TMILP), we determine 
+We determine a solution with the heuristic developed in \Cref{sec:basic_idea} with a splitting according to \Cref{def:time_dependent_splitting}. Based on this solution $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$, we determine 
 \begin{align*}
 	C_1(c) := C_1(m) && \text{for } c\in\mathcal{C}, m\in C^{-1}(c) \text{ with } \bar{u}_m = 1
 \end{align*}
 
 \paragraph{Finding Bad Route Choice} \parfill
 
-Given a solution of the problem, the subproblem is to find a costumer with a bad route choice. This means, for this costumer there is another route, such that the total costs are lower if this route is chosen. Then, we can exchange these routes and compute a new solution considering the new route. 
+Given a solution of the problem, the subproblem is to find a costumer with a bad route choice. This means, for this costumer there is another route, such that the total cost is lower choosing this route. We can exchange these routes and compute a new solution considering the new route. 
 
-An initial idea is to compute the costs, one route in the solution contributes to the entire solution. Then, we can compare this to the cost, with which we estimated the route costs before. If the actual costs are considerably higher than the estimated costs, this costumer is a candidate for exchanging routes.
+An initial idea is to compute the cost, one route in the solution contributes to the entire solution. Then, we can compare this to the cost, with which we estimated the route costs before. If the actual cost are considerably higher than the estimated cost, this costumer is a candidate for exchanging routes. Since we cannot determine the contributing cost exactly, we try to estimate this cost.
 
-Since we cannot determine the contributing costs exactly, we try to estimate these costs.
-
-Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of $\eqref{eq:MMILP}$. To determine the contributing costs for route $m\in\mathcal{M}$, we define the following auxiliary costs for every trip $t\in\mathcal{T}$ of the solution:
+Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of $\eqref{eq:MMILP}$. In order to determine the contributing cost for route $m\in\mathcal{M}$, we define the following auxiliary costs for every trip $t\in\mathcal{T}$ of the solution:
 
 Vehicle costs $\cv_t(S)$: Let $v\in\mathcal{V}$ be the vehicle covering $t$ and $k_v$ the number of trips covered by $v$:
 \begin{align*}
@@ -639,12 +670,7 @@ For simplicity of notation, we assume that $S$ is a solution of $\eqref{eq:MMILP
 
 Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of $\eqref{eq:MMILP}$ and $c\in\mathcal{C}$ a candidate for a bad route choice. We define the following subproblem $(\operatorname{HSP}_c)$: Assume the schedule according to $S$ for the entire time without $[\zstart_c,\zend_c]$ and all route choices for costumers except $c$ as fix. Determine an optimal schedule within these restrictions.
 
-Considering only the trips of $c$ and the trips chosen in $S$, we define
-\begin{align*}
-	\mathcal{T}^c := \left\{t\in\mathcal{T}\mid(M\circ C)(t)=c\lor \sum_{s\in\Nin(t)} \bar{x}_{s,t}=1\right\}
-\end{align*}
-
-and the splittings $\mathcal{T}^c=\left\{\mathcal{T}^c_1,\mathcal{T}^c_2,\mathcal{T}^c_3\right\}$ and $\mathcal{V}=\left\{\mathcal{V}^c_1,\mathcal{V}^c_2,\mathcal{V}^c_3\right\}$ by
+We define the splittings $\mathcal{T}=\left\{\mathcal{T}^c_1,\mathcal{T}^c_2,\mathcal{T}^c_3\right\}$ and $\mathcal{V}=\left\{\mathcal{V}^c_1,\mathcal{V}^c_2,\mathcal{V}^c_3\right\}$ by
 \begin{align*}
 	\mathcal{T}^c_i := \begin{cases}
 		\left\{t\in\mathcal{T}^c\mid \zstart_t<\zstart_c\right\} & \text{if } i=1 \\
@@ -664,21 +690,26 @@ and
 
 We then define the start point set $\hat{\mathcal{V}}_2$ and the end point set $\hat{\mathcal{P}}_2$
 \begin{align*}
-	\hat{\mathcal{V}}_2 & := \left\{s\in\mathcal{T}^c_1\mid \bar{x}_{s,t}=1\text{ for }t\in\left(\mathcal{T}^c_2\cupdot\mathcal{T}^c_3\cupdot\left\{\de\right\}\right)\right\}\cupdot\mathcal{V}_1\cupdot\mathcal{V}_2 \\
-	\hat{\mathcal{P}}_2 & := \left\{t\in\mathcal{T}^c_3\mid \bar{x}_{s,t}=1\text{ for }t\in\left(\left\{\ds\right\}\cupdot\mathcal{T}^c_1\cupdot\mathcal{T}^c_2\right)\right\}
+	\hat{\mathcal{V}}_2 & := \left\{s\in\mathcal{T}^c_1\mid \bar{x}_{s,t}=1\text{ for }t\in\left(\mathcal{T}^c_2\cupdot\mathcal{T}^c_3\cupdot\left\{\de\right\}\right)\right\}\cupdot\mathcal{V}^c_1\cupdot\mathcal{V}^c_2 \\
+	\hat{\mathcal{P}}_2 & := \left\{t\in\mathcal{T}^c_3\mid \bar{x}_{s,t}=1\text{ for }s\in\left(\left\{\ds\right\}\cupdot\mathcal{T}^c_1\cupdot\mathcal{T}^c_2\right)\right\}
 \end{align*}
 
-With these definitions, we can adapt the formulation $\eqref{eq:TMILPi}$ for $i=2$ to $(\operatorname{HSP}_c)$. The only modified constraints are the costumer and route constraints $\eqref{eq:TMILP:costumer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:route_fix}$ and $\eqref{eq:MMILP:um}$. They are replaced by
+With these definitions, we can adapt the formulation $(\operatorname{TMILP}_i)$ for $i=2$ to $(\operatorname{HSP}_c)$. The only modified constraints are the cover constraints $\eqref{eq:TMILP:costumer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:um}$ and $\eqref{eq:TMILP:route_fix}$. They are replaced by
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 \label{eq:HSP:costumer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_2}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}(c),t\in m \label{eq:HSP:route} \\
-	& \sum_{s\in\operatorname{N}_{\overline{G}_2}^-(t)} x_{s,t} = \bar{u}_{M(t)} && \text{for all } t\in\mathcal{T}_2\backslash(M\circ C)^{-1}(c) \label{eq:HSP:route_fix} \\
+	& \sum_{s\in\operatorname{N}_{\overline{G}_2}^-(t)} x_{s,t} = \bar{u}_{M(t)} && \text{for all } t\in\mathcal{T}^c_2\backslash(M\circ C)^{-1}(c) \label{eq:HSP:route_fix} \\
 	& u_m\in\{0,1\} && \text{for all } m\in M^{-1}(c) \label{eq:HSP:um}
 \end{align}
 
-The objective function is the same as in $\eqref{eq:TMILPi}$.
+We decide only the routes of costumer $c$. Thus, we use the objective function of $\eqref{eq:SMILPi}$ and add the following term:
+\begin{align*}
+	\sum_{m\in C^{-1}(c)} u_m \croute_m
+\end{align*}
 
-We can easily receive a new entire solution: Transform the original solution $S$ into three partial solutions $\left\{S^c_1,S^c_2,S^c_3\right\}$ according to the splitting $\mathcal{T}^c=\left\{\mathcal{T}^c_1,\mathcal{T}^c_2,\mathcal{T}^c_3\right\}$ and $\mathcal{V}^c=\left\{\mathcal{V}^c_1,\mathcal{V}^c_2,\mathcal{V}^c_3\right\}$. Let $\hat{S}^c_2$ be an optimal solution of $(\operatorname{HSP}_c)$. Then feasibly connect the partial solutions $\left\{S^c_1,\hat{S}^c_2,S^c_3\right\}$ to a new solution $\hat{S}$. 
+\paragraph{Creating an Improved Solution} \parfill
+
+With solving $(\operatorname{HSP}_c)$, we receive a new partial solution denoted as $\hat{S}^c_2$. Let $S$ be the original entire solution. First, we transform $S$ into three partial solutions $\left\{S^c_1,S^c_2,S^c_3\right\}$ according to the splitting $\mathcal{T}=\left\{\mathcal{T}^c_1,\mathcal{T}^c_2,\mathcal{T}^c_3\right\}$ and $\mathcal{V}=\left\{\mathcal{V}^c_1,\mathcal{V}^c_2,\mathcal{V}^c_3\right\}$.\fxnote{This is done according to the procedure in ...} Then, we feasibly connect the partial solutions $\left\{S^c_1,\hat{S}^c_2,S^c_3\right\}$ to a new solution $\hat{S}$ according to the procedure described in \Cref{sec:general_setting}.
 
 The original partial solution $S^c_2$ is a feasible solution of $(\operatorname{HSP}_c)$. Therefore, with this method we cannot get a worse entire solution than before.
 
@@ -693,31 +724,43 @@ The costumer extension $\LC$ is not bounded explicitly like $\eqref{eq:LCLS}$. B
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Restricted Approach}
+\label{sec:restricted_approach}
 
-We consider again the special case that the costumer extension is smaller than the splitting length. 
-\begin{align*}
+We regard the special case in which each costumer has trips in at most two subsequent splittings. This can be ensured if the costumer extension is bounded by the splitting length. We try to exploit this special structure. For each costumer, we basically distinguish between two cases: There are more trips of this costumer in the splitting whose partial instance is solved first (Case 1) or there are more trips in the splitting whose partial instance is solved later (Case 2). In Case 1, the cost estimation for the routes is easy since most of the structure is already contained in the first processed partial instance. In Case 2, there is not much structure in the first processed partial instance, so the cost prediction will be imprecise. In order to prevent an imprecise cost estimation as in Case 2, we inspect the possibility of reversing a previous route choice in the later solved partial instance, if we find a better alternative there. In this section, we inspect the potential of cost saving for a belated trip deletion and develop a more flexible formulation in order to receive a better solution.
+
+\begin{lemma}
+
+For $n\geq 3$, consider the problem with costumer set $\mathcal{C}$ and split points $c_i$ for ${i\in[n-1]}$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. Let
+\begin{align}
 	L_{\operatorname{C}}\leq L_{\operatorname{S}} \tag{\ref{eq:LCLS}}
-\end{align*}
+\end{align}
 
-For costumer $c\in\mathcal{C}$ there are $i\in[n-1]$ with time points $c_{i-1}\leq \zstart_c < c_i$ and therefore
+For every costumer $c\in\mathcal{C}$, there is $i\in[n-1]$ such that
+\begin{align}
+	t\in\left(\Ti\cupdot\mathcal{T}_{i+1}\right) && \text{for all } t\in (M\circ C)^{-1}(c)
+\end{align}
+
+this means, each costumer is represented in at most two subsequent splittings.
+
+\end{lemma}
+
+\begin{proof}
+
+For simplicity of notion, we state $c_0:=-\infty$ and $c_n:=+\infty$. Consider costumer $c\in\mathcal{C}$ and $i\in[n]$ such that ${c_{i-1} \leq \zstart_c < c_i}$. For $i=n$ all trips of $c$ are in splitting $n$.	 For $i<n$ we have
 \begin{align*}
-	\zstart_t \leq \zstart_c + L_{\operatorname{C}} < c_i + L_{\operatorname{C}} \leq c_i + L_{\operatorname{S}} \leq c_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
+	\zstart_c \leq \zstart_t \leq \zstart_c + L_{\operatorname{C}} < c_i + L_{\operatorname{C}} \leq c_i + L_{\operatorname{S}} \leq c_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
 \end{align*}
 
-We again state $c_{0}:=-\infty$ and $c_n:=+\infty$. Thus we have
+Thus we have
 \begin{align*}
 	t\in\left(\mathcal{T}_i\cupdot\mathcal{T}_{i+1}\right) && \text{for all } t\in (M\circ C)^{-1}(c)
 \end{align*}
 
-This means, for every costumer $c\in\mathcal{C}$ at most two splittings are affected. We can exploit this property for solution methods.
+\end{proof}
 
-Each costumer is represented in at most two subsequent splittings. Costumers, that are only represented in one splitting, are neglected here since the costumer satisfaction is already ensured in $\eqref{eq:TMILPi}$.
+In the following considerations, we neglect the costumer whose trip are in one splitting. These cover constraints are already ensured in the partial instance.
 
-For each costumer, we basically distinguish between two cases: There are more trips of the costumer in the splitting whose partial instance is processed first (Case 1). Or there are more trips in the splitting whose partial instance is processed later (Case 2). In Case 1, the cost estimation for the routes is easy since most of the structure is already contained in the first processed partial instance. In Case 2, there is not much structure in the first processed partial instance, so the cost prediction will be imprecise.
-
-To prevent an imprecise cost estimation in Case 2, we inspect the possibility to reverse a previous route choice in the later processed partial instance if we find a better alternative there. For this, we have to think about the cost saving for a belated trip deletion.
-
-Consider partial instance $i\in[n]$ and the costumer set
+Consider partial instance $i\in[n]$, the costumer set
 \begin{align*}
 	\CR_i := \left\{c\in\mathcal{C}\mid\gamma(c)\in\left\{i-1,i+1\right\}\land\left((M\circ C)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
 \end{align*}
@@ -729,31 +772,36 @@ and the route set
 
 $\CR_i$ are all costumers represented in $\Ti$ but initially treated in another partial instance, $\MR_i$ are all routes of these costumers where all trips are in $\Ti$.
 
-We regard the possibility to revise a previous route choice if we find a better alternative in partial instance~$i$. For this, we think about the cost saving for subsequent trip deletion. As in Section~\ref{sec:iterative_approach}, the cost function $C_1(m)$ is used for cost estimation.
+We regard the possibility to revise a previous route choice if we find a better alternative in partial instance~$i$. For this, we think about the cost saving for subsequent trip deletion. As in \Cref{sec:iterative_approach}, the cost function $C_1(m)$ is used for cost estimation.
 
 \paragraph{Costs for Trip Replacement} \parfill
 
-Consider partial instance~$i$ where partial instances~$i-1$ or $i+1$ are processed before, i.e. $\sigma(i)<\sigma(i-1)$ or $\sigma(i)<\sigma(i+1)$. If both are processed later, we have $\CR_i=\emptyset$ and this procedure is not considered at all.
+We want to regard the possibility of deleting an already chosen route in partial instance $I_i$. We therefore consider costumer $c\in\CR_i$, \ie the costumer has trips in an adjacent splitting and this partial instance is solved before. For this, we introduce the following notation.
 
-Let $\bar{m}(c)\in C^{-1}(c)$ be the unique route with $\bar{u}_m = 1$ for all $c\in\CR_i$. Let $s_1(t)\in\left(\left\{\ds_{\gamma(c)}\right\}\cupdot\hat{\mathcal{V}}_{\gamma(c)}\cupdot\mathcal{T}_{\gamma(c)}\right)$, $s_2(t)\in\left(\mathcal{T}_{\gamma(c)}\cupdot\hat{\mathcal{P}}_{\gamma(c)}\cupdot\left\{\de_{\gamma(c)}\right\}\right)$ be the unique trips with $\bar{x}_{s_1,t}=\bar{x}_{t,s_2}=1$ for all $t\in\left(\bar{m}(c)\backslash\Ti\right)$. 
+\begin{definition}
 
-If we delete trip $t$ in partial instance~$\gamma(c)$, the saved costs are
+Let $c\in\CR_i$ and let ${S_{\gamma(c)}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be the partial solution of the previously solved partial instance, where the route of $c$ has been chosen. Let $\bar{m}(c)\in C^{-1}(c)$ be the unique route with $\bar{u}_m = 1$
+
+Let ${s_1(t)\in\left(\left\{\ds_{\gamma(c)}\right\}\cupdot\hat{\mathcal{V}}_{\gamma(c)}\cupdot\mathcal{T}_{\gamma(c)}\right)}$, ${s_2(t)\in\left(\mathcal{T}_{\gamma(c)}\cupdot\hat{\mathcal{P}}_{\gamma(c)}\cupdot\left\{\de_{\gamma(c)}\right\}\right)}$ be the unique trips with $\bar{x}_{s_1,t}=\bar{x}_{t,s_2}=1$ for all $t\in\left(\bar{m}(c)\backslash\Ti\right)$.
+
+Here, ${\ds_{\gamma(c)},\de_{\gamma(c)}\in\overline{V}_{\gamma(c)}}$ are the respective source and sink node of the partial task graph $\overline{G}_{\gamma(c)}$.
+
+\end{definition}
+
+The route $\bar{m}(c)$ denotes the route that is chosen for costumer $c\in\CR_i$ by the partial solution, $s_1(t)$ and $s_2(t)$ are the trips that are directly before and after this trip in its respective duty. 
+
+By assuming ${\cd_{\ds,t}=\cd_{t,\de}=:0}$ for all ${t\in\mathcal{T}_{\gamma(c)}}$, the cost saving for deleting a trip $t$ in partial instance $I_{\gamma(c)}$ is
 \begin{align*}
 	\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}
 \end{align*}
 
-We state the deadhead costs $\cd_{\ds,t}=\cd_{t,\de}=:0$ for all $t\in\mathcal{T}_{\gamma(i)}$. 
+\paragraph{Adaption of the Model} \parfill
 
-We modify the formulation $\eqref{eq:TMILPi}$ such that a belated route exchange is possible in the restricted case with $\eqref{eq:LCLS}$. The formulation is called $(\operatorname{RTMILP}_i)$. The underlying partial task graph is not modified.
+In the following, we adapt the formulation $(\operatorname{TMILP}_i)$ in order to allow a belated route replacement. The restriction $\eqref{eq:LCLS}$ is required for this formulation. It is also necessary that at least one adjacent partial instance is already solved. In this procedure, the partial instance is solved before, with the additional ability to replace already chosen routes under strong restrictions: If for costumer $c\in\mathcal{C}$ a route has been chosen in a previously solved partial instance $I_{\gamma(c)}$ and there are routes whose trips are all in the partial trip set $\mathcal{T}_i$, then either one of these routes is chosen or the previous route decision is confirmed. The choice of another route is not possible since this would require an insertion of trips into an already existing partial solution. We call this formulation $\eqref{eq:RTMILPi}$. The underlying partial task graph $\overline{G}_i$ is not modified.
 
-We introduce new decision variables $u^c$ for $c\in\CR_i$. They indicate whether the route choice for costumer $c$ is confirmed or not. If a deletion of the route determined in the partial instances~$i-1$ or $i+1$ is possible, it is necessary to add routes of the same costumer. Since a belated insertion of trips is difficult, we restrict ourselves to the routes that have only trips in $\Ti$. We therefore introduce decision variables $u_m$ for all $m\in\MR_i$.
+We introduce new decision variables $u^c$ for $c\in\CR_i$. They indicate whether the route choice for costumer $c$ is confirmed or not. If the route choice is not confirmed, adding of routes of the same costumer is necessary. This is only possible, if all trips of this route are in $\mathcal{T}_i$. We therefore introduce decision variables $u_m$ for all $m\in\MR_i$.
 
-We add the following term to the objective function:
-\begin{align*}
-	\sum_{m\in\MR_i} u_m c_m - \sum_{c\in\CR_i} \left(1-u^c\right)\left[\sum_{t\in\left(\bar{m}_c\backslash\Ti\right)} \left(\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}\right)\right]
-\end{align*}
-
-For every $c\in\CR_i$, either the previous choice must be confirmed or a new route is chosen. We therefore add the constraint
+For every $c\in\CR_i$, either the previous choice must be confirmed or a new route is chosen. This is ensured by
 \begin{align}
 	u^c + \sum_{\substack{m\in\MR_i \\ C(m)=c}} u_m = 1 && \text{for all } c\in\CR_i \label{eq:RTMILP:costumer_old}
 \end{align}
@@ -762,25 +810,55 @@ We have $\overline{\mathcal{C}}_i = \CR_i$ since $\eqref{eq:LCLS}$. The constrai
 \begin{align}
 	& \sum_{s\in\Ninoi(t)} x_{s,t} = u^c && \text{for all } c\in\CR_i, t\in\bar{m}(c)\cap\Ti \label{eq:RTMILP:route_confirmed} \\
 	& \sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } t\in M^{-1}\left(\MR_i\right) \label{eq:RTMILP:route_old} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 0 && \text{for all } c\in\CR_i, t\in M^{-1}\left(C^{-1}(c)\backslash\left(\MR_i\cap\left\{\bar{m}_c\right\}\right)\right)\cap\Ti \label{eq:RTMILP:route_fix}
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 0 && \text{for all } c\in\CR_i, t\in M^{-1}\left(C^{-1}(c)\backslash\left(\MR_i\cup\left\{\bar{m}(c)\right\}\right)\right)\cap\Ti \label{eq:RTMILP:route_fix}
 \end{align}
 
-The route satisfaction for the previously decided trips is ensured by $\eqref{eq:RTMILP:route_confirmed}$ for the decided tour, by $\eqref{eq:RTMILP:route_old}$ for all routes in $\Ti$ and by $\eqref{eq:RTMILP:route_fix}$ for all other trips in $\Ti$.
+The constraint $\eqref{eq:RTMILP:route_confirmed}$ ensures the route satisfaction for the previously decided route, $\eqref{eq:RTMILP:route_old}$ for all route completely in $\Ti$ and $\eqref{eq:RTMILP:route_fix}$ for all other trips in $\Ti$. Note that $\mathcal{C}_i\cap\CR_i = \emptyset$. Hence, $\eqref{eq:TMILP:costumer}$ and $\eqref{eq:TMILP:route}$ are not influenced by them. We contract $\eqref{eq:TMILP:route}$ and $\eqref{eq:RTMILP:route_old}$ to
+\begin{align}
+	\sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in\MR_i\cupdot C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:RTMILP:route}
+\end{align}
 
-Note that $\mathcal{C}_i\cap\CR_i = \emptyset$. Hence, $\eqref{eq:TMILP:costumer}$ and $\eqref{eq:TMILP:route}$ are not influenced by them.
-
-Finally, we replace $\eqref{eq:MMILP:um}$ by
+Finally, we replace $\eqref{eq:TMILP:um}$ by
 \begin{align}
 	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right)\cupdot\MR_i \label{eq:RTMILP:um} \\
 	& u^c \in\{0,1\} && \text{for all } c\in\CR_i \label{eq:RTMILP:uc}
+\end{align}
+
+\paragraph{Cost Function} \parfill
+
+We have to consider additional contributions to the cost function. If the route choice is not confirmed, the trips of $\bar{m}(c)$ are deleted and the route cost and the saved cost are subtracted from the cost function. We define these cost as
+\begin{align*}
+	\hat{c}_c := \croute_{\bar{m}(c)} + \sum_{t\in\left(\bar{m}(c)\backslash\Ti\right)} \left(\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}\right) && \text{for } c\in\CR_i
+\end{align*}
+
+Note, that the costs $\ct$ and $\cd$ belong to the partial instance $I_{\gamma(i)}$ and are not part of the considered partial task graph $\overline{G}_i$. The term $\hat{c}_c$ describes the cost saving for not confirming the route choice of $c$ and is completely given in advance.
+
+In order to determine the route costs for all $c\in\CR_i$, we add the following term to the objective function.
+\begin{align*}
+	\sum_{m\in\MR_i} u_m \croute_m - \sum_{c\in\CR_i} \left(1-u^c\right)\hat{c}_c
+\end{align*}
+
+In summary, the formulation $\eqref{eq:RTMILPi}$ is given by $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:costumer}$, $\eqref{eq:RTMILP:costumer_old}$, $\eqref{eq:RTMILP:route_confirmed}$, $\eqref{eq:RTMILP:route_fix}$, $\eqref{eq:RTMILP:route}$, $\eqref{eq:RTMILP:um}$ and $\eqref{eq:RTMILP:uc}$ and the objective function
+\begin{align}
+	&\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m + \sum_{m\in\MR_i} u_m \croute_m + \sum_{c\in\CR_i} \left(u^c - 1\right)\hat{c}_c \nonumber \\
+	+ & \sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right] \tag{$\operatorname{RTMILP}_i$} \label{eq:RTMILPi}
 \end{align}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Improvements}
 
-\begin{itemize}
-	\item{If $\eqref{eq:LCLS}$ does not hold: Find a possibility to arrange splittings such that at most 2 splittings are affected.}
-	\item{If a route is chosen where no trip is in this splitting: Choice of routes among routes with no trip in this splitting in the next processed partial instance.}
-	\item{(RTMILP) does not work if two subsequent trips, fulfilled by the same car, are deleted.}
-\end{itemize}
+This is listing of comments regarding this section. It includes some small changes that can be made in the formulations in order to improve the performance, some new considerations and some small mistakes, where the developed methods work inaccurately but there is not an easy handling.
+
+\begin{enumerate}
+	\item{$\eqref{eq:LCLS}$ does not hold in general}:
+It is possible that each costumer is represented in at most two splittings although $\eqref{eq:LCLS}$ does not hold. If this is not the case, one can possibly deviate some split points by a small value \st the condition holds. If only a small number of costumers exceeds the splitting length, their exclusion from the formulations $(\operatorname{HSP}_c)$ or $\eqref{eq:RTMILPi}$ still promises good results.
+	\item{Create Preprocessing}:
+One can create the split points via an own problem. The goal of this preprocessing is minimizing the costumers represented in several splittings, constraints are a minimal and a maximal splitting length. If there are only few costumers in more than one splitting, the solution behavior is improved.
+	\item{Strategy for route choice in \Cref{sec:iterative_approach}}:
+In $I_i$, it is not beneficial to choose a route with $m\cap\Ti=\emptyset$. If such a route is the most suitable one, one can leave the choice open and choose in the next partial instance among all routes with $m\cap\Ti=\emptyset$. In $I_i$ is is not necessary to choose the route because there are no trips to cover, thus it is not beneficial fix the route choice already there.
+	\item{Strategy for route choice in \Cref{sec:restricted_approach}}:
+In $I_{\gamma(c)}$, it is beneficial to choose a route with $m\cap\mathcal{T}_{\gamma(c)}\neq\emptyset$, even is another choice, \ie $m'\in\MR_i$ is more beneficial there. If $m$ is a bad choice at the end, it will be reversed in $I_i$. If $m$ is a good choice against expectation, it will be confirmed in $I_i$.
+	\item{Deleting subsequent trips}:
+If in $\eqref{eq:RTMILPi}$ two subsequent trips of the same duty are deleted, the value for cost saving is wrong. For four subsequent trips $t_1, t_2, t_3, t_4$ where $t_2, t_3$ are deleted, the difference between the real cost saving and the computed cost saving is ${\cd_{t_1,t_4}+\cd_{t_2,t_3}-\cd_{t_1,t_3}-\cd_{t_2,t_4}}$. If there a subsequent trips of the same route in the same duty, the term can be adapted. An exact solution would be the introduction of a decision variable for each combination of route deletions.
+\end{enumerate}

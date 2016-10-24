@@ -31,7 +31,7 @@ The fact, whether the costumer changes during his usage of public transport, has
 
 \paragraph{Route Creation} \parfill
 
-We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the costumer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in algorithm~\ref{alg:route_creation}.
+We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the costumer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in \Cref{alg:route_creation}.
 
 Until now, we do not consider any changing times between a car trip and a public transport trip.
 
@@ -74,7 +74,7 @@ Further, we assume that the given costumer start and and times are feasible, i.e
 
 \paragraph{Further Restrictions} \parfill
 
-If the routes are created as described in algorithm~\ref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the costumer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
+If the routes are created as described in \Cref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the costumer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
 
 \begin{example}
 

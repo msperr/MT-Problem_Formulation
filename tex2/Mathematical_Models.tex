@@ -4,7 +4,7 @@ We introduce the mathematical model, with which we want to solve the previously 
 
 \section{Task Graph}
 
-We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in Section \ref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the costumer and route considerations are adapted here.
+We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in \Cref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the costumer and route considerations are adapted here.
 
 \begin{definition}[Task Graph]
 
@@ -33,7 +33,7 @@ $\hat{G}$ is a directed acyclic graph.
 
 Assume there is a cycle in $\hat{G}$. The source $\ds$ and sink $\de$ have only ingoing, respectively outgoing arcs and are therefore not part of the cycle. For $\vinV$, all ingoing arcs come from $\ds$, hence $\vinV$ are not part of the cycle, too. This means, a cycle consists only of trips.
 
-Consider an arbitrary cycle of trips $t_1,\dots,t_k\in\mathcal{T}$, $k\geq 2$. These trips form a cycle, \ie ${t_1\prec\dots\prec t_k}$ and ${t_k\prec t_1}$. With Definition \ref{def:partial_order} and the assumptions $\eqref{eq:notime_trip}$ and $\eqref{eq:triangle_inequality}$ holds:
+Consider an arbitrary cycle of trips $t_1,\dots,t_k\in\mathcal{T}$, $k\geq 2$. These trips form a cycle, \ie ${t_1\prec\dots\prec t_k}$ and ${t_k\prec t_1}$. With \Cref{def:partial_order} and the assumptions $\eqref{eq:notime_trip}$ and $\eqref{eq:triangle_inequality}$ holds:
 \begin{align*}
 	\zstart_i < \zend_i \leq \zend_i + t_{t_i,t_{i+1}} \leq \zstart_{i+1} < \zend_{i+1} && \text{for all } i\in[k-1]
 \end{align*}
@@ -73,7 +73,7 @@ $\hat{G}$ is a directed acyclic graph.
 
 \begin{proof}
 
-Assume there is a cycle in $G$. In comparison to $\hat{G}$, only arcs $(s,r)$ and $(r,t)$ for ${r\in\Rst, s\prec t}$ were added. Assume there is a cycle containing $r\in\Rst$. $r$ has only one ingoing arc $(s,r)$ and one outgoing arc $(r,t)$ and only if the arc $(s,t)$ exists. There is no cycle on the vertices $\left\{s,r,t\right\}$. Every other cycle containing $r$ is also a cycle using the arc $(s,t)$. This is a contradiction to the fact that $\hat{G}$ is cycle-free as proven in Lemma~\ref{lem:taskgraph_cyclefree}.
+Assume there is a cycle in $G$. In comparison to $\hat{G}$, only arcs $(s,r)$ and $(r,t)$ for ${r\in\Rst, s\prec t}$ were added. Assume there is a cycle containing $r\in\Rst$. $r$ has only one ingoing arc $(s,r)$ and one outgoing arc $(r,t)$ and only if the arc $(s,t)$ exists. There is no cycle on the vertices $\left\{s,r,t\right\}$. Every other cycle containing $r$ is also a cycle using the arc $(s,t)$. This is a contradiction to the fact that $\hat{G}$ is cycle-free as proven in \Cref{lem:taskgraph_cyclefree}.
 
 \end{proof}
 
