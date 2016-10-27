@@ -4,7 +4,7 @@ We introduce the mathematical model, with which we want to solve the previously 
 
 \section{Task Graph}
 
-We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in \Cref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the costumer and route considerations are adapted here.
+We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in \Cref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the customer and route considerations are adapted here.
 
 \begin{definition}[Task Graph]
 
@@ -89,6 +89,7 @@ $\Nin(t)$ is the set of in-neighbors of $t\in V$, $\Nout(s)$ is the set of out-n
 %---------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Arc Flow Formulation}
+\label{sec:arcflow_formulation}
 
 In the following, we model the problem via a flow of the vehicles on the extended task graph. The trips and multimodal routes are given in advance. The fact, whether two trips can be fulfilled subsequently in one duty, is already given by the underlying task graph. We additionally have to model the cover constraints and the fuel constraints. Since the duties of various vehicles are disjoint \wrt $\mathcal{T}$, we are able to use one common set of variables for the flow of one vehicle. From the flow, we can easily extract the individual $\ds$-$\de$-paths in order to identify the duties of the respective vehicles.
 
@@ -111,22 +112,22 @@ Additionally to $\eqref{eq:MILP}$, we introduce decision variables in order to e
 
 The basic constraints are developed in \cite[pp. 21-34]{Kaiser_Knoll} and not explained in detail here. The basic constraints are the flow conservation constraint, the constraint for considering every car and the constraints ensuring feasible fuel states all the time.
 
-\paragraph{Costumer and Route Constraints} \parfill
+\paragraph{Customer and Route Constraints} \parfill
 
-In $\eqref{eq:MILP}$, each costumer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. This is modeled as follows:
+In $\eqref{eq:MILP}$, each customer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. This is modeled as follows:
 
 \begin{align*}
-	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \tag{\ref{eq:MILP:costumer}}
+	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \tag{\ref{eq:MILP:customer}}
 \end{align*}
 
-In contrast to $\eqref{eq:MILP}$, here each costumer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:costumer}$ by the following formulation:
+In contrast to $\eqref{eq:MILP}$, here each customer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:customer}$ by the following formulation:
 
 \begin{align}
-	\sum_{m\in C^{-1}(c)} u_m = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MMILP:costumer} \\
+	\sum_{m\in C^{-1}(c)} u_m = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MMILP:customer} \\
 	\sum_{s\in\Nin(t)} x_{s,t} = u_m &&& \text{for all } m\in\mathcal{M}, t\in m \label{eq:MMILP:route}
 \end{align}
 
-The constraint $\eqref{eq:MMILP:costumer}$ says, that for every costumer exactly one route is fulfilled. The constraint $\eqref{eq:MMILP:route}$ says, if a route is fulfilled then every trip of this route must be fulfilled.
+The constraint $\eqref{eq:MMILP:customer}$ says, that for every customer exactly one route is fulfilled. The constraint $\eqref{eq:MMILP:route}$ says, if a route is fulfilled then every trip of this route must be fulfilled.
 
 \paragraph{Objective Function} \parfill
 
@@ -153,7 +154,7 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MMILP} \label{eq:MMILP} \\
 	\text{s.t.} \quad & \sum_{s\in\Nin(t)} x_{s,t} = \sum_{s\in\Nout(t)} x_{t,s} & & \text{for all } t\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:flow} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \label{eq:MMILP:vehicles} \\
-	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:costumer}} \\
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = u_m && \text{for all } m\in\mathcal{M}, t\in m \tag{\ref{eq:MMILP:route}} \\
 	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:refuel} \\
 	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \label{eq:MMILP:initial_fuel} \\

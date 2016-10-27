@@ -2,7 +2,7 @@
 
 \begin{labeling}{$\psi:X\to\{0,1\}^{\Tcar}$}
 	\item[$\mathcal{V}$]{Set of vehicles}
-	\item[$\mathcal{C}$]{Set of costumers}
+	\item[$\mathcal{C}$]{Set of customers}
 	\item[$\mathcal{S}$]{Set of public transport stations}
 	\item[$\mathcal{P}$]{Set of public transport rides}
 	\item[$\mathcal{T}$]{Set of trips}
@@ -21,8 +21,8 @@
 	\item[$t_{s,t}$]{Time between two trips $s\in\mathcal{V}\cupdot\Tcar\cupdot\mathcal{R}$ and $t\in\Tcar\cupdot\mathcal{R}$}
 	\item[$\mathcal{M}$]{Set of multimodal routes}
 	\item[$M:\mathcal{T}\to\mathcal{M}$]{Mapping of trips to multimodal routes}
-	\item[$\mathcal{C}$]{Set of costumers}
-	\item[$C:\mathcal{M}\to\mathcal{C}$]{Mapping of multimodal routes to costumers}
+	\item[$\mathcal{C}$]{Set of customers}
+	\item[$C:\mathcal{M}\to\mathcal{C}$]{Mapping of multimodal routes to customers}
 	\item[$\cv$]{Unit vehicle cost}
 	\item[$\cd_{s,t}$]{Cost for deadhead trip from $s\in\mathcal{V}\cupdot\Tcar\cupdot\mathcal{R}$ to $t\in\Tcar\cupdot\mathcal{R}$}
 	\item[$\ct_t$]{Cost for trip $t\in\mathcal{T}$}
@@ -58,20 +58,20 @@
 	\item[$\hat{\mathcal{V}}_i$]{Set of start points for partial instance~$i$}
 	\item[$\hat{\mathcal{P}}_i$]{Set of end points for partial instance~$i$}
 	\item[$\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$]{Partial transformed task graph with vertex set $\overline{V}_i$ and arc set $\overline{A}_i$}
-	\item[$(\operatorname{CMILP}_i)$]{ILP for solving partial instance~$i$ with costumer-dependent splitting}
+	\item[$(\operatorname{CMILP}_i)$]{ILP for solving partial instance~$i$ with customer-dependent splitting}
 	\item[$c_i$]{Time point for splitting}
 	\item[$\mathcal{C}_i$]{Splitting of $\mathcal{C}$}
-	\item[$(\operatorname{CMILP})$]{Adaption of (SMILP) with costumer-dependent splitting}
+	\item[$(\operatorname{CMILP})$]{Adaption of (SMILP) with customer-dependent splitting}
 	\item[$f^{\max}_s$]{Maximal fuel level at start of a duty in partial instance~$i$ for $s\in\Ti$}
 	\item[$f^{\min}_s$]{Minimal fuel level at end of a duty in partial instance~$i$ for $s\in\Ti$}
-	\item[$\LC(c)$]{Costumer extension for costumer $c\in\mathcal{C}$}
-	\item[$\LC$]{Maximal costumer extension}
+	\item[$\LC(c)$]{customer extension for customer $c\in\mathcal{C}$}
+	\item[$\LC$]{Maximal customer extension}
 	\item[$\LS$]{Minimal splitting length}
 	\item[$\operatorname{val}(S)$]{Value of the objective function for solution $S$}
 	\item[$(\operatorname{TMILP})$]{Adaption of (SMILP) with time-dependent splitting}
 	\item[$\gamma:\mathcal{C}\to\lbrack n\rbrack$]{Earliest solved partial instance where $c\in\mathcal{C}$ is represented}
 	\item[$(\operatorname{TMILP}_i)$]{ILP for solving partial instance~$i$ with time-dependent splitting}
-	\item[$\overline{\mathcal{C}}_i$]{Set of costumers solved before partial instance~$i$}
+	\item[$\overline{\mathcal{C}}_i$]{Set of customers solved before partial instance~$i$}
 	\item[$\bar{u}_m$]{Fixed route choice from earlier solved partial instances for $m\in\mathcal{M}$}
 	\item[$C_1(m)$]{Cost estimation for $m\in\mathcal{M}\cupdot\mathcal{C}$}
 	\item[$\hat{c}^{\operatorname{r}}_m$]{Modified route cost including estimated cost}
@@ -81,13 +81,13 @@
 	\item[$\cd_t(S)$]{Auxiliary deadhead cost for $t\in\Tcar$ and solution $S$}
 	\item[$C_2(S,m)$]{Improved cost estimation for solution $S$, $m\in\mathcal{M}\cupdot\mathcal{C}$}
 	\item[$c^*$]{Candidate for bad route choice}
-	\item[$(\operatorname{HSP}_c)$]{Subproblem for finding a better route choice for costumer $c\in\mathcal{C}$}
+	\item[$(\operatorname{HSP}_c)$]{Subproblem for finding a better route choice for customer $c\in\mathcal{C}$}
 	\item[$\mathcal{T}^c$]{Set of trips for $c\in\mathcal{C}$ in subproblem $(\operatorname{HSP}_c)$}
 	\item[$\mathcal{T}^c_i$]{Splitting of $\mathcal{T}^c$ in subproblem $(\operatorname{HSP}_c)$}
 	\item[$\mathcal{V}^c_i$]{Splitting of $\mathcal{V}$ in subproblem $(\operatorname{HSP}_c)$}
-	\item[$\CR_i$]{Set of costumers represented in partial instance~$i$ but solved before}
-	\item[$\MR_i$]{Set of multimodal routes with all trips in $\Ti$ but the costumer is solved before}
-	\item[$\bar{m}(c)$]{Multimodal route chosen for costumer $c\in\mathcal{C}$}
+	\item[$\CR_i$]{Set of customers represented in partial instance~$i$ but solved before}
+	\item[$\MR_i$]{Set of multimodal routes with all trips in $\Ti$ but the customer is solved before}
+	\item[$\bar{m}(c)$]{Multimodal route chosen for customer $c\in\mathcal{C}$}
 	\item[$s_1(t)$]{Preceding trip in the same duty for $t\in\Tcar$}
 	\item[$s_2(t)$]{Succeeding trip in the same duty for $t\in\Tcar$}
 	\item[$(\operatorname{RTMILP}_i)$]{ILP for solving partial instance~$i$ with time-dependent splitting and route replacement}

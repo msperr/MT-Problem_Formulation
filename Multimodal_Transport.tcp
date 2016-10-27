@@ -6,7 +6,7 @@ Version=4
 MainFile=Multimodal_Transport.tex
 UseBibTeX=0
 UseMakeIndex=0
-ActiveProfile=LaTeX ⇨ PDF
+ActiveProfile=LaTeX ⇨ PDF (bibtex)
 ProjectLanguage=en
 ProjectDialect=US
 

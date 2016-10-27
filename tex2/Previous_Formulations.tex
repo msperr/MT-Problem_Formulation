@@ -7,7 +7,7 @@
 	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MILP} \label{eq:MILP} \\
 	\text{s.t.} & \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MILP:flow} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \label{eq:MILP:vehicles} \\
-	& \sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } c\in\mathcal{C} \label{eq:MILP:costumer} \\
+	& \sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } c\in\mathcal{C} \label{eq:MILP:customer} \\
 	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MILP:refuel} \\
 	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \label{eq:MILP:initial_fuel} \\
 	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MILP:min_fuel} \\

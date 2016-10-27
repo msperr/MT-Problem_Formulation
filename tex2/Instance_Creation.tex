@@ -3,7 +3,7 @@
 
 \section{Route Creation}
 
-We are not given the set of routes $\mathcal{M}$ in advance. For each costumer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstarto_c, \zendo_c$. All the trips of the costumer lie in this interval, i.e.
+We are not given the set of routes $\mathcal{M}$ in advance. For each customer $c\in\mathcal{C}$, we have start and end location $\pstart_c, \pend_c$ and a start and end time $\zstarto_c, \zendo_c$. All the trips of the customer lie in this interval, i.e.
 
 \begin{align*}
 	\zstarto_c \leq \zstart_m && \zend_m \leq \zendo_c && \text{for all } m\in C^{-1}(c).
@@ -20,26 +20,26 @@ To simplify the creation of the routes, we make some assumptions. For every rout
 	\item{We define a walking distance $d^{\operatorname{walk}}$. If the distance between the start position and the first station or between the last station and the end position, there is no car trip necessary.}
 \end{itemize}
 
-We assume that we have some oracle that provides the set of feasible public transport routes for costumer $c\in\mathcal{C}$:
+We assume that we have some oracle that provides the set of feasible public transport routes for customer $c\in\mathcal{C}$:
 
 \begin{align*}
 	M_c & = && \left\{\left(s_1,z_1,s_2,z_2\right)|s_1,s_2\in\mathcal{S}, \zstarto_c\leq t_1 < t_2 \leq \zendo_c, \text{ there is a public} \right. \\
 	&&& \left.\vphantom{\zstarto}\text{transport route from $s_1$ to $s_2$ with start time $z_1$ and end time $z_2$}\right\}
 \end{align*}
 
-The fact, whether the costumer changes during his usage of public transport, has no effect on the model. Thus, we can consider each element in $M_c$ as a public transport trip.
+The fact, whether the customer changes during his usage of public transport, has no effect on the model. Thus, we can consider each element in $M_c$ as a public transport trip.
 
 \paragraph{Route Creation} \parfill
 
-We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the costumer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in \Cref{alg:route_creation}.
+We create the set of multimodal routes $\mathcal{M}$. For this, we set a car trip before and after each public transport trip in order to bring the customer from his start to his destination, except when it is possible to walk the distance. We also have to consider the given time restrictions. Further, we create the pure car trips. How the set $\mathcal{M}$ is created in detail, is described in \Cref{alg:route_creation}.
 
 Until now, we do not consider any changing times between a car trip and a public transport trip.
 
-Further, we assume that the given costumer start and and times are feasible, i.e. $\zstarto_c+t_{\pstart_c,\pend_c}\leq\zendo_c$ for all $c\in\mathcal{C}$.
+Further, we assume that the given customer start and and times are feasible, i.e. $\zstarto_c+t_{\pstart_c,\pend_c}\leq\zendo_c$ for all $c\in\mathcal{C}$.
 
 \begin{algorithm}
 	\SetAlgoLined
-	\KwIn{costumer set $\mathcal{C}$; $\pstart_c, \pend_c, \zstarto_c, \zendo_c, M_c$ for all $c\in\mathcal{C}$}
+	\KwIn{customer set $\mathcal{C}$; $\pstart_c, \pend_c, \zstarto_c, \zendo_c, M_c$ for all $c\in\mathcal{C}$}
 	\KwOut{set of routes $\mathcal{M}$, set of trips $\Tcar,\Tpub$}
 	$\Tcar\gets\emptyset$\;
 	$\Tpub\gets\emptyset$\;
@@ -74,7 +74,7 @@ Further, we assume that the given costumer start and and times are feasible, i.e
 
 \paragraph{Further Restrictions} \parfill
 
-If the routes are created as described in \Cref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the costumer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
+If the routes are created as described in \Cref{alg:route_creation}, there are routes using every available station as long as it is feasible. Most of these routes are obviously bad for the customer since they cause a big detour. What is more, a large number of routes enlarge the problem size and leads to  a bad performance for solving it. Therefore, we try to restrict the set of alternatives to a reasonable size.
 
 \begin{example}
 
@@ -86,7 +86,7 @@ Let $\mathcal{S}=\left\{s_1,\dots,s_n\right\}$ with a single public transport ri
 
 with $\left(\pstart_{c_1},s_k\right)\prec\left(s_k,\pend_{c_2}\right)$ and $\left(\pstart_{c_1},s_i\right)\not\prec\left(s_k,\pend_{c_2}\right)$ for all $i\in[n]\backslash\{k\}$. 
 
-We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other costumers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of cutting off the optimal solution.
+We get the only solution, where only one car is needed, when $c_1$ drives to $s_k$, wherever the station $s_k$ is. Every route of $c_1$ can be the optimal route, considering the other customers. Therefore, an exact reduction of $\mathcal{M}$ is not possible without the the risk of cutting off the optimal solution.
 	
 \end{example}
 

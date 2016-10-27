@@ -1,19 +1,20 @@
 \chapter{Problem Description and Classification}
+\label{ch:problem_description}
 
 In this chapter, the problem is stated in detail and the notation is introduced. The problem is classified by relating it to known problems in literature and its complexity is determined. Finally, known approaches to similar problems are regarded. Most of the following considerations are already part of the underlying theses \cite{Kaiser_Knoll}, except for the fact that multiple leg is allowed. For better clarity to the reader, all crucial results are repeated here.
 
 \section{Situation and Issue}
 
-We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a costumer can rent an available car wherever and whenever there is one and use it as long as he needs it. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles. An autonomous vehicle behaves the same as if a human being drives it, but without that a human being is necessarily present. Instead of looking for a car, a costumer books a car via a smartphone application and gets picked up by the car at the desired start location and at the desired start time. For the costumer, this seems similar to a taxi service. 
+We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a customer can rent an available car wherever and whenever there is one and use it as long as he needs it. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles. An autonomous vehicle behaves the same as if a human being drives it, but without that a human being is necessarily present. Instead of looking for a car, a customer books a car via a smartphone application and gets picked up by the car at the desired start location and at the desired start time. For the customer, this seems similar to a taxi service. 
 
-The car sharing issue is combined with public transport as it is known today. There is a fixed schedule, according to which the bus or train visits public transport stations in a row at certain time points. A possible route for a costumer may look as follows: The costumer is picked up at his start position by a car and is brought to a station where he gets on a train. After finishing the train trip, he is picked up again by another car and is brought to his destination. It is also possible to change trains during this public transport trip. This behavior is very advantageous for the costumer. While an in-between train trip is cheaper than a pure car trip, the combination of car and train is faster than a pure public transport trip since does not have walking and changing time.
+The car sharing issue is combined with public transport as it is known today. There is a fixed schedule, according to which the bus or train visits public transport stations in a row at certain time points. A possible route for a customer may look as follows: The customer is picked up at his start position by a car and is brought to a station where he gets on a train. After finishing the train trip, he is picked up again by another car and is brought to his destination. It is also possible to change trains during this public transport trip. This behavior is very advantageous for the customer. While an in-between train trip is cheaper than a pure car trip, the combination of car and train is faster than a pure public transport trip since does not have walking and changing time.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Problem Description and Notation}
 \label{sec:problem_description}
 
-In order to realize the previously described problem, we introduce a formal notation for the problem. We have a set of costumers with known travel requests. Each of those can be realized by a number of precomputed multimodal routes. Each route consists of a sequence of trips. A trip is either a car trip or a public transport trip and has a fixed start and end position, as well as a fixed start and end time. Fulfilling a route means that the costumer takes all the trips of this route in a row, \ie he starts at the start point of the first trip and is finished at the end point of the last trip. The transition between two subsequent trips is the changing from a car to a train or the other way round. Each costumer has to be satisfied, \ie he has to be able to fulfill one of his alternative routes.
+In order to realize the previously described problem, we introduce a formal notation for the problem. We have a set of customers with known travel requests. Each of those can be realized by a number of precomputed multimodal routes. Each route consists of a sequence of trips. A trip is either a car trip or a public transport trip and has a fixed start and end position, as well as a fixed start and end time. Fulfilling a route means that the customer takes all the trips of this route in a row, \ie he starts at the start point of the first trip and is finished at the end point of the last trip. The transition between two subsequent trips is the changing from a car to a train or the other way round. Each customer has to be satisfied, \ie he has to be able to fulfill one of his alternative routes.
 
 Although we formally define public transport trips here, we regard only the car trips in detail. Public transport is maintained by an own schedule and is not of interest for this issue. The availability of suitable public transport trips has to be respected while creating the routes (\Cref{ch:instance_creation}). There, the car trips are created in such a way that they are suitable to the existing public transport trips. Here, we assume the existence of feasible routes and therefore only control the behavior of the cars.
 
@@ -21,15 +22,15 @@ For fulfilling the car trips, we have a set of vehicles. For each vehicle, we ha
 
 A further restriction to the problem is that the vehicles have a maximal range that they can drive without refueling. In the model, refueling points are included.
 
-The objective is to create a schedule for the vehicles, such that for each costumer exactly one route is fulfilled, \ie every trip of this route is fulfilled. Further, each vehicle has a feasible fuel state all the time and visits a refuel station when necessary.
+The objective is to create a schedule for the vehicles, such that for each customer exactly one route is fulfilled, \ie every trip of this route is fulfilled. Further, each vehicle has a feasible fuel state all the time and visits a refuel station when necessary.
 
-\paragraph{Costumers, Trips and Vehicles} \parfill
+\paragraph{Customers, Trips and Vehicles} \parfill
 
 We are given a set of car trips $\mathcal{T}$. Each trip $t\in\mathcal{T}$ has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$. For the sake of completeness, we define the set of public transport trips $\Tpub$ with the same properties for $t\in\Tpub$.
 
 The set of vehicles is denoted by $\mathcal{V}$. The start position and the start time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$.
 
-We have the set of costumers $\mathcal{C}$ and the set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_{k_m}\right)$ is a finite sequence of trips with the following properties:
+We have the set of customers $\mathcal{C}$ and the set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_{k_m}\right)$ is a finite sequence of trips with the following properties:
 \begin{align*}
 	\pend_{t_i} = \pstart_{t_{i+1}} && \zend_{t_i} \leq \zstart_{t_{i+1}} && \text{for all } i\in[k-1].
 \end{align*}
@@ -39,7 +40,7 @@ We define the route start and end locations and times for $m\in\mathcal{M}$ as
 	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
 \end{align*}
 
-The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs. Each costumer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which costumer.
+The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs. Each customer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which customer.
 
 We use the notation
 \begin{align*}
@@ -48,16 +49,16 @@ We use the notation
 	\left(M\circ C\right)^{-1}(c) & := M^{-1}\left(C^{-1}(c)\right) = \left\{t\in\mathcal{T}\mid C\left(M(t)\right)=c\right\} && \text{for } c\in\mathcal{C}
 \end{align*}
 
-for all routes of a costumer, all trips of a route and all trips of a costumer, respectively.
+for all routes of a customer, all trips of a route and all trips of a customer, respectively.
 
-For each route of the same costumer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the costumer start and end times for $c\in\mathcal{C}$
+For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$
 \begin{align*}
 	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m .
 \end{align*}
 
 \paragraph{Fuel and Refueling} \parfill
 
-We have to consider fuel restrictions. Fuel can be any form of energy the considered vehicle is powered with. For each vehicle, the fuel level is in the interval $[0,1]$, where $1$ means full capacity and $0$ is empty. We call a trip without a costumer, \ie a trip between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time on the same station.
+We have to consider fuel restrictions. Fuel can be any form of energy the considered vehicle is powered with. For each vehicle, the fuel level is in the interval $[0,1]$, where $1$ means full capacity and $0$ is empty. We call a trip without a customer, \ie a trip between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time on the same station.
 
 For refueling, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$, $t\in\mathcal{T}\cupdot\mathcal{R}$ as the amount, the fuel level decreases along a deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cupdot\mathcal{R}$ is the amount of fuel, a vehicle needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. $f^0_v$ for $v\in\mathcal{V}$ is the initial fuel state of a car.
 
@@ -94,7 +95,7 @@ The binary relation $\preceq$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as:
 
 \end{definition}
 
-The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same costumer, except they belong to the same route. This results from the problem setting, that for each costumer exactly one route is fulfilled. 
+The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same customer, except they belong to the same route. This results from the problem setting, that for each customer exactly one route is fulfilled. 
 
 \begin{remark}
 
@@ -115,13 +116,13 @@ Then,
 
 \paragraph{Problem Description} \parfill
 
-We define the considered problem as follows: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every costumer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
+We define the considered problem as follows: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every customer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
 
 \begin{itemize}
 	\item{Each car is able to serve its scheduled trips, considering time and location.}
 	\item{The fuel state of each car is always in a feasible range.}
-	\item{Each costumer is able to complete his route, considering time and location.}
-	\item{For each costumer, exactly one route is chosen.}
+	\item{Each customer is able to complete his route, considering time and location.}
+	\item{For each customer, exactly one route is chosen.}
 \end{itemize}
 
 The goal is to find a cost-minimal feasible schedule considering all these constraints.
@@ -131,14 +132,14 @@ The goal is to find a cost-minimal feasible schedule considering all these const
 We introduce the following types of costs:
 \begin{itemize}
 	\item{Vehicles costs $\cv$: unit costs for each used vehicle}
-	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}, t\in\mathcal{T}\cupdot\mathcal{R}$: costs, if a vehicle drives to a trip or a refuel station without a costumer using it}
+	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}, t\in\mathcal{T}\cupdot\mathcal{R}$: costs, if a vehicle drives to a trip or a refuel station without a customer using it}
 	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}$: costs for fulfilling a trip}
 \end{itemize}
 
-For public transport, we define either trip costs for each public transport trip or fixed costs for each costumer using public transport. Finally, we define costs to consider the costumer preferences.
+For public transport, we define either trip costs for each public transport trip or fixed costs for each customer using public transport. Finally, we define costs to consider the customer preferences.
 \begin{itemize}
 	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{public}}$: costs for using public transport}
-	\item{Route-dependent costs $\bar{c}^{\operatorname{r}}_m$ for $m\in\mathcal{M}$: costs for costumer preferences and unit costs for using public transport}
+	\item{Route-dependent costs $\bar{c}^{\operatorname{r}}_m$ for $m\in\mathcal{M}$: costs for customer preferences and unit costs for using public transport}
 \end{itemize}
 
 Since the trip costs for public transport are connected with the choice of the route, we easily add these costs to the trip costs.
@@ -146,9 +147,9 @@ Since the trip costs for public transport are connected with the choice of the r
 	\croute_m := \bar{c}^{\operatorname{r}}_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-The route costs additionally include costumer preferences. Each costumer has a set of alternative routes. He does not choose the route by himself, but this is decided by the problem whatever fits best into the system. The user preference costs work as penalty terms for an inconvenient route choice. This means, a route that is disadvantageous for the costumer is penalized. Then, either the less favorable route is chosen (if it fits better into the system) and this is penalized. Or the more favorable route is chosen although it is not so good for the system. With this, a realistic costumer behavior is modeled.
+The route costs additionally include customer preferences. Each customer has a set of alternative routes. He does not choose the route by himself, but this is decided by the problem whatever fits best into the system. The user preference costs work as penalty terms for an inconvenient route choice. This means, a route that is disadvantageous for the customer is penalized. Then, either the less favorable route is chosen (if it fits better into the system) and this is penalized. Or the more favorable route is chosen although it is not so good for the system. With this, a realistic customer behavior is modeled.
 
-The costumer preferences are \eg the total travel time, the number of changes or the costs for the costumer. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
+The customer preferences are \eg the total travel time, the number of changes or the costs for the customer. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
 
 \paragraph{Additional Assumptions} \parfill
 
@@ -267,3 +268,27 @@ With \Cref{th:complexity_VSPRC} and \Cref{th:complexity_VSPMC} we can see, that 
 The problem gets even harder, as we do not only consider the number of vehicles but include the operational cost and penalty terms for costumer preferences. Further, we want to have the possibility to refuel during the process, \ie we have negative resource cost. Finally, we want to apply both of these constraints simultaneously. 
 
 We will model our problem as a mixed-integer linear program in a size polynomial in the input size. Therefore, it is possible to verify a solution in polynomial time. This means, our problem is $\mathcal{NP}$-complete.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Approaches in Literature}
+
+In the previous sections we have seen, that the problem we are dealing with is very hard. We cannot expect to find a algorithm that solves the problem running in polynomial time. Therefore we focus on the field of meta heuristics. Using them it is possible to find a good solution for realistic instances in reasonable time. The field of the vehicle scheduling problems is highly researched and there are many solution approaches available in literature. \cite{Bunte_Kliewer} provide an extensive overview for both problems (SD-VSP) and (MD-VSP). We have classified our problem as (SD-VSP) with resource constraints and multi-leg cover constrains. This is only a small extension to the problem treated in the underlying theses, which contained single-leg cover constraints. \cite{Kaiser} and \cite{Knoll} already discussed the concerning approaches in literature. Since their problem is the basis of our problem and the theses have been published only a short time before this, we can expect their literature approaches to be almost complete. Thus we refer to \cite[pp. 13-15]{Kaiser} and \cite[pp. 13-15]{Knoll} for more details. To the knowledge of the author there is no work of cover constraints in context with vehicle scheduling available in literature.
+
+\paragraph{Electric Vehicle Scheduling Problem} \parfill
+
+The most related problems in literature are the Alternative-Fuel Vehicle Scheduling Problem (AF-VSP), treated by \cite{Adler} and the Electric Vehicle Scheduling Problem (E-VSP), treated by \cite{Wen}. Both denote a (MD-VSP) with resource constraints and refuel stations. While \cite{Adler} restrict the problem to full charging in conjunction with a fixed charging time, \cite{Wen} allow a partial charging and treats the charging time as a linear function. Thus, the differences of (E-VSP) to our problem is that cover constraints are not considered there. 
+
+Besides a mathematical problem formulation, \cite{Wen} provide an \enquote{Adaptive Large Neighborhood Search} heuristic (ALNS) in order to tackle the problem. We present a rough outline of this algorithm. First, an initial solution is created by a greed heuristic. From this solution, a certain number of trips is deleted (destroy method). After this, several new feasible duties are created by inserting respective trips with lowest cost increasing at certain positions (repair method). Finally, the new duties are selected with minimal total cost, such that the duties cover each trip and the depot constraints are fulfilled. There are several destroy and repair methods presented and there is a deterministic and a randomized version of the heuristic.
+
+We do not examine the possibility of extending (ALNS) in order to cope with cover constraints. We adapt only the solution methods developed by \cite{Kaiser} and \cite{Knoll}.
+
+\paragraph{Approaches to Model Refuel Points} \parfill
+
+There is no straight-forward procedure to model the refuel points. It is not possible to use them individually in a task graph since several vehicles may use the same refuel point.
+
+In order to model refuel points for the (VRP), \cite{Erdogan_Miller-Hooks} and \cite{Felipe} include several copies of the refuel points, each for one potential visit between two nodes. This guarantees that a refuel point can be visited more than once. The number of used copies is not specified there. While \cite{Erdogan_Miller-Hooks} considers only complete refueling, in \cite{Felipe} partial refueling is allowed.
+
+In literature concerning the (VSP), \cite{Wen} create two copies for each refuel point. One copy is set between the depot and the trip, the other is set after the trip. With this, they guarantee that a vehicle is able to refuel before and after each trip. There are constraints that prevent a car from visiting the same refuel station twice. With this formulation $2|\mathcal{T}||\mathcal{R}|$ refuel point nodes are needed. In other (VSP) models, a preprocessing of the graph removes arcs between trips that cannot be fulfilled after another due to time. Using this refuel point modeling, the complete graph has to be considered in order to model a partial refueling and a feasible timing of the routes is ensured by explicit constraints.
+
+In the underlying theses (\cite{Kaiser}, \cite{Knoll}), a copy of each refuel point between each pair of feasible trips is created. With this method it is possible to determine the respective charging time individually in advance and modeling partial refueling is easy. In the task graph, time infeasible arcs are removed in advance and are not treated by additional constraints. In the worst case there are needed ${\frac{1}{2}|\mathcal{R}||\mathcal{T}|^2}$ refuel point nodes. In order to reduce the size of the task graph, they provide a preprocessing on the refuel points nodes, based on Pareto optimality. Using this for realistic instances, most of the copies can be eliminated without cutting the optimal solution.
