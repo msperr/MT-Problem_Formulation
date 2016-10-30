@@ -217,15 +217,15 @@ Note that this procedure only provides a solution of the LP-relaxation of the ma
 \section{Solving of the Subproblems}
 \label{sec:solving_subproblem}
 
-In every step of the master problem, we solve the subproblem $\eqref{eq:SPv}$ for each vehicle $\vinV$. This subproblem is equivalent to the shortest path problem with resource constraints, which is $\mathcal{NP}$-hard. A vehicle duty is expressed as $\ds$-$\de$-path whose first vertex is the respective vehicle $v$. The main resource is the fuel state of the vehicle, where refuel station have negative fuel consumption. The goal is to find a feasible path with negative reduced cost which is then the new duty. Besides fuel, in the algorithm are used additional resources which describe what multimodal routes are served in this duty.
+In every step of the master problem, we solve the subproblem $\eqref{eq:SPv}$ for each vehicle $\vinV$. This subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). A vehicle duty is expressed as $\ds$-$\de$-path whose first vertex is the respective vehicle $v$. The main resource is the fuel state of the vehicle, where refuel stations have negative fuel consumption. The goal is to find a feasible path with negative reduced cost which is then the new duty. Besides fuel, in the algorithm are used additional resources which describe what multimodal routes are served in this duty.
 
 \subsection{Shortest Path Problem with Resource Constraints}
 
-The Shortest Path Problem with Resource Constraints (SPPRC) is a generalization of the Shortest Path Problem. The (SPPRC) is given by a graph, a set of resources and a relation on every arc that specifies the change of resources along its way.
+In this section, we summarize the crucial results in order to show a label-setting algorithm which solves the (SPPRC) optimally. The respective definitions and the algorithm are shown in detail in \cite{Kaiser} and \cite{Irnich_Desaulniers}. The (SPPRC) is a generalization of the Shortest Path Problem and is $\mathcal{NP}$-hard, as shown in \cite[p.307]{Handler_Zang}. The problem is given by a graph, a set of resources and a relation on every arc that specifies the change of resources along its way. 
 
 \begin{definition}[Graph with resource constraints]
 
-We call ${H:=\left(V_H,A_H,\sqsubseteq,I,\operatorname{REF}\right)}$ a graph with resource constraints for a set of resources $\mathcal{U}$ if
+We call ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ a graph with resource constraints for a set of resources $\mathcal{U}$ if
 \begin{enumerate}
 	\item{$\left(V_H,A_H\right)$ is a directed graph with vertex set $V_H$ and arc set $A_H$.}
 	\item{$\sqsubseteq\in\left\{\leq,=,\geq\right\}^{\mathcal{U}}$ is a vector of resource relations and is called the resource dominance relation.}
@@ -239,16 +239,16 @@ We call ${H:=\left(V_H,A_H,\sqsubseteq,I,\operatorname{REF}\right)}$ a graph wit
 		\end{align*}
 	\item{$I\subseteq\mathbb{R}^{\mathcal{U}}$ is the Cartesian product of closed intervals of $\mathbb{R}$.}
 		The projection onto a single resource $u\in\mathcal{U}$ denoted by $\Pi_u(I)$ is called its resource window. If $\Pi_u(I)=\mathbb{R}$ for some resource $u\in\mathcal{U}$ it is called unrestricted.
-	\item{$\operatorname{REF} = \left(\operatorname{REF}_{u,w}\right)_{(v,w)\in A_H}$}
-		is a vector of binary relations ${\operatorname{REF}_{v,w}\subseteq I\times I}$ for all ${(v,w)\in A_H}$ such that the set of vectors related to some ${r^v\in I}$
+	\item{$\REF = \left(\REF_{u,w}\right)_{(v,w)\in A_H}$}
+		is a vector of binary relations ${\REF_{v,w}\subseteq I\times I}$ for all ${(v,w)\in A_H}$ such that the set of vectors related to some ${r^v\in I}$
 		\begin{align*}
-			\operatorname{REF}_{v,w}\left(r^v\right) := \left\{r^w\in I\mid \left(r^v,r^w\right)\in\operatorname{REF}_{v,w}\right\}
+			\REF_{v,w}\left(r^v\right) := \left\{r^w\in I\mid \left(r^v,r^w\right)\in\REF_{v,w}\right\}
 		\end{align*}
-		is closed, has a finite set of maximal vectors ${\max_{\sqsubseteq}\operatorname{REF}_{v,w}\left(r^v\right)}$ and fulfills
+		is closed, has a finite set of maximal vectors ${\max_{\sqsubseteq}\REF_{v,w}\left(r^v\right)}$ and fulfills
 		\begin{align*}
-			\forall r^w,\tilde{r}^w\in I,r^w\sqsubseteq\tilde{r}^w : \tilde{r}^w\in\operatorname{REF}_{v,w}\left(r^v\right) \Rightarrow r^w\in\operatorname{REF}_{v,w}\left(r^v\right).
+			\forall r^w,\tilde{r}^w\in I,r^w\sqsubseteq\tilde{r}^w : \tilde{r}^w\in\REF_{v,w}\left(r^v\right) \Rightarrow r^w\in\REF_{v,w}\left(r^v\right).
 		\end{align*}
-		$\operatorname{REF}_{v,w}$ is called the resource extension function with respect to $\sqsubseteq$ on the arc $(v,w)\in A_H$.
+		$\REF_{v,w}$ is called the resource extension function with respect to $\sqsubseteq$ on the arc $(v,w)\in A_H$.
 \end{enumerate}
 	
 \end{definition}
@@ -259,35 +259,176 @@ The resource dominance relation is a partial order on $\mathbb{R}^{\mathcal{U}}$
 
 \begin{definition}[Monotone resource extension function]
 
-A resource extension function ${\operatorname{REF}_{v,w}\subseteq I\times I}$ with respect to $\sqsubseteq$ is called monotone of
+A resource extension function ${\REF_{v,w}\subseteq I\times I}$ with respect to $\sqsubseteq$ is called monotone if
 \begin{align*}
-	\forall r^v,\tilde{r}^v\in I, r^v\sqsubseteq\tilde{r}^v : \operatorname{REF}_{v,w}\left(r^v\right)\subseteq\operatorname{REF}_{v,w}\left(\tilde{r}^v\right)
+	\forall r^v,\tilde{r}^v\in I, r^v\sqsubseteq\tilde{r}^v : \REF_{v,w}\left(r^v\right)\subseteq\REF_{v,w}\left(\tilde{r}^v\right)
 \end{align*}
 holds.
 
 \end{definition}
 
+The monotonicity is important for the consistency. If a resource vector is dominated by another, then there are not more possible outcomes than for the dominating one.
+
+After introducing the graph, we define resource-feasible paths on this graph.
+
 \begin{definition}[Resource-feasible path]
 
-Let ${H=\left(V_H,A_H,\sqsubseteq,I,\operatorname{REF}\right)}$ be a graph with resource constraints. A path ${P:=\left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is called resource-feasible if
+Let ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. A path ${P:=\left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is called resource-feasible if
 \begin{align*}
-	\exists r^{v_i}\in I,i\in\{0,\dots,n\}: \left(r^{v_{i-1}},r^{v_i}\right)\in\operatorname{REF}_{v_{i-1},v_i} \forall i\in\{1,\dots,n\}
+	\exists r^{v_i}\in I,i\in\{0,\dots,n\}: \left(r^{v_{i-1}},r^{v_i}\right)\in\REF_{v_{i-1},v_i} \forall i\in\{1,\dots,n\}
 \end{align*}
 holds. We say $\left(r^v\right)_{v\in P}$ witnesses resource-feasibility of $P$.
 
 \end{definition}
 
+The witnessing resource vectors $\left(r^v\right)_{v\in\mathcal{P}}$ are the resources along this path, \eg the fuel state of the respective trips of a vehicle duty.
+
+\paragraph{Contraction and Inversion} \parfill
+
+We define the actions \enquote{contraction of an arc} and \enquote{inversion of a graph} in order to apply them to our problem.
+
+\begin{definition}[Contraction]
+
+${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints, ${(v,w)\in A_H}$ be the only arc leaving some vertex $v\in V_H$ and $\REF_{v,w}$ be monotone.
+\begin{enumerate}
+	\item
+For $(u,v)\in A_H$, the concatenation of resource extension functions is defined as
+\begin{align*}
+	\REF_{v,w}\circ\REF_{u,v} := \left\{\vphantom{\REF_{v,w}}\right. & \left(r^u,r^w\right)\in I\times I\mid \exists r^v\in I: \\
+	& \left.\left(r^u,r^v\right)\in\REF_{u,v}\land\left(r^v,r^w\right)\in\REF_{v,w}\right\}
+\end{align*}
+	\item
+The graph with resource constraints ${\widehat{H} := \left(V_{\widehat{H}},A_{\widehat{H}},\sqsubseteq,I,\widehat{\REF}\right)}$ which results from $H$ by contracting the arc $(v,w)$ is defined by the vertex set ${V_{\widehat{H}} := V_H\backslash\{v\}}$, the arc set
+\begin{align*}
+	A_{\widehat{H}} := \left(A_H\cap V^2_{\widehat{H}}\right) \cup \left\{(u,w)\mid (u,v)\in A_H\right\},
+\end{align*}
+
+and the resource extension function ${\left(\REF_a\right)_{a\in A_{\widehat{H}}}}$, where
+\begin{align*}
+	\widehat{\REF}_a :=
+	\begin{cases}
+		\REF_{u,w}\cup\left(\REF_{v,w}\circ\REF_{u,v}\right) & \text{if } \exists u\in V_{\widehat{H}}: a=(u,w) \\
+		\REF_a & \text{otherwise}
+	\end{cases}
+\end{align*}
+
+for all ${a\in A_H}$. $\REF_{u,w}$ and $\REF_{u,v}$ are considered to be the empty relation $\emptyset$ if ${(u,w)\not\in A_H}$ or ${(u,v)\not\in A_H}$, respectively.
+
+\end{enumerate}
+
+\end{definition}
+
+In \cite[p.~79]{Kaiser} is proven that for a resource-feasible path $P$ in the original graph $H$ there is a resource-feasible path $\widehat{P}$ in the contracted graph $\widehat{H}$ and vice versa such that $P$ and $\widehat{P}$ cover the same vertices of $V_H\backslash\{v\}$. We need contraction since we have resources on both the vertices and the arcs in our problem. 
+
+\begin{definition}[Inversion]
+
+\begin{enumerate}
+	\item{A resource extension function}
+$\REF_{v,w}$ with respect to $\sqsubseteq$ is called invertible if the inverted relation
+\begin{align*}
+	\REF^{-1}_{v,w} := \left\{\left(r^w,r^v\right)\mid\left(r^v,r^w\right)\in\REF_{v,w}\right\}
+\end{align*}
+is a resource extension function with respect to the inverted dominance relation~$\sqsupseteq$. $\REF^{-1}_{v,w}$ is called the inversion of $\REF_{v,w}$.
+	\item{Let}
+${H := \left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints and invertible resource extension functions.
+
+The inversion of $H$ is defined to be the graph
+\begin{align*}
+	H^{-1} := \left(V_H,A^{-1}_H,\sqsupseteq,I,\REF^{-1}\right)
+\end{align*}
+with inverted arc set ${A_H^{-1}:=\left\{(w,v)\in V_H^2\mid (v,w)\in A_H\right\}}$ and inverted resource extension functions ${\REF^{-1} := \left(\REF^{-1}_{v,w}\right)_{(w,v)\in A^{-1}_H}}$.
+\end{enumerate}
+
+\end{definition}
+
+In \cite[p.~83]{Kaiser} is proven that in a graph $H$ with invertible resource extension functions, a path ${P:=\left(v_0,\dots,v_n\right)}$ is resource-feasible with witnessing resource vectors ${\left(r^v\right)_{v\in P}}$ if and only if ${P^{-1}:=\left(v_n,\dots,v_0\right)}$ is resource-feasible in the inverted graph $H^{-1}$ with witnessing resource vectors $\left(r^v\right)_{v\in P^{-1}}$. We need inversions in order to improve the behavior of the algorithm. Using inversions we can apply the algorithm once for all subproblems and do not have to solve each subproblem separately.
+
+\paragraph{Label-Setting Algorithm} \parfill
+
+We solve the (SPPRC) via a label-setting algorithm. Previously in this section, we have added resources to the graph in order to restrict the set of feasible paths. Since we do not have a cost function, finding an optimal path is not straight-forward. We do not have a shortest path but multiple resource-feasible paths. We use the resource dominance relation $\sqsubseteq$ to compare different paths. If a path is dominated by another, it is not preferable and therefore not considered in the solution. If two paths are not comparable, we cannot decide which one is more preferable. This leads to the concept of Pareto-optimality.
+
+\begin{definition}[Pareto-optimal paths]
+
+Let ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. Let $P$ be a resource-feasible $v$-$w$-path in $H$.
+
+$P$ is called Pareto-optimal if there exist witnesses $\left(r^u\right)_{u\in P}$ for the resource-feasibility of $P$ such that for every resource-feasible $v$-$w$-path $Q$ in $H$ with witnessing resource vectors $\left(\tilde{r}^u\right)_{u\in Q}$ fulfilling ${\tilde{r}^v = r^v}$
+\begin{align*}
+	r^w\sqsubseteq \tilde{r}^w \Rightarrow r^w = \tilde{r}^w
+\end{align*}
+
+holds. We say that the resource vectors $\left(r^u\right)_{u\in P}$ witness Pareto-optimality of $P$.
+
+\end{definition}
+
+In general, there can be exponentially many paths in a graph with respect to its size. It is further possible that the witnessing resource vectors are not comparable. Hence, there can be an exponential number of Pareto-optimal paths in a graph. This fact gives a feeling why (SPPRC) is $\mathcal{NP}$-hard.
+
+The idea of the algorithm is to start with a trivial path, consisting of one single vertex. We then extend the paths while we maintain resource-feasibility and Pareto-optimality for all paths. Finally, we receive Pareto-optimal paths from the starting vertex to all vertices. The algorithm works on the concept of Dynamic Programming.
+
+\begin{algorithm}[hbt]
+	\SetAlgoLined
+	\KwIn{graph with resource constraints ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$, topological sorting ${v_0,\dots,v_n}$ of $V_H$ and initial resource vector $r^{v_0}$}
+	\KwOut{shortest path tree rooted at $\left(v_0,r^{v_0}\right)$ encoded by $\delta$}
+	$\mathcal{P}_{v_0}\gets\left\{r^{v_0}\right\}$ \;
+	$\delta\left(v_0,r^{v_0}\right)\gets\emptyset$ \;
+	\lForEach{$i\in\left\{1,\dots,n\right\}$}{$\mathcal{P}_{v_i}\gets\emptyset$}
+	\ForEach{$i=0,\dots,n$}{
+		\ForEach{$r^{v_i}\in\mathcal{P}_{v_i}$}{
+			\ForEach{$w\in\operatorname{N}^+_H\left(v_i\right)$}{
+				$\mathcal{P}\gets\max_{\sqsubseteq}\REF_{v_i,w}\left(r^{v_i}\right)$ \;
+				\lForEach{$r^w\in\mathcal{P}$}{$\delta\left(w,r^w\right)\gets\left(v_i,r^{v_i}\right)$}
+				$\mathcal{P}_w\gets\mathcal{P}_w\cup\mathcal{P}$ \;
+				$\mathcal{P}_w\gets\max_{\sqsubseteq}\mathcal{P}_w$ \;
+			}
+		}
+	}
+	\Return{$\delta$}
+	\caption{Label-setting algorithm for acyclic graphs with resource constraints}
+\end{algorithm}
+
+We have a graph with resource constraints, a topological sorting of the vertices and an initial resource vector as input. The graph has to be acyclic. A topological sorting ${\left\{v_0,\dots,v_n\right\}}$ means that there are no $i<j$ with ${\left(v_j,v_i\right)\in A_H}$. Start with vertex $v_0$ and initial resource vector $r^{v_0}$, we treat the vertices successively in topological order. For each vertex $v\in V_H$ and for each computed Pareto-optimal $v_0$-$v$-path, we try to extend the path feasibly by a single vertex. If a path is found, we add a label to the extending vertex and update the mapping $\delta$ in order to identify the origin of the extension. At the end, we receive the mapping $\delta$ which identifies all resource-feasible Pareto-optimal $v_0$-$v$-paths for each vertex $v\in V_H$.
+
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Strengthening Constraints}
+\subsection{Strengthening Inequalities}
+
+Before we apply the previously stated algorithm to the subproblem, we want to insert additional valid inequalities. These are not necessary but may improve the column generation process. In the original problem, we have the linking constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ which ensure that for every customer exactly one route is fulfilled. These constraints cannot be moved into the subproblems since the customers can be satisfied by different vehicles. It is even likely that two trips of the same route are fulfilled by different vehicles.
+
+Nevertheless, we can identify duties that are infeasible with respect to the cover constraints. This is the case, if a vehicle fulfills two trips that belong to the same costumer but not to the same route. If this duty is part of the overall solution, it is not possible that $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are fulfilled simultaneously. Therefore, we want to prevent such a duty from being added to the column set.
+
+In order to use the inequalities, we have to introduce decision variables $u_m\in\{0,1\}$ for $m\in\mathcal{M}$. We insert the following inequalities to $\eqref{eq:SPv}$ for each $\vinV$. They are not necessary since they are implied by the cover constraints of the master problem, but they strengthen formulation of the subproblem.
+\begin{align}
+	& \sum_{m\in C^{-1}(c)} u_m \leq 1 && \text{for all } c\in\mathcal{C} \label{eq:SPv:customer} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} \leq u_m && \text{for all } m\in\mathcal{M}, t\in m \label{eq:SPv:route} \\
+	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:SPv:um}
+\end{align}
+
+These constraints ensure that for every customer at most one route can be fulfilled. Note that $\eqref{eq:SPv:customer}$ is also valid with equality. Adding these constraints possibly makes the subproblems harder to solve, but improves the behavior in the master problem since there are no duties added that are infeasible from the very beginning. If the addition is beneficial for the overall process, is not known in advance.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Adaption of the Resources}
+\subsection{Determination of the Resources}
+
+The only resource that we have used so far is the fuel resource. We use the index \emph{fuel} in our resource vector. The fuel is in the interval $[0,1]$ for the fuel level where $0$ means that the vehicle has no fuel and $1$ that the vehicle is completely fueled. A higher fuel level is preferable, hence the resource relation for fuel is $\leq$.
+
+Since we have no objective function in this problem, we model the reduced cost as an additional resource. We introduce the index \emph{redcost} in order to keep track of the reduced cost of a duty. The reduced cost is unrestricted and the reduced cost is minimized, thus we set the resource window to $\mathbb{R}$ and the resource relation to $\geq$.
+
+An additional resource is the number of trips that a vehicle fulfills. We call it the length of a duty and use the index \emph{length}. This resource is not necessary for the subproblem but advantageous for the branch-and-bound procedure as we see in \Cref{sec:solving_masterproblem}. The length of a duty lies in the interval $[0,|\mathcal{T}|]$. Comparing two duties with different lengths, it is not clear which of them is preferable. Thus the resource relation is $=$.
+
+In order to ensure the constraints $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ we use a resource for every multimodal route. We use the respective $m\in\mathcal{M}$ as index for the route resource. This resource indicates whether a trip of this route is fulfilled within this duty, therefore the resource window is $[0,1]$. Similar to the duty length is is not possible to compare different route resources, thus the resource relation is $=$.
+
+Altogether, we consider resources ${\mathcal{U} := \left\{\operatorname{redcost},\operatorname{fuel},\operatorname{length}\right\}\cupdot\mathcal{M}}$ in the resource window
+\begin{align*}
+	I := \mathbb{R}\times[0,1]\times[0,|\mathcal{T}|]\times[0,1]^{\mathcal{M}}\subseteq\mathbb{R}^{\mathcal{U}}
+\end{align*}
+
+A resource vector $r\in I$ consists of the reduced cost ${r_{\operatorname{redcost}}\in\mathbb{R}}$, the fuel level ${r_{\operatorname{fuel}}\in[0,1]}$, the duty length ${r_{\operatorname{length}}\in[0,|\mathcal{T}|]}$ and the route resources ${r_{\mathcal{M}}\in[0,1]^{\mathcal{M}}}$ in this order. The resource relation vector is given by ${\sqsubseteq := \left(\geq,\leq,=,=,\dots,=\right)}$.
+
+These resources coincide in large parts with the formulation in \cite{Kaiser}. They use resources for each costumer instead of route resources in order to ensure the single-leg cover constraints. This is the only adaption in this section and the next section.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Adaption of the Resource Extension Function}
+\subsection{Determination of the Resource Extension Function}
+\label{sec:ref}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
