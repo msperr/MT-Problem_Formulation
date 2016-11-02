@@ -13,6 +13,7 @@ Most of the procedure is already developed by \cite{Kaiser}. We show the crucial
 %########################################################################################################################################
 
 \section{Path Flow Formulation}
+\label{sec:pathflow_formulation}
 
 We apply Dantzig-Wolfe Decomposition in order to create a path flow formulation of our problem. This is advantageous since the size of the arc flow formulation grows very fast with increasing problem size. We give only a short outline on the general procedure and then show the application of our problem.
 
@@ -220,10 +221,12 @@ Note that this procedure only provides a solution of the LP-relaxation of the ma
 In every step of the master problem, we solve the subproblem $\eqref{eq:SPv}$ for each vehicle $\vinV$. This subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). A vehicle duty is expressed as $\ds$-$\de$-path whose first vertex is the respective vehicle $v$. The main resource is the fuel state of the vehicle, where refuel stations have negative fuel consumption. The goal is to find a feasible path with negative reduced cost which is then the new duty. Besides fuel, in the algorithm are used additional resources which describe what multimodal routes are served in this duty.
 
 \subsection{Shortest Path Problem with Resource Constraints}
+\label{sec:spprc}
 
 In this section, we summarize the crucial results in order to show a label-setting algorithm which solves the (SPPRC) optimally. The respective definitions and the algorithm are shown in detail in \cite{Kaiser} and \cite{Irnich_Desaulniers}. The (SPPRC) is a generalization of the Shortest Path Problem and is $\mathcal{NP}$-hard, as shown in \cite[p.307]{Handler_Zang}. The problem is given by a graph, a set of resources and a relation on every arc that specifies the change of resources along its way. 
 
 \begin{definition}[Graph with resource constraints]
+\label{def:graph_resource_constraints}
 
 We call ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ a graph with resource constraints for a set of resources $\mathcal{U}$ if
 \begin{enumerate}
@@ -258,6 +261,7 @@ The resource vectors are assigned to the vertices of the graph. They describe th
 The resource dominance relation is a partial order on $\mathbb{R}^{\mathcal{U}}$. If two resource vectors are comparable, then the dominating vector is always preferable to the other. If it is desirable to have a high quantity of a resource, the resource relation is set to $\leq$, \eg for the fuel resource. Otherwise it is set to $\geq$, \eg for the modeling cost resource. If no general relation holds, it is set to $=$. The resource extension function models the change of the resource vectors along the arcs. It relates a resource vector to all possible outcomes when traveling along this arc. 
 
 \begin{definition}[Monotone resource extension function]
+\label{def:monotone_ref}
 
 A resource extension function ${\REF_{v,w}\subseteq I\times I}$ with respect to $\sqsubseteq$ is called monotone if
 \begin{align*}
@@ -288,6 +292,7 @@ The witnessing resource vectors $\left(r^v\right)_{v\in\mathcal{P}}$ are the res
 We define the actions \enquote{contraction of an arc} and \enquote{inversion of a graph} in order to apply them to our problem.
 
 \begin{definition}[Contraction]
+\label{def:contraction}
 
 ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints, ${(v,w)\in A_H}$ be the only arc leaving some vertex $v\in V_H$ and $\REF_{v,w}$ be monotone.
 \begin{enumerate}
@@ -312,7 +317,7 @@ and the resource extension function ${\left(\REF_a\right)_{a\in A_{\widehat{H}}}
 	\end{cases}
 \end{align*}
 
-for all ${a\in A_H}$. $\REF_{u,w}$ and $\REF_{u,v}$ are considered to be the empty relation $\emptyset$ if ${(u,w)\not\in A_H}$ or ${(u,v)\not\in A_H}$, respectively.
+for all ${a\in A_H}$. $\REF_{u,w}$ and $\REF_{u,v}$ are considered to be the empty relation $\emptyset$ if ${(u,w)\notin A_H}$ or ${(u,v)\notin A_H}$, respectively.
 
 \end{enumerate}
 
@@ -321,6 +326,7 @@ for all ${a\in A_H}$. $\REF_{u,w}$ and $\REF_{u,v}$ are considered to be the emp
 In \cite[p.~79]{Kaiser} is proven that for a resource-feasible path $P$ in the original graph $H$ there is a resource-feasible path $\widehat{P}$ in the contracted graph $\widehat{H}$ and vice versa such that $P$ and $\widehat{P}$ cover the same vertices of $V_H\backslash\{v\}$. We need contraction since we have resources on both the vertices and the arcs in our problem. 
 
 \begin{definition}[Inversion]
+\label{def:inversion}
 
 \begin{enumerate}
 	\item{A resource extension function}
@@ -341,7 +347,16 @@ with inverted arc set ${A_H^{-1}:=\left\{(w,v)\in V_H^2\mid (v,w)\in A_H\right\}
 
 \end{definition}
 
-In \cite[p.~83]{Kaiser} is proven that in a graph $H$ with invertible resource extension functions, a path ${P:=\left(v_0,\dots,v_n\right)}$ is resource-feasible with witnessing resource vectors ${\left(r^v\right)_{v\in P}}$ if and only if ${P^{-1}:=\left(v_n,\dots,v_0\right)}$ is resource-feasible in the inverted graph $H^{-1}$ with witnessing resource vectors $\left(r^v\right)_{v\in P^{-1}}$. We need inversions in order to improve the behavior of the algorithm. Using inversions we can apply the algorithm once for all subproblems and do not have to solve each subproblem separately.
+\begin{theorem}[Feasibility-conservation of inversions]
+\label{th:inversion}
+
+Let ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. Further, let all the resource extension functions of $\REF$ be invertible.
+
+Then a path ${P := \left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is resource-feasible with witnessing resource vectors $\left(r^v\right)_{v\in P}$ if and only if ${P^{-1} := \left(v_n,\dots,v_0\right)}$ is a resource-feasible path in the inverted graph $H^{-1}$ with witnessing resource vectors $\left(r^v\right)_{v\in P^{-1}}$.
+
+\end{theorem}
+
+This theorem is already proven in \cite[p.~83]{Kaiser}. We need inversions in order to improve the behavior of the algorithm. Using inversions we can apply the algorithm once for all subproblems and do not have to solve each subproblem separately.
 
 \paragraph{Label-Setting Algorithm} \parfill
 
@@ -382,7 +397,7 @@ The idea of the algorithm is to start with a trivial path, consisting of one sin
 		}
 	}
 	\Return{$\delta$}
-	\caption{Label-setting algorithm for acyclic graphs with resource constraints}
+	\caption{Label-setting algorithm for acyclic graphs with resource constraints} \label{alg:label_setting}
 \end{algorithm}
 
 We have a graph with resource constraints, a topological sorting of the vertices and an initial resource vector as input. The graph has to be acyclic. A topological sorting ${\left\{v_0,\dots,v_n\right\}}$ means that there are no $i<j$ with ${\left(v_j,v_i\right)\in A_H}$. Start with vertex $v_0$ and initial resource vector $r^{v_0}$, we treat the vertices successively in topological order. For each vertex $v\in V_H$ and for each computed Pareto-optimal $v_0$-$v$-path, we try to extend the path feasibly by a single vertex. If a path is found, we add a label to the extending vertex and update the mapping $\delta$ in order to identify the origin of the extension. At the end, we receive the mapping $\delta$ which identifies all resource-feasible Pareto-optimal $v_0$-$v$-paths for each vertex $v\in V_H$.
@@ -398,7 +413,7 @@ Nevertheless, we can identify duties that are infeasible with respect to the cov
 In order to use the inequalities, we have to introduce decision variables $u_m\in\{0,1\}$ for $m\in\mathcal{M}$. We insert the following inequalities to $\eqref{eq:SPv}$ for each $\vinV$. They are not necessary since they are implied by the cover constraints of the master problem, but they strengthen formulation of the subproblem.
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m \leq 1 && \text{for all } c\in\mathcal{C} \label{eq:SPv:customer} \\
-	& \sum_{s\in\Nin(t)} x_{s,t} \leq u_m && \text{for all } m\in\mathcal{M}, t\in m \label{eq:SPv:route} \\
+	& \sum_{s\in\Nin(t)} x_{s,t} \leq u_m && \text{for all } m\in\mathcal{M}, t\in m \label{eq:SPv:route}
 	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:SPv:um}
 \end{align}
 
@@ -407,6 +422,7 @@ These constraints ensure that for every customer at most one route can be fulfil
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Determination of the Resources}
+\label{sec:resources}
 
 The only resource that we have used so far is the fuel resource. We use the index \emph{fuel} in our resource vector. The fuel is in the interval $[0,1]$ for the fuel level where $0$ means that the vehicle has no fuel and $1$ that the vehicle is completely fueled. A higher fuel level is preferable, hence the resource relation for fuel is $\leq$.
 
@@ -414,25 +430,292 @@ Since we have no objective function in this problem, we model the reduced cost a
 
 An additional resource is the number of trips that a vehicle fulfills. We call it the length of a duty and use the index \emph{length}. This resource is not necessary for the subproblem but advantageous for the branch-and-bound procedure as we see in \Cref{sec:solving_masterproblem}. The length of a duty lies in the interval $[0,|\mathcal{T}|]$. Comparing two duties with different lengths, it is not clear which of them is preferable. Thus the resource relation is $=$.
 
-In order to ensure the constraints $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ we use a resource for every multimodal route. We use the respective $m\in\mathcal{M}$ as index for the route resource. This resource indicates whether a trip of this route is fulfilled within this duty, therefore the resource window is $[0,1]$. Similar to the duty length is is not possible to compare different route resources, thus the resource relation is $=$.
+In order to ensure the constraints $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$, we use a resource for every multimodal route. We use the respective $m\in\mathcal{M}$ as index for the route resource. This resource indicates how many trips of this route can still be fulfilled within this duty. Initially, all trips of a route can be fulfilled, thus the resource window is $[0,|m|]$ for $m\in\mathcal{M}$. Similar to the duty length it is not possible to compare different route resources, therefore the resource relation is $=$.
 
 Altogether, we consider resources ${\mathcal{U} := \left\{\operatorname{redcost},\operatorname{fuel},\operatorname{length}\right\}\cupdot\mathcal{M}}$ in the resource window
 \begin{align*}
-	I := \mathbb{R}\times[0,1]\times[0,|\mathcal{T}|]\times[0,1]^{\mathcal{M}}\subseteq\mathbb{R}^{\mathcal{U}}
+	I := \mathbb{R}\times[0,1]\times[0,|\mathcal{T}|]\times\bigotimes_{m\in\mathcal{M}}[0,|m|]\subseteq\mathbb{R}^{\mathcal{U}}
 \end{align*}
 
-A resource vector $r\in I$ consists of the reduced cost ${r_{\operatorname{redcost}}\in\mathbb{R}}$, the fuel level ${r_{\operatorname{fuel}}\in[0,1]}$, the duty length ${r_{\operatorname{length}}\in[0,|\mathcal{T}|]}$ and the route resources ${r_{\mathcal{M}}\in[0,1]^{\mathcal{M}}}$ in this order. The resource relation vector is given by ${\sqsubseteq := \left(\geq,\leq,=,=,\dots,=\right)}$.
+A resource vector $r\in I$ consists of the reduced cost ${r_{\operatorname{redcost}}\in\mathbb{R}}$, the fuel level ${r_{\operatorname{fuel}}\in[0,1]}$, the duty length ${r_{\operatorname{length}}\in[0,|\mathcal{T}|]}$ and the route resources ${r_m\in[0,|m|]}$ for $m\in\mathcal{M}$ in this order. The resource relation vector is given by ${\sqsubseteq := \left(\geq,\leq,=,=,\dots,=\right)}$.
 
-These resources coincide in large parts with the formulation in \cite{Kaiser}. They use resources for each costumer instead of route resources in order to ensure the single-leg cover constraints. This is the only adaption in this section and the next section.
+These resources coincide in large parts with the formulation in \cite{Kaiser}. They use resources for each customer instead of route resources in order to ensure the single-leg cover constraints. This is the only adaption in this section and the next section.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Determination of the Resource Extension Function}
 \label{sec:ref}
 
+In this section, we determine the resource extension function such that we receive a formulation equivalent to $\eqref{eq:SPv}$. We first define a more complex graph with simple resource extension functions. Then we contract the graph in order to shift the complexity from the graph into the functions.
+
+\paragraph{Extended Task Graph with Split Vertices} \parfill
+
+In the problem as defined in \Cref{sec:spprc}, changes of the resource vectors are only defined on the arcs. This means, only resources occurring on the arcs are considered. Since we have also a trip cost and fuel consumption at the vertices of the task graph, we modify the graph in order to deal with vertex resources. Therefore, we create a graph by splitting the vertices, based on the extended task graph $G=(V,A)$ according to \Cref{def:taskgraph}. 
+
+Define ${\widetilde{G} := \left(\widetilde{V},\widetilde{A}\right)}$ with vertex set
+\begin{align*}
+	\widetilde{V} := \left\{\ds,\de\right\}\cupdot\left\{s^-,s^+\mid s\in V\backslash\left\{\ds,\de\right\}\right\}
+\end{align*}
+
+and arc set
+\begin{align*}
+	\widetilde{A} := & \left\{\left(\ds,s^-\right)\mid \left(\ds,s\right)\in A\right\}\cupdot\left\{\left(s^+,\de\right)\mid\left(s,\de\right)\in A\right\} \\
+	& \cupdot\left\{\left(s^+,t^-\right)\mid (s,t)\in A\right\}\cupdot\left\{\left(s^-,s^+\right)\mid s\in V\backslash\left\{\ds,\de\right\}\right\}
+\end{align*}
+
+We use $\sqsubseteq$, $I$ as described in \Cref{sec:resources} and $\widetilde{V}$, $\widetilde{A}$ as described before. The values $\gamma_t$ for $t\in\mathcal{T}$ and $\mu_v$ for the specific $\vinV$ come from the dual solution of $\eqref{eq:DLRMP}$, from which the subproblem results. With this, we define the resource extension function $\widetilde{\REF}$. 
+
+In the arc between the split vertices of a vehicle $\vinV$ occur the cost $-\mu_v$ and the fuel consumption $\left(1-f^0_v\right)$ as the initial fuel is $f^0_v$. Thus we define the resource extension function for $\vinV$ as
+\begin{align*}
+	\widetilde{\REF}_{v^-,v^+}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c-\mu_v \\ e-\left(1-f^0_v\right) \\ l \\ b
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}
+
+for $(c,e,l,b)\in I$. In refuel points we have fuel consumption $\ft_r$, thus we define the resource extension function for each refuel point $r$ as
+\begin{align*}
+	\widetilde{\REF}_{r^-,r^+}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c \\ e-\ft_r \\ l \\ b
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}
+
+for $(c,e,l,b)\in I$. 
+
+In a trip $t\in\mathcal{T}$ occur the cost $\ct_t-\gamma_t$, the fuel consumption is $\ft_t$ and the length of the duty increases by $1$. If trip $t$ is fulfilled in this duty, no other trip of the same costumer must be fulfilled, unless from the same route. We therefore define the following auxiliary functions
+\begin{align*}
+	\MC(t) & = \left\{m\in\mathcal{M}\mid C(m)\neq\left(C\circ M\right)(t)\right\} \\
+	\MRoute(t) & = \left\{m\in\mathcal{M}\mid C(m)=\left(C\circ M\right)(t)\land m\neq M(t)\right\}
+\end{align*}
+
+Note that $\MC(t),\MR(t)\subseteq\mathcal{M}$ are subsets and $M(t)\in\mathcal{M}$ is an element of the route set. We define the resource extension function for $t\in\mathcal{T}$ as
+\fxnote{l+1}
+\begin{align}
+	\widetilde{\REF}_{t^-,t^+}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c+\ct_t-\gamma_t \\ e-\ft_t \\ l-1 \\ b_{\MC(t)} \\ 0_{\MRoute(t)} \\ b_{M(t)} - 1
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I \label{eq:ref_trip}
+\end{align}
+
+for $(c,e,l,b)\in I$ where $\mathbbm{1}_{\overline{M}(t)}$ is the unit vector of the coordinate $\overline{M}(t)$. Between two trips, we have the cost and the fuel consumption for the deadhead trip and for ${(s,t)\in A\cap\mathcal{T}^2}$
+\begin{align*}
+	\widetilde{\REF}_{s^+,t^-}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c + \cd_{s,t} \\ e-\fd_{s,t} \\ l \\ b
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}
+
+for $(c,e,l,b)\in I$. Between a vehicle and a trip we additionally have to consider the fixed vehicle cost $\cv$, thus the resource extension function is for ${(s,t)\in A\cap\mathcal{V}\times\mathcal{T}}$ defined by
+\begin{align*}
+	\widetilde{\REF}_{s^+,t^-}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c + \cv + \cd_{s,t} \\ e-\fd_{s,t} \\ l \\ b
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}
+
+for $(c,e,l,b)\in I$. For all arcs incident with $\ds$ or $\de$, the resource extension function is the function corresponding to the identity, \ie ${\left((c,e,l,b)+\mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right)\cap I}$ for ${(c,e,l,b)\in I}$.
+
+\paragraph{Extended Task Graph} \parfill
+
+We transform the developed task graph ${\widetilde{G}=\left(\widetilde{V},\widetilde{A},\sqsubseteq,I,\widetilde{\REF}\right)}$ by contracting the arcs $\left(t^-,t^+\right)$ for all $t\in V\backslash\left\{\ds,\de\right\}$. Then we identify $t^+$ with $t$ for all $t\in V\backslash\left\{\ds,\de\right\}$ and receive the extended task graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with
+\begin{align*}
+	\REF_{s,t} = \widetilde{\REF}_{t^-,t^+}\circ\widetilde{\REF}_{s^+,t^-}
+\end{align*}
+
+for all $s,t\in V\backslash\left\{\ds,\de\right\}$. For arcs starting from a refuel point or a trip and leading to a trip, \ie ${(s,t)\in A,s\notin\mathcal{V},t\in\mathcal{T}}$ we have
+\begin{align*}
+	\REF_{s,t}(c,e,l,b) := \left(\left(
+	\begin{array}{c}
+		c + \cd_{s,t} + \ct_{s,t} - \gamma_t \\ e - \fd_{s,t} - \fd_{s,t} \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+	\end{array}
+	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}\fxnote{adapt b-vector}
+
+since $\fd_{s,t}\geq 0$ and $\ft_t\geq 0$. The resources are independent from each other.
+
+For arcs starting at a trip and leading to a refuel point, \ie $(s,r),(s,t)\in A, s\in\mathcal{T}, r\in\Rst$ we have
+\begin{align*}
+	\REF_{s,r}(c,e,l,b) := \left\{ \begin{array}{cl}
+		\left(\left( \begin{array}{c}
+			c + \cd_{s,r} \\ e - \fd_{s,r} - \fd_{s,r} \\ l \\ b
+		\end{array} \right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I & \text{if } e\geq\fd_{s,r} \\
+		\\
+		\emptyset & \text{otherwise}
+	\end{array} \right.
+\end{align*}
+
+For both cases, we can extend the evaluation to $s\in\mathcal{V}$ by adding $\cv$ to the reduced cost resource. For arcs indicent with $\ds$ or $\de$ we have ${\REF_{\ds,s}=\widetilde{\REF}_{s^-,s^+}}$ and ${\REF_{s,\de}=\widetilde{\REF}_{s^+,\de}}$.
+
+\paragraph{Task Graph} \parfill
+
+We transform the extended task graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ by contracting the arcs ${(r,t)\in A}$ for all ${s,t\in\mathcal{V}\cupdot\mathcal{T}}, {s\prec t}$ and ${r\in\Rst}$. This yields the task graph ${\widehat{G}=\left(\widehat{V},\widehat{A},\sqsubseteq,I,\widehat{\REF}\right)}$ which builds on the task graph ${\widehat{G}=\left(\widehat{V},\widehat{A}\right)}$ from \Cref{def:taskgraph}. 
+
+For every arc $(s,t)\in\widehat{A}$ with $s\notin\mathcal{V}, t\in\mathcal{T}$ and $r\in\Rst$, we determine the resource vectors ${\left(\REF_{r,t}\circ\REF_{s,r}\right)(c,e,l,b)}$ as
+\begin{align*}
+	\begin{array}{cl}
+		\left(\left( \begin{array}{c}
+			c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r, 1\right) - \fd_{r,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+		\end{array} \right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0} \right) \cap I & \text{if } e\geq\fd_{s,r} \\
+		\\
+		\emptyset & \text{otherwise}
+	\end{array}
+\end{align*}
+
+for $(c,e,l,b)\in I$. For $s\in\mathcal{V}$, we again add $\cv$ to the reduced cost resource. The resource extension function is then according to \Cref{def:contraction} given by
+\begin{align*}
+	& \widehat{\REF}_{s,t}(c,e,l,b) = \REF_{s,t}(c,e,l,b)\cup\bigcup_{r\in\Rst}\left(\REF_{r,t}\circ\REF_{s,r}\right)(c,e,l,b) \\
+	= & \left[\left(\left(\begin{array}{c}
+		c + \cd_{s,t} + \ct_t - \gamma_t \\ e - \fd_{s,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+	\end{array} \right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right)\cap I\right] \\
+	\cup & \left[\left(\left\{\left(\begin{array}{c}
+		c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r,1\right) - \fd_{r,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+	\end{array}\right) \mid r\in\Rst, e\geq\fd_{s,r}\right\} + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right)\cap I\right]
+\end{align*}
+
+for $s\notin\mathcal{V}$ and with an additional $\cv$ in the first component of all vectors for $s\in\mathcal{V}$.
+
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Improvement of the Algorithm}
+\subsection{An Exact Algorithm for Solving the Subproblems}
+
+After specification of the resources and the resource extension function, we present an algorithm that solves the subproblem for every vehicle optimally.
+
+\paragraph{Model Equivalence} \parfill
+
+First, we prove that the previously developed problem formulation is equivalent to the subproblem and that the values for the reduced cost coincide.
+
+\begin{theorem}[Correspondence to MMILP formulation]
+\label{th:equivalence_SPv_MMILP}
+
+For every resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$ with $n\in\mathbb{N}_0$ in the graph ${\widehat{G}=\left(\widehat{V},\widehat{A},\sqsubseteq,I,\widehat{\REF}\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$, there is a feasible solution ${(x,z,e,u)\in X_v}$ satisfying $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ such that ${g^v(x,z,e,u)\leq r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}}$.
+
+Inversely, for every feasible solution ${(x,z,e,u)\in X_v}$ to some subproblem $\vinV$ that satisfies $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$, there is a resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$, $n\in\mathbb{N}_0$ in ${\widehat{G}=\left(\widehat{V},\widehat{A},\sqsubseteq,I,\widehat{\REF}\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$ such that the equation ${g^v(x,z,e)=r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}}$ holds.
+
+\end{theorem}
+
+This theorem is proven by \cite[pp.~96-99]{Kaiser} for a slightly modified problem. The strengthening inequality is adapted to single-leg cover constraints and the route resource is a customer resource there. This has also an impact on the resource extension function. We do not present the complete proof, but only the parts that are different here. This concerns mainly the decision variable $u_m$ and the route resources $r_m$.
+
+\begin{proof}
+
+We show that we can create a solution of $\eqref{eq:MMILP}$ out of a resource-feasible path and vice versa.
+
+\paragraph{\enquote{$\boldsymbol{\Rightarrow}$}: Resource-feasible path to feasible solution} \proofparfill
+
+Let ${P:=\left(\ds,t_0,t_1,\dots,t_n,\de\right)}, {n\in\mathbb{N}_0}$ be a resource-feasible $\ds$-$\de$-path in ${\widehat{G}=\left(\widehat{V},\widehat{A},\sqsubseteq,I,\widehat{\REF}\right)}$ with witnessing resource vectors $\left(r^s\right)_{s\in P}$. Construct the following solution $(x,z,e,u)$. For $a\in\widehat{A}$, set $x_a$ to $1$ if the path $P$ uses the arc $a$ and $0$ otherwise. Set ${e_s := r^s_{\operatorname{fuel}}}$ if $s\in P$ and $e_s:=0$ otherwise. For all $i\in[n]$ and $r\in\mathcal{R}_{t_{i-1},t_i}$, set ${z_{t_{i-1},r,t_i} := 1}$ if ${r^{t_{i-1}}\in\left(\widehat{\REF}_{r,t_i}\circ\widehat{\REF}_{t_{i-1},r}\right)\left(r^{t_{i-1}}\right)}$ and ${z_{t_{i-1},r,t_i} := 0}$ otherwise. If this holds true for more than one ${r\in\mathcal{R}_{t_{i-1},t_i}}$, change $z_{t_{i-1},r,t_i}$ to $0$ for all such $r$ but one. For all other arcs $a\in A$, set $z_a:=0$. For all $m\in\mathcal{M}$ set ${u_m := 1}$ if there is an ${i\in[n]}$ such that ${M\left(t_i\right)=m}$ and ${u_m := 0}$ otherwise. The claim is that this $(x,z,e,u)\in X_v$ holds, \ie $(x,z,e,u)$ is a feasible solution to the subproblem of vehicle $v:=t_0$.
+
+The flow conservation and the fuel constraints hold as proven by \cite{Kaiser}. This applied directly since the respective parts of $X_v$ and $\widehat{\REF}$ have not been modified. The claim concerning the reduced cost is also proven there.
+
+Due to $\eqref{eq:MMILP:flow}$ and $\eqref{eq:MMILP:xst}$ we have ${\sum_{s\in\operatorname{N}^-_{\widehat{G}}(t)} x_{s,t} \in\{0,1\}}$ for all $t\in\mathcal{T}$. From the previous definition follows that
+\begin{align*}
+	\sum_{s\in\operatorname{N}^-_{\widehat{G}}(t)} x_{s,t} = 1 && \Rightarrow && t\in P && \Rightarrow && u_{M(t)} = 1
+\end{align*}
+
+for all $t\in\mathcal{T}$ and therefore holds $\eqref{eq:SPv:route}$. For $\eqref{eq:SPv:customer}$ we assume by contradiction that there is a $m\in\mathcal{M}$ with ${\sum_{m\in C^{-1}(c)} u_m > 1}$. Then there are ${i,j\in[n]}, {i<j}$ such that ${t_i,t_j\in P}$ and ${M\left(t_i\right)\neq M\left(t_j\right)}, {(M\circ C)\left(t_i\right) = (M\circ C)\left(t_j\right)}$. Since the definition of $\widehat{\REF}$ and ${t_j\in\MRoute\left(t_i\right)}$ we have
+\begin{align*}
+	r^{t_i}_{M\left(t_j\right)}=0 && \Rightarrow && r^{t_{j-1}}_{M\left(t_j\right)} = 0 && \Rightarrow && r^{t_j}_{M\left(t_j\right)} = r^{t_{j-1}}_{M\left(t_j\right)} - 1 \notin I_{M\left(t_j\right)}
+\end{align*}
+
+This leads to contradiction to the resource-feasibility of $P$ and therefore holds $\eqref{eq:SPv:customer}$.
+
+\paragraph{\enquote{$\boldsymbol{\Leftarrow}$}: Feasible solution to resource-feasible path} \proofparfill
+
+Let $(x,z,e,u)\in X_v$ for some $\vinV$. Set ${t_0 := v}$. By the definition of $X_v$, ${x_{\ds,t_0} = 1}$ holds. Based on the flow conservation $\eqref{eq:MMILP:flow}$ and construction of the task graph $\widehat{G}$, the existence of exactly one ${t_1\in\mathcal{T}\cupdot\left\{\de\right\}}$ with ${x_{t_0,t_1} = 1}$ follows. This step can be repeated ${n\in\mathbb{N}_0}$ times for finding ${t_i\in\mathcal{T}\cupdot\left\{\de\right\}}, {i = 2,\dots,n+1}$ until ${t_{n+1}=\de}$ is reached. This defines a path ${P:=\left(\ds,t_0,\dots,t_n,\de\right)}$ in the task graph. Set the resource vectors $\left(r^s\right)_{s\in P}$ along this path as follows. For all vertices $t_k, {k\in\left\{0,\dots,n\right\}}$, set the reduced cost to
+\begin{align*}
+	r^{t_k}_{\operatorname{redcost}} := \cv + \sum_{i=1}^k\left[ \vphantom{\sum_{r\in\mathcal{R}_{t_{i-1}}}} \right. & x_{t_{i-1},t_i}\left(\cd_{t_{i-1},t_i}+\ct_{t_i}-\gamma_{t_i}\right) + \\
+	& \left. \sum_{r\in\mathcal{R}_{t_{i-1},t_i}} z_{t_{i-1},r,t_i}\left(\cd_{t_{i-1},r}+\cd_{r,t_i}-\cd_{t_{i-1},t_i}\right)\right] - \mu_v
+\end{align*}
+
+the fuel level to ${r^{t_k}_{\operatorname{fuel}} := e_{t_k}}$, the length to ${r^{t_k}_{\operatorname{length}} := k}$ and the route resources to
+\begin{align*}
+	r^{t_k}_m = \left\{\begin{array}{ccl}
+		0 && \displaystyle{\text{if } \sum_{ \substack{i\in[k]: \\ m\in\MRoute\left(t_i\right)} } \sum_{s\in\operatorname{N}^-_{\widehat{G}}} x_{s,t} > 0} \\ \\
+		\displaystyle{\vert m\vert - \sum_{ \substack{i\in[k]: \\ m = M\left(t_i\right)} } \sum_{s\in\operatorname{N}^-_{\widehat{G}}} x_{s,t}} && \text{otherwise}
+	\end{array}\right.
+\end{align*}
+
+for $m\in\mathcal{M}$. The route resource lies in $I$ since $\vert m\vert$ is chosen large enough. The resource vectors at the source and sink are set to ${r^{\ds} := \left(0,1,0,\left(\vert m\vert\right)_{m\in\mathcal{M}}\right)}$ and ${r^{\de} := r^{t_n}}$, respectively. We claim that these resource vectors $\left(r^s\right)_{s\in P}$ witness resource-feasibility of the path $P$ in the task graph $\widehat{G}$. 
+
+The resource-feasibility for the resources \emph{fuel}, \emph{redcost} and \emph{length} are already proven by \cite{Kaiser}. This is applied directly since the respective parts of $X_v$ and $\widehat{REF}$ have not been modified.
+
+For all $m\in\mathcal{M}$, we have ${r^{t_0}_m = \vert m\vert\in I_m}$ and therefore resource-feasibility. For ${k\in[n]}$, we distinguish the following cases for the resource-feasibility of $r^{t_k}_m$:
+\begin{align*}
+	\left. \begin{array}{lll}
+		m\in\MRoute\left(t_k\right) & \Rightarrow & r^{t_k}_m = 0 \\
+		m\in\MC\left(t_k\right) & \Rightarrow & r^{t_k}_m = r^{t_{k-1}}_m \\
+		m = M\left(t_k\right) & \Rightarrow & r^{t_k}_m = r^{t^{k-1}_m} - 1, r^{t_k}_m\geq 0
+	\end{array} \right\} \Rightarrow r^{t_k}_m\in\widehat{\REF}_{t_{k-1},t_k}\left(r^{t_{k-1}}_m\right)
+\end{align*}
+
+We always have ${r^{t_k}_m\geq 0}$ since the initial value has been chosen large enough. Therefore, the above defined resource vector witnesses resource-feasibility for all $m\in\mathcal{M}$. This concludes the proof.
+
+\end{proof}
+
+\paragraph{Inversion of the Graph} \parfill
+
+We have seen in \Cref{th:equivalence_SPv_MMILP} that the subproblem $\eqref{eq:SPv}$ can be written as a Shortest Path Problem with Resource Constraints. Therefore, we can apply \Cref{alg:label_setting} in order to solve the subproblem optimally. Since there is a subproblem for every vehicle $\vinV$, it is not advantageous to apply the algorithm for each subproblem separately. In order to improve this behavior we can exploit the symmetry of the problem. Remember, that the only differences of the subproblems are caused by the the dual variables $\left(\gamma_t,\mu_v\right)$ from the dual solution of $\eqref{eq:DLRMP}$. Thus, the subproblems vary only in the fact which vehicle is included. As we search $\ds$-$\de$-paths in the subproblem, only the second vertex of such a path is affected. 
+
+From the results of \Cref{th:inversion} and \Cref{th:equivalence_SPv_MMILP} we can see that (SPPRC) given on the inverted task graph $\widehat{G}^{-1}$ is equivalent to the one given by $\widehat{G}$. As \Cref{alg:label_setting} yields Pareto-optimal paths from the starting vertex to each vertex in the graph, it is profitable to apply the algorithm to $\widehat{G}^{-1}$ with starting vertex $\de$. Thus, we receive Pareto-optimal $\de$-$v$-paths for all $\vinV$ in the inverted graph and we have to execute the algorithm only once. We can then extend the respective $\de$-$v$-paths to $\de$-$\ds$-paths and receive solutions for all the subproblems.
+
+The following lemma shows that it is possible to invert the problem. It is a condition for \Cref{th:inversion} that the resource extension function is invertible.
+
+\begin{lemma}[Invertibility of $\widehat{\REF}$]
+
+The resource extension function $\widehat{\REF}$ is invertible. 
+
+\end{lemma}
+
+\begin{proof}
+
+We will only prove that the resource extension function $\widetilde{\REF}$ restricted to the route constraints and to the split vertices of trips is invertible. \cite{Kaiser} has already shown the invertibility of the resource extension function for the simplified problem setting and that invertibility is maintained if arcs are contracted. Since the parts of $\widetilde{\REF}$ are independent from each other, the 	invertibility of $\widehat{\REF}$ follows directly.
+
+For readability, we write the restriction of $\widetilde{\REF}$ to the route resources as $F$. The concerned resource window is ${I_\mathcal{M} := \bigotimes_{m\in\mathcal{M}}[0,\vert m\vert]}$ and the resource dominance relation is ${\sqsubseteq_{\mathcal{M}} := \left(=,\dots,=\right)}$. For every $t\in\mathcal{T}$ we have the partition ${\mathcal{M} = \MC(t)\cupdot\MRoute(t)\cupdot\left\{M(t)\right\}}$. Using this partition, we split the resource vectors as follows:
+\begin{align*}
+	b = \left(b_{\MC(t)},b_{\MRoute(t)},b_{M(t)}\right)\in I_{\MC(t)}\times I_{\MRoute(t)}\times I_{M(t)} = I_{\mathcal{M}}
+\end{align*}
+
+According to $\eqref{eq:ref_trip}$ we have for $t\in\mathcal{T}$
+\begin{align*}
+	F_{t^-,t^+}\left(b_{\MC(t)},b_{\MRoute(t)},b_{M(t)}\right) := \left(\left( \begin{array}{c}
+		b_{\MC(t)} \\ 0 \\ b_{M(t)} - 1
+	\end{array} \right) + \mathbb{R}_{\sqsubseteq_{\mathcal{M}} 0}^{\mathcal{M}} \right) \cap I_\mathcal{M}
+\end{align*}
+
+for $b\in I_{\mathcal{M}}$. Because of the definition of $\sqsubseteq_{\mathcal{M}}$ and ${b\in I_{\mathcal{M}}}$, this is equivalent to
+\begin{align*}
+	F_{t^-,t^+}\left(b_{\MC(t)},b_{\MRoute(t)},b_{M(t)}\right) := \left\{\left( b_{\MC(t)}, 0, b_{M(t)} - 1\right)\mid b_{M(t)}\geq 1\right\}
+\end{align*}
+
+Recall the inverted relation according to \Cref{def:inversion}. The inverted relation is given by
+\begin{align*}
+	F^{-1}_{t^-,t^+} := \left\{\left(r^{t^+},r^{t^-}\right)\mid \left(r^{t^-},r^{t^+}\right)\in F_{t^-,t^+}\right\}
+\end{align*}
+
+for all $t\in\mathcal{T}$. Applying the respective definitions we get
+\begin{align*}
+	F_{t^-,t^+} = & \left\{\left(\left( b_{\MC(t)}, b_{\MRoute(t)}, b_{M(t)} \right), \left( b_{\MC(t)}, 0, b_{M(t)}-1 \right)\right)\mid b\in I_{\mathcal{M}}, b_{M(t)}\geq 1\right\} \\
+	\Rightarrow F^{-1}_{t^-,t^+} = & \left\{\left(\left( b_{\MC(t)}, 0, b_{M(t)}-1 \right), \left( b_{\MC(t)}, b_{\MRoute(t)}, b_{M(t)}\right)\right)\mid b\in I_{\mathcal{M}}, b_{M(t)}\geq 1\right\} \\
+	= & \left\{\left(\left( b_{\MC(t)}, 0, b_{M(t)} \right), \left( b_{\MC(t)}, b_{\MRoute(t)}, b_{M(t)}+1\right)\right)\mid b\in I_{\mathcal{M}}, b_{M(t)}\leq \vert m\vert - 1\right\}
+\end{align*}
+
+and therefore
+\begin{align*}
+	F^{-1}_{t^-,t^+}(b) = \left\{\begin{array}{cl}
+		\left(b_{\MC(t)}, I_{\MRoute(t)}, b_{M(t)}+1\right) & \text{if } b_{\MRoute(t)} = 0_{\MRoute(t)}, b_{M(t)}\leq\vert m\vert - 1 \\
+		\emptyset & \text{otherwise}
+	\end{array}\right.
+\end{align*}
+
+We show that $F^{-1}_{t^-,t^+}$ is a resource extension function with respect to $\sqsupseteq_{\mathcal{M}}$ for all $t\in\mathcal{T}$. Since we have equality everywhere in the resource dominance relation, we have ${\left(\sqsupseteq_{\mathcal{M}}\right) = \left(\sqsubseteq_{\mathcal{M}}\right)}$. The respective conditions from \Cref{def:graph_resource_constraints} and \Cref{def:monotone_ref} are obviously fulfilled since for ${r^v,\tilde{r}^v\in I_{\mathcal{M}}}$ we have ${r^v\sqsupseteq\tilde{r}^v\Leftrightarrow r^v = \tilde{r}^v}$.
+
+Since considering the other resources and contraction of vertices does not destroy invertibility follows that $\widehat{\REF}$ is invertible.
+
+\end{proof}
 
 %########################################################################################################################################
 %#
@@ -442,6 +725,135 @@ These resources coincide in large parts with the formulation in \cite{Kaiser}. T
 
 \section{Solving of the Master Problem}
 \label{sec:solving_masterproblem}
+
+With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. But this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply the \enquote{Branch-and-Bound} rule in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly taken over by the branching rules created by \cite{Kaiser}. The branching rule concerning the choice of routes is modified.
+
+\subsection{Branch-and-Bound}
+
+The set of feasible solutions for the relaxed problem is divided into two separate sets by a hyperplane. We express this restriction as an inequality. We evaluate both sets individually. An optimal solution of one of these sets is an optimal solution for the entire problem. If we repeat this procedure iteratively, we get smaller problems. This procedure is called \enquote{Branching}. We receive a tree of smaller problems where the root is the original master problem and the respective child nodes are the smaller problems resulting by branching.
+
+The overall process works as follows: Starting with the root, we solve the respective relaxed problem. If we receive a fractional solution, we branch the problem and create child nodes. We continue this procedure for each child until we either receive a feasible integer solution or the problem becomes infeasible. After this, we iteratively assign to each node the feasible solution of its child nodes with the smallest objective value, or infeasible, if both child nodes are infeasible. Therefore, the solution assigned to the root is the optimal solution of the entire problem.
+
+Depending on the problem and the branching strategy, the decision tree might become quite large. Therefore we have to think about methods to improve this behavior. If we already have an initial feasible solution, then the value of this solution is an upper bound to the optimal solution value. As we know, the value of the relaxation is a lower bound to the optimal value of this problem. Therefore, if the value of the relaxation for a subtree is greater than the value of the initial solution, we know that the optimal solution does not lie in this subtree. Thus we can completely neglect this subtree. This method is called \enquote{Bounding}.
+
+\paragraph{Application to the Master Problem} \parfill
+
+A branching decision is always an inequality that we add to the master problem. As suggested by \cite{Kaiser}, we only use inequalities written in terms of ${(x,z,e,u)\in X_v}, {\vinV}$ such that the structure of the subproblems is not changed. Further, we do not want to affect the symmetry of the subproblems since we exploit this when we solve the subproblems. Thus, we discuss the decision rules with respect to keeping the symmetry.
+
+If an inequality concerns only a single subproblem, we move this restriction completely to the subproblem. This has the advantage that we still create feasible columns. However, moving the inequalities to the subproblems might lead to a change of their structure and therefore might make it harder to solve. In \Cref{sec:branching_rules} we discuss several branching rules.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Branching Rules}
+\label{sec:branching_rules}
+
+In the following, we present a number of branching rules. In order to keep the branching tree small, we try to create decisions that lead to a balanced branching. The branching is used for enforcing integrality in the master problem. In order to discuss the branching rules, we introduce for $\vinV$ the set of vertices that can be reached from $v$ and the set of vertices from which $v$ can be reached:
+\begin{align*}
+	\operatorname{N}_G^{++}(v) := \left\{w\in V\mid\exists v \text{-} w \text{-path in } G\right\} && \operatorname{N}_G^{--}(v) := \left\{w\in V\mid\exists w \text{-} v \text{-path in } G\right\}
+\end{align*}
+
+\paragraph{Assignment of Trips} \parfill
+
+We first consider a branching on the components of the image with respect to $\psi$. This is a branching on the single variables of the master problem and thus the most specific branching rule we consider. We fix a value for the expression
+\begin{align*}
+	\psi\left(x^v,z^v,e^v\right)_t = \sum_{s\in\Nin(t)} x^v_{s,t}
+\end{align*}
+
+for some $\vinV, t\in\mathcal{T}$. This decision can be interpreted as determining whether trip $t$ is fulfilled by vehicle $v$. This is a very specific decision since it implicitly chooses the route $M(t)$ for customer $(M\circ C)(t)$ and assigns it to vehicle $v$.
+
+Branching down means setting ${\sum_{s\in\Nin(t)} x^v_{s,t} = 0}$ for some $\vinV, t\in\mathcal{T}$. This can be implemented in $\eqref{eq:SPv}$ by setting
+\begin{align*}
+	x^v_{s,t}=0 && \text{for all } s\in\Nin(t)
+\end{align*}
+
+This corresponds to deleting the respective arcs in the task graph.
+
+Branching up means demanding ${\sum_{s\in\Nin(t)} x^v_{s,t} = 1}$ for some $\vinV, t\in\mathcal{T}$. With the constraints $\eqref{eq:MMILP:flow}, \eqref{eq:Xv:vehicle}, \eqref{eq:Xv:other_vehicles}$ and the fact that $G$ is acyclic, this is equivalent to setting
+\begin{align*}
+	x^v_{s,u} = 0 && \text{for all } (s,u)\in A\cap\left(\left(\operatorname{N}_G^{--}(t)\backslash\{t\}\right)\times\left(\operatorname{N}_G^{++}(t)\backslash\{t\}\right)\right)
+\end{align*}
+
+This corresponds to deleting all arc skipping trip $t$.
+
+Branching up excludes a lot of possible assignments, while branching only forbids one such assignment. This leads to an quite unbalanced tree. Another disadvantage is that this rule destroys symmetry between the subproblems as it concerns only one subproblem. Nevertheless, there is always a branching decision that can be made if the previous solution was not integral. This means, this rule is enough to completely ensure integrality in the master problem.
+
+\paragraph{Length of Vehicle Duties} \parfill
+
+Another suggestion is to consider not a single trip, but the sum up over all trips for the components of the image of $\psi$. We fix a value for the expression
+\begin{align*}
+	\sum_{t\in\mathcal{T}}\psi\left(x^v,z^v,e^v\right)_t = \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} x^v_{s,t}
+\end{align*}
+
+for some $\vinV$. This can be interpreted as determining the duty length for vehicle $v$. As the length of the duty can be expressed linearly in terms of $\left(x^v,z^v,e^v\right)$ and in terms of images of $\psi$ it would be possible to include this decision in the master problem without changing the subproblems. But since this decision affects only one specific vehicle, we move it to the subproblem.
+
+This leads to the following general setting of the subproblem using a lower bound $l^{\operatorname{LB}}$ and an upper bound $l^{\operatorname{UB}}$ for the vehicle length.
+\begin{align}
+	\min \quad & g^v\left(x^v,z^v,e^v\right) \nonumber \\
+	\text{s.t.} \quad & l^{\operatorname{LB}} \leq \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} x^v_{s,t} \leq l^{\operatorname{UB}} \label{eq:SPv:duty_length} \\
+	& \left(x^v,z^v,e^v\right)\in X_v \nonumber
+\end{align}
+
+As proven by \cite{Kaiser}, this problem can be solved by using the resource length as introduced before. We modify the resource extension function for $(c,e,l,b)\in I$ as follows:
+\begin{align*}
+	\widehat{\REF}_{t,\de}(c,e,l,b) := \left(\left\{(c,e,l,b)\mid l^{\operatorname{LB}}\leq l \leq l^{\operatorname{UB}}\right\} + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
+\end{align*}
+
+This is a coarser branching rule as the assignment of trips, but still destroys the symmetry between the subproblems. In contrast to before, this rule alone is not sufficient to completely ensure integrality in the master problem.
+
+\paragraph{Choice of Multimodal Routes} \parfill
+
+The next approach is to sum up over all vehicles for the components of the image of $\psi$. We fix a value for the expression
+\begin{align*}
+	\sum_{\vinV}\psi\left(x^v,z^v,e^v\right)_t = \sum_{\vinV} \sum_{s\in\Nin(t)} x^v_{s,t}
+\end{align*}
+
+for some $t\in\mathcal{T}$. This can be interpreted as deciding whether trip $t$ is fulfilled by some vehicle. Because of the cover constraint $\eqref{eq:MMILP:linking}$, this decision directly determines the route variable $u_m$ for ${m := M(t)}$ and therefore all other trips ${t'\in M^{-1}(m)}$. Because of this implication, we directly regard the case of branching on $u_m$.
+
+Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. From this follows ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
+\begin{align*}
+	x^v_{s,t} = 0 && \text{for all } \vinV, t\in M^{-1}(m), s\in\Nin(t)
+\end{align*}
+
+This corresponds to deleting the respective arcs in all task graphs.
+
+Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
+\begin{align*}
+	x^v_{s,t} = 0 && \text{for all } & \vinV, m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}, \\
+	&&& t\in M^{-1}(m'), s\in\Nin(t)
+\end{align*}
+
+In other words, stating that a multimodal route is fulfilled by some vehicles is equivalent to stating that all trips belonging to other routes of the same customer are not fulfilled by any vehicle, if $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:linking}$ hold. Again, this can be realized by deleting the respective arcs in all task graphs.
+
+This branching rule maintains the symmetry for the various subproblems since for all $\vinV$ the same arcs are deleted. Therefore, we can still solve all subproblems by just one executing of the algorithm. Further, the tree is more balanced than before. Similar to the duty length, this rule alone is not sufficient to completely ensure integrality in the master problem.
+
+\paragraph{Number of Used Vehicles} \parfill
+
+Finally, we regard the branching on the number of used vehicles. We say, a vehicle is used if it fulfills at least one trip. The only duty that a vehicle can have to be unused is the duty with no trip, uniquely described by the path ${\left(\ds,v,\de\right)}$ in $G$. For a duty $(x,z,e)\in X_v$ for $\vinV$ the term
+\begin{align*}
+	\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x_{s,t}
+\end{align*}
+
+is one if and only if the vehicles serves at least one trip. One possibility would be to decide if a specific vehicle is used or not. But the various subproblems are to similar as only the vehicle vertex is different and therefore this branching rule leads to an unbalanced tree.
+
+Instead, we regard the number of used vehicles. For ${\left(x^v,e^v,z^v\right)\in X_v}$ the number of used vehicles can be expressed as
+\begin{align*}
+	\sum_{\vinV}\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t}
+\end{align*}
+
+Using this branching decision requires adding a suitable inequality to the master problem. As these inequalities concern the duties of all vehicles, they cannot be moved to the subproblems. We modify the master problem using a lower bound $v^{\operatorname{LB}}$ and an upper bound $v^{\operatorname{UB}}$ for the number of used cars as follows:
+
+\begin{align}
+	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
+	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
+	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} = u_m && \text{for all } m\in\mathcal{M},t\in m \tag{\ref{eq:MMILP:linking}} \\
+	& \omit\rlap{$\displaystyle{v^{\operatorname{LB}} \leq \sum_{\vinV}\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t} \leq v^{\operatorname{UB}}}$} \label{eq:MMILP:used_vehicles} \\
+	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
+	& u_m\in\{0,1\}^{\mathcal{M}} \nonumber
+\end{align}
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\subsection{Choosing Branching Decisions}
 
 %########################################################################################################################################
 %#

@@ -29,7 +29,7 @@ In order to create the partial instances, we define splittings of $\mathcal{V}$ 
 Let $n\in\mathbb{N}$ and let
 \begin{align*}
 	\mathcal{T}=\Cupdot_{i=1}^n\Ti && \mathcal{V}=\Cupdot_{i=1}^n\Vi
-\end{align*}
+\end{align*}\fxnote{Remove splitting of vehicles}
 
 be partitions of the set of trips, respectively vehicles. Then we call $\left\{\Ti\mid i\in[n]\right\}$ and $\left\{\Vi\mid i\in[n]\right\}$ splitting of $\mathcal{T}$ and $\mathcal{V}$ and $\Ti$ and $\Vi$ partial trip respectively vehicle set.
 
@@ -167,12 +167,9 @@ The partial instance $I_1$ has a special role. In this instance, we have no star
 	\SetAlgoLined
 	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$, $\mathcal{V}=\left\{\mathcal{V}_1,\dots,\mathcal{V}_n\right\}$, $\sigma\in S_n$ with $\sigma(n)=1$}
 	\KwOut{overall solution $S$}
-	\ForEach{$i\in[n]$}{
-		$\Vhat_{\sigma(i)}\gets\emptyset$\;
-		$\Phat_{\sigma(i)}\gets\emptyset$\;
-	}
+	\lForEach{$i\in[n]$}{$\Vhat_{\sigma(i)}\gets\emptyset$, $\Phat_{\sigma(i)}\gets\emptyset$}
 	\ForEach{$i\in[n-1]$}{
-		solve partial instance~$\sigma(i)$, receive partial solution~$S_{\sigma(i)}$ with duty set~$D_{\sigma(i)}$\;
+		solve $I_{\sigma(i)}$, receive partial solution~$S_{\sigma(i)}$ with duty set~$D_{\sigma(i)}$\;
 		$j=\argmin_{j>i}\left\{\sigma(j)\mid\sigma(j)>\sigma(i)\right\}, k=\argmin_{k>i}\left\{\sigma(k)\mid\sigma(k)<\sigma(i)\right\}$\;
 		\ForEach{$D_{\sigma(i)}\ni d=\left(s_1,\dots,s_l\right)$}{
 			\If{$s_1\in\mathcal{T}_{\sigma(i)}\cupdot\Phat_{\sigma(i)}$}{
@@ -188,7 +185,7 @@ The partial instance $I_1$ has a special role. In this instance, we have no star
 		}
 	}
 	$\Vhat_1\gets\mathcal{V}$\;
-	solve partial instance $1$, receive partial solution~$1$ with duty set~$D_1$\;
+	solve $I_1$, receive partial solution~$S_1$ with duty set~$D_1$\;
 	\ForEach{$D_1\ni d = \left(s_1,\dots,s_l\right)$}{
 		\Repeat{Duty finished}{
 			\If{$s_l\in\bigcup_{i=1}^{n}\Phat_i$}{
@@ -445,7 +442,7 @@ Since $\eqref{eq:LCLS}$, holds
 
 and therefore $t\in\mathcal{T}_l,s\in\mathcal{T}_{l+1}$. Here, we use $c_{0}:=-\infty,c_{n+1}:=+\infty$.
 
-\paragraph{Feasibility}
+\paragraph{Feasibility} \proofparfill
 
 For arbitrary $i\in[k-2]$ holds: $t_i\prec t_{i+1}\prec t_{i+2}$, therefore also $t_i\prec t_{i+2}$. We prove that $t_{i+2}$ can be appended after $t_{i}$ or $t_{i+1}$. We differentiate between the following cases:
 \begin{enumerate}
@@ -463,7 +460,7 @@ For arbitrary $i\in[k-2]$ holds: $t_i\prec t_{i+1}\prec t_{i+2}$, therefore also
 
 We have seen that two duties $d_1,d_2$ can fulfill the trips of duty $d$, such that $d_1$ and $d_2$ are feasible in (CMILP). Each trip can be appended to $d_1$ or to $d_2$.
 
-\paragraph{Costs}
+\paragraph{Costs} \proofparfill
 
 The costs of duty $d$ are
 \begin{align*}

@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage[algoruled,linesnumbered]{algorithm2e}
 \usepackage{bm}
+\usepackage{bbm}
 
 \usepackage{cleveref}
 \usepackage{csquotes}
@@ -26,7 +27,8 @@
 
 \setlength{\parindent}{0pt}
 
-\newcommand{\parfill}{\hfill \\} %to decide if paragraphs cause a new line
+\newcommand{\parfill}{\hfill \\} %decides whether paragraphs cause a new line
+\newcommand{\proofparfill}{\hfill \\} %decides whether paragraphs cause a new line in a proof
 
 \newcommand{\fd}{f^{\operatorname{d}}} %deadhead fuel
 \newcommand{\ft}{f^{\operatorname{t}}} %trip fuel
@@ -69,6 +71,8 @@
 \newcommand{\LC}{L_{\operatorname{C}}}
 \newcommand{\LS}{L_{\operatorname{S}}}
 \newcommand{\REF}{\operatorname{REF}}
+\newcommand{\MC}{M^{\operatorname{C}}}
+\newcommand{\MRoute}{M^{\operatorname{R}}}
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}

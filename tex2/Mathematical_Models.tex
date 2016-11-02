@@ -7,8 +7,9 @@ We introduce the mathematical model, with which we want to solve the previously 
 We introduce the task graph, on which the model is based. This is a directed graph corresponding to the relation $\prec$ which we defined in \Cref{sec:problem_description}. The graph is basically the same as used in \cite{Kaiser_Knoll} with the only difference that the customer and route considerations are adapted here.
 
 \begin{definition}[Task Graph]
+\label{def:taskgraph}
 
-Let $\ds,\de$ be special vertices describing the source and sink of the vehicle flow. We define the task graph as $\hat{G}=(\hat{V},\hat{A})$, where
+Let $\ds,\de$ be special vertices describing the source and sink of the vehicle flow. We define the task graph as $\hat{G}=(\hat{V},\hat{A})$\fxnote{widehat}, where
 \begin{align*}
 	\hat{V}:=\left\{\ds,\de\right\}\cupdot\mathcal{V}\cupdot\mathcal{T}
 \end{align*}
@@ -48,6 +49,7 @@ This is a contradiction to the existence of a cycle.
 In order to consider refueling and refuel stations, we introduce an extended task graph.
 
 \begin{definition}[Extended Task Graph]
+\label{def:extended_taskgraph}
 
 For every $s,t\in \mathcal{V}\cupdot\mathcal{T}$ with $s\prec t$ we create a copy of $\left\{r\in\mathcal{R}|\zend_s+t_{s,r}+t_{r,t}\leq\zstart_t\right\}$ denoted by $\Rst$. This means, various copied sets are pairwise disjoint. The expression $r\in\Rst$ means that a vehicle is able to finish trip $s$, then drive to refuel station $r$ and then start trip $t$ in time.
 
@@ -67,7 +69,7 @@ It is possible that there is a copy of each refuel station for each feasible pai
 
 \begin{lemma}
 
-$\hat{G}$ is a directed acyclic graph.
+$G$ is a directed acyclic graph.
 
 \end{lemma}
 
@@ -162,7 +164,7 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:max_fuel} \\
 	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
 	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:MMILP:fuel_consumption} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \label{eq:MMILP_xst} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in A \label{eq:MMILP:xst} \\
 	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\mathcal{T},s\in\Nin(t),r\in\Rst \label{eq:MMILP:zsrt} \\
 	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:es} \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:MMILP:um}
