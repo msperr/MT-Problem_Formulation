@@ -1,48 +1,79 @@
 \chapter{Problem Description and Classification}
 \label{ch:problem_description}
 
-In this chapter, the problem is stated in detail and the notation is introduced. The problem is classified by relating it to known problems in literature and its complexity is determined. Finally, known approaches to similar problems are regarded. Most of the following considerations are already part of the underlying theses \cite{Kaiser_Knoll}, except for the fact that multiple leg is allowed. For better clarity to the reader, all crucial results are repeated here.
+In this chapter, the problem is stated in detail and the notation is introduced. The problem is classified by relating it to known problems in literature and its complexity is determined. Finally, known approaches to similar problems are regarded. Most of the following considerations are already part of the underlying theses \cite{Kaiser} and \cite{Knoll}, except for the fact that multiple legs are allowed. All crucial results are repeated here for clarity.
 
 \section{Situation and Issue}
 
-We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a customer can rent an available car wherever and whenever there is one and use it as long as he needs it. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles. An autonomous vehicle behaves the same as if a human being drives it, but without that a human being is necessarily present. Instead of looking for a car, a customer books a car via a smartphone application and gets picked up by the car at the desired start location and at the desired start time. For the customer, this seems similar to a taxi service. 
+We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a customer can rent an available car wherever and whenever one is available and use it as long as he needs. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles which behave the same as if a human were driving, but without a human being necessarily present. Instead of looking for a car, a customer books a car via a smartphone application and gets picked up by the car at the desired start location at the desired start time. For the customer, this would be similar to a taxi service. 
 
-The car sharing issue is combined with public transport as it is known today. There is a fixed schedule, according to which the bus or train visits public transport stations in a row at certain time points. A possible route for a customer may look as follows: The customer is picked up at his start position by a car and is brought to a station where he gets on a train. After finishing the train trip, he is picked up again by another car and is brought to his destination. It is also possible to change trains during this public transport trip. This behavior is very advantageous for the customer. While an in-between train trip is cheaper than a pure car trip, the combination of car and train is faster than a pure public transport trip since does not have walking and changing time.
+The car sharing issue is combined with public transport as it is known today. There is a fixed schedule, according to which the bus or train visits public transport stations in a row at certain time points. A possible route for a customer may look as follows: The customer is picked up at his start position by a car and is brought to a station where he gets on a train. After finishing the train trip, he is picked up again by another car and is brought to his destination. It is also possible to change trains during this public transport trip. This behavior is very advantageous for the customer. While a partial train trip is cheaper than a pure car trip, the combination of cars and trains is faster than pure public transport since it does not require walking and transfer time.
+
+\newpage
+
+\paragraph{Assumption of Perfect Information} \parfill
+
+As mentioned in \Cref{ch:introduction}, the introduction of autonomous vehicles probably involves a huge change in the customer behavior. The estimation of this is not part of the thesis, the focus lies rather in the potential of autonomous cars. Therefore, we use renting data from present time in order to model the customer behavior. The determined results for the optimal fleet size with autonomous vehicles can then be used to compare it to the current fleet size with conventional vehicles in order to estimate the possible enhancements. Further, we do not try to model an online behavior for the routing where the customer requests arise during during runtime. We rather assume to have perfect information of the customer behavior. This means we know all the travel requests in advance and create a vehicle schedule for the complete instance.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Problem Description and Notation}
 \label{sec:problem_description}
 
-In order to realize the previously described problem, we introduce a formal notation for the problem. We have a set of customers with known travel requests. Each of those can be realized by a number of precomputed multimodal routes. Each route consists of a sequence of trips. A trip is either a car trip or a public transport trip and has a fixed start and end position, as well as a fixed start and end time. Fulfilling a route means that the customer takes all the trips of this route in a row, \ie he starts at the start point of the first trip and is finished at the end point of the last trip. The transition between two subsequent trips is the changing from a car to a train or the other way round. Each customer has to be satisfied, \ie he has to be able to fulfill one of his alternative routes.
+We aim to state the problem for the routing of autonomous vehicles such that it suits to the situation as described before. In order to realize this, we introduce a formal notation. We are given a set of customers where we know the travel requests for each of them. Each of these travel requests can be realized by one of a set of alternative multimodal routes that is also given in advance. Each multimodal route consists of a sequence of trips. In this context, a trip is either a car trip or a public transport trip and has a fixed start and end position as well as a fixed start and end time and is completed without interruption and with the same means of transport for the whole duration. Fulfilling a route means that the customer takes all the trips of this route in a row, this means he starts at the start point of the first trip and is finished at the end point of the last trip. The transition between two subsequent trips is the changing from a car to a train or the other way round. Each customer has to be satisfied, this means it is possible that he fulfills one of his alternative routes.
 
-Although we formally define public transport trips here, we regard only the car trips in detail. Public transport is maintained by an own schedule and is not of interest for this issue. The availability of suitable public transport trips has to be respected while creating the routes (\Cref{ch:instance_creation}). There, the car trips are created in such a way that they are suitable to the existing public transport trips. Here, we assume the existence of feasible routes and therefore only control the behavior of the cars.
+Our goal is to create a schedule for the vehicles of the car sharing supplier. For this we assume that there is already a schedule for public transport fixed. The car trips are created in such a way that they suit to the public transport schedule which we describe in \Cref{ch:instance_creation}. Therefore we assume the given routes to be feasible. Since we are interested in a schedule for the cars and the car trips are chosen appropriately, the public transport trips are not part of the input. 
 
-For fulfilling the car trips, we have a set of vehicles. For each vehicle, we have a position where it starts and a time from when it is available. A vehicle can drive from its start point to a trip's start point, execute this trip, and then drive from the trip's end point to the next trip's start point. After fulfilling its last trip, the car stays at the end point of the last trip. The sequence, in which the vehicle executes the trips, is called the duty of the vehicle. 
+For fulfilling the trips, we have a set of vehicles. For each vehicle, we have a position where it starts and a time from when it is available. A vehicle can drive from its start point to a trip's start point, executing this trip, and then drive from the trip's end point to the next trip's start point. After fulfilling its last trip, the car stays at the end point of the last trip. The sequence, in which the vehicle executes the trips, is called the duty of the vehicle. 
 
-A further restriction to the problem is that the vehicles have a maximal range that they can drive without refueling. In the model, refueling points are included.
+A further restriction to the problem is that the vehicles have a maximal range. They can drive only a certain distance without refueling. We are given a set of refuel points where each car is able to refuel between serving trips.
 
-The objective is to create a schedule for the vehicles, such that for each customer exactly one route is fulfilled, \ie every trip of this route is fulfilled. Further, each vehicle has a feasible fuel state all the time and visits a refuel station when necessary.
+\paragraph{Choice of the Multimodal Routes} \parfill
+
+As mentioned before, each customer has a set of multimodal routes one of which has to be fulfilled. In real life could be assumed that the customer chooses his alternative on its own, for example according to time reasons, costs or his personal preferences. In contrast, we assume in this context that the choice of the route is made by the system. This means each customer takes exactly this route which is necessary for the overall schedule to be optimal. This behavior can be interpreted in two ways: Either this problem setting aims to find the best possible schedule under assumption of ideal customer decisions or the car sharing supplier presents only one alternative to the customer for his travel request.
+
+As described later more formally, we introduce costs for the route choice into the model. With these route costs we can model the customer preferences. The customer preferences contain for example the total travel time, the number of changes or the cost for the customer. They work as penalty costs for inconvenient route choices. This means a route that is disadvantageous for the customer is penalized. Then either the for the customer less favorable route is chosen if it fits better into the schedule and is penalized. Or the more favorable route is chosen although it suits not so good in the schedule.
+
+We can further add the costs for public transport to the route costs. Although we regard the problem solely from the supplier's point of view, we motivate this approach as follows: If we assume that each customer chooses a pure public transport route, this schedule would be optimal since there arise no costs for the supplier. Obviously, this is not optimal in reality since the supplier achieves no profit. If we try to maximize the profit, the optimal schedule would contain long car distances, although a customer would not pay for this in reality. Thus we include the customer costs in the model.
+
+In summary, we try to model additional customer costs and customer inconveniences as penalty terms in order to receive a more realistic customer behavior.
 
 \paragraph{Customers, Trips and Vehicles} \parfill
 
-We are given a set of car trips $\mathcal{T}$. Each trip $t\in\mathcal{T}$ has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$. For the sake of completeness, we define the set of public transport trips $\Tpub$ with the same properties for $t\in\Tpub$.
+We first define the car trips, the multimodal routes, the customers and the connections between them. 
 
-The set of vehicles is denoted by $\mathcal{V}$. The start position and the start time of a vehicle $v\in\mathcal{V}$ is $p_v$ and $z_v$.
+\begin{definition}[Trips, routes and customers]
 
-We have the set of customers $\mathcal{C}$ and the set of multimodal routes $\mathcal{M}$. A route $m=\left(t_1,\dots,t_{k_m}\right)$ is a finite sequence of trips with the following properties:
+\begin{enumerate}
+	\item
+We are given a set of car trips $\mathcal{T}$. Each trip $t\in\mathcal{T}$ has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$.
+
+	\item
+Further, we are given a set of multimodal routes $\mathcal{M}$. A route ${m=\left(t_1,\dots,t_{k_m}\right)\in\mathcal{M}}$ is a finite sequence of trips with the following properties:
 \begin{align*}
-	\pend_{t_i} = \pstart_{t_{i+1}} && \zend_{t_i} \leq \zstart_{t_{i+1}} && \text{for all } i\in[k-1].
-\end{align*}
-
+	\pend_{t_i} = \pstart_{t_{i+1}} && \zend_{t_i} \leq \zstart_{t_{i+1}} && \text{for all } i\in[k_m-1].
+\end{align*}	
 We define the route start and end locations and times for $m\in\mathcal{M}$ as
 \begin{align*}
-	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_k} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_k}.
+	\pstart_m := \pstart_{t_1} & &  \pend_m := \pend_{t_{k_m}} & & \zstart_m := \zstart_{t_1} & & \zend_m := \zend_{t_{k_m}}.
 \end{align*}
 
-The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs. Each customer $c\in\mathcal{C}$ has a finite set of alternative routes. The mapping $C:\mathcal{M}\to\mathcal{C}$ shows which route belongs to which customer.
+	\item
+We are given a set of customers $\mathcal{C}$. Each customer $c\in\mathcal{C}$ has a finite set of alternative multimodal routes.
 
-We use the notation
+	\item
+Each trips belongs to exactly one route and each route belongs to exactly one customer. The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs and the mapping $C:\mathcal{M}\to\mathcal{C}$ shows to which customer a route belongs.	
+
+	\item
+For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, but the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$
+\begin{align*}
+	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m .
+\end{align*}
+\end{enumerate}
+
+\end{definition}
+
+We use the following notation in order to describe the preimages of the mappings $M$ and $C$
 \begin{align*}
 	C^{-1}(c) & := C^{-1}\left(\{c\}\right) = \left\{m\in\mathcal{M}\mid C(m)=c\right\} && \text{for } c\in\mathcal{C} \\
 	M^{-1}(m) & := M^{-1}\left(\{m\}\right) = \left\{t\in\mathcal{T}\mid M(t)=m\right\} && \text{for } m\in\mathcal{M} \\
@@ -51,20 +82,35 @@ We use the notation
 
 for all routes of a customer, all trips of a route and all trips of a customer, respectively.
 
-For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$
-\begin{align*}
-	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m .
-\end{align*}
+The vehicles that are needed for fulfilling the trips are introduced as follows:
+
+\begin{definition}[Vehicles]
+
+We are given a set of vehicles $\mathcal{V}$. For each vehicle $\vinV$ we are given a start position $p_v$ and a start time $z_v$.
+
+\end{definition}
 
 \paragraph{Fuel and Refueling} \parfill
 
-We have to consider fuel restrictions. Fuel can be any form of energy the considered vehicle is powered with. For each vehicle, the fuel level is in the interval $[0,1]$, where $1$ means full capacity and $0$ is empty. We call a trip without a customer, \ie a trip between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time on the same station.
+We have to consider fuel restrictions. Fuel can be any form of energy with which the considered vehicle is powered. For each vehicle, the fuel level is in the interval $[0,1]$, where~$1$ means full capacity and~$0$ is empty. We call a drive without a customer, \ie a drive between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time at the same station. We define the refuel points and the fuel consumption as follows:
 
-For refueling, we have a set of refuel stations $\mathcal{R}$. A refuel station $r\in\mathcal{R}$ has a location $p_r$. We define $\fd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$, $t\in\mathcal{T}\cupdot\mathcal{R}$ as the amount, the fuel level decreases along a deadhead trip. $\ft_t$ for $t\in\mathcal{T}\cupdot\mathcal{R}$ is the amount of fuel, a vehicle needs for a trip. For $r\in\mathcal{R}$ holds $\ft_r \leq 0$. $f^0_v$ for $v\in\mathcal{V}$ is the initial fuel state of a car.
+\begin{definition}[Fuel and refuel points]
+
+\begin{enumerate}
+	\item
+We are given a set of refuel stations $\mathcal{R}$. Each refuel station $r\in\mathcal{R}$ has a location $p_r$.
+
+	\item
+We define $\fd_{s,t}$ for ${s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}}, {t\in\mathcal{T}\cupdot\mathcal{R}}$ as the amount the fuel level decreases along the deadhead trip between $s$ and $t$. We define $\ft_t$ for ${t\in\mathcal{T}}$ as the amount of fuel a vehicle needs for a trip and $f^0_v$ for $\vinV$ as the initial fuel state of a vehicle.
+\end{enumerate}
+
+\end{definition}
+
+The amount of fuel that is charged at a refuel point between two trips can be determined from the time the vehicle stays at the refuel point between these trips. \fxnote{ft for r in chapter 3}
 
 \paragraph{Ordering of the Trips} \parfill
 
-We define the time, a vehicle needs to get from position $p_1$ to $p_2$ as $t_{p_1,p_2}$. We define
+We define the time a vehicle needs to get from position $p_1$ to $p_2$ as $t_{p_1,p_2}$. We define
 \begin{equation*}
 	t_{s,t} = 
 	\begin{cases}
@@ -83,23 +129,24 @@ In order to decide whether a vehicle is able to fulfill two trips in a row, we d
 
 The binary relation $\prec$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as follows:
 \begin{align*}
-	s\prec t && :\Leftrightarrow && \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left((M\circ C)(s)\neq (M\circ C)(t)\lor M(s)=M(t)\right) \\
-	&&&& \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{T} \hphantom{\mathcal{V}} \\
-	s\not\prec t &&&& \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{V} \hphantom{\mathcal{T}}
+	& s\prec t \quad :\Leftrightarrow \quad z_s + t_{s,t} \leq \zstart_t && \text{for all } s\in\mathcal{V}, t\in\mathcal{T} \\	
+	& \omit\rlap{$\displaystyle{s\prec t \quad :\Leftrightarrow \quad \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left((M\circ C)(s)\neq (M\circ C)(t)\lor M(s)=M(t)\right)}$} \\
+	&&& \text{for all } s\in\mathcal{T}, t\in\mathcal{T} \\
+	& s\not\prec t && \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{V}
 \end{align*}
 
 The binary relation $\preceq$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as:
 \begin{align*}
-	s\preceq t && :\Leftrightarrow && s=t \land s\prec t && \text{for all } s,t\in\mathcal{V}\cupdot\mathcal{T}
+	s\preceq t \quad :\Leftrightarrow \quad s=t \lor s\prec t && \text{for all } s,t\in\mathcal{V}\cupdot\mathcal{T}
 \end{align*}
 
 \end{definition}
 
-The expression $s\prec t$ means, that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same customer, except they belong to the same route. This results from the problem setting, that for each customer exactly one route is fulfilled. 
+The expression $s\prec t$ means that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same customer, except when they belong to the same route. This results from the problem description, where for each customer exactly one route is fulfilled. 
 
 \begin{remark}
 
-Note, that $\preceq$ is not a partial order on $\mathcal{V}\cupdot\mathcal{T}$ since the transitivity is missing. Let $t_1,t_2,t_3\in\mathcal{T}$ with 
+Note that $\preceq$ is not a partial order on $\mathcal{V}\cupdot\mathcal{T}$ since the transitivity is missing. Let $t_1,t_2,t_3\in\mathcal{T}$ with 
 \begin{align*}
 	\zend_{t_1} + t_{t_1,t_2} \leq \zstart_{t_2} && \zend_{t_2} + t_{t_2,t_3} \leq \zstart_{t_3}
 \end{align*}
@@ -107,49 +154,60 @@ Note, that $\preceq$ is not a partial order on $\mathcal{V}\cupdot\mathcal{T}$ s
 	(M\circ C)\left(t_1\right) = (M\circ C)\left(t_3\right) && (M\circ C)\left(t_1\right) \neq (M\circ C)\left(t_2\right) && M\left(t_1\right)\neq M\left(t_3\right)
 \end{align*}
 
-Then,
+Then we have
 \begin{align*}
 	t_1 \preceq t_2 \preceq t_3 && t_1 \not\preceq t_3
 \end{align*}
 
 \end{remark}
 
-\paragraph{Problem Description} \parfill
+\paragraph{Problem Description and Cost} \parfill
 
-We define the considered problem as follows: Find a schedule of trips for every vehicle including refueling stops and a sequence of trips for every customer. Therefore, the car trips are fulfilled by the scheduled car and the public transport trips by public transport according to its timetable. For this, we have the following conditions:
+Using the previously introduced notation, we can formally define the problem of routing autonomous vehicles with fuel constraints and multi-leg cover constraints:
 
-\begin{itemize}
-	\item{Each car is able to serve its scheduled trips, considering time and location.}
-	\item{The fuel state of each car is always in a feasible range.}
-	\item{Each customer is able to complete his route, considering time and location.}
-	\item{For each customer, exactly one route is chosen.}
-\end{itemize}
+\begin{definition}[Feasible schedule]
+\label{def:feasible_schedule}
 
-The goal is to find a cost-minimal feasible schedule considering all these constraints.
+A feasible schedule is an assignment of vehicles~$\mathcal{V}$ to trips~$\mathcal{T}$ including refuel points~$\mathcal{R}$ with the following properties:
 
-\paragraph{Costs} \parfill
-
-We introduce the following types of costs:
-\begin{itemize}
-	\item{Vehicles costs $\cv$: unit costs for each used vehicle}
-	\item{Deadhead costs $\cd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}, t\in\mathcal{T}\cupdot\mathcal{R}$: costs, if a vehicle drives to a trip or a refuel station without a customer using it}
-	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}$: costs for fulfilling a trip}
-\end{itemize}
-
-For public transport, we define either trip costs for each public transport trip or fixed costs for each customer using public transport. Finally, we define costs to consider the customer preferences.
-\begin{itemize}
-	\item{Trip costs $\ct_t$ for $t\in\mathcal{T}_{\operatorname{public}}$: costs for using public transport}
-	\item{Route-dependent costs $\bar{c}^{\operatorname{r}}_m$ for $m\in\mathcal{M}$: costs for customer preferences and unit costs for using public transport}
-\end{itemize}
-
-Since the trip costs for public transport are connected with the choice of the route, we easily add these costs to the trip costs.
+\begin{enumerate}
+	\item
+Each vehicle $\vinV$ has a feasible duty ${d_v := \left(t_1,\dots,t_{k_v}\right)}$ with ${t_i\in\mathcal{T}}$ and
 \begin{align*}
-	\croute_m := \bar{c}^{\operatorname{r}}_m + \sum_{t\in m\cap\Tpub}\ct_t && \text{for } m\in\mathcal{M}
+	v\prec t_1 && t_i\prec t_{i+1} && \text{for all } i\in[k_v]
 \end{align*}
 
-The route costs additionally include customer preferences. Each customer has a set of alternative routes. He does not choose the route by himself, but this is decided by the problem whatever fits best into the system. The user preference costs work as penalty terms for an inconvenient route choice. This means, a route that is disadvantageous for the customer is penalized. Then, either the less favorable route is chosen (if it fits better into the system) and this is penalized. Or the more favorable route is chosen although it is not so good for the system. With this, a realistic customer behavior is modeled.
+Between before each trip a refuel point can be visited. The fuel state of $v$ considering $f^0, \ft, \fd$ and the respective refueling is always in the range~$[0,1]$. The empty duty is feasible.
 
-The customer preferences are \eg the total travel time, the number of changes or the costs for the customer. Typically, a pure car trip is faster but more expensive. Further, a late departure time or an early arrival time can be criteria for this cost function.
+	\item
+For each customer $c\in\mathcal{C}$ exactly one route ${m\in C^{-1}(c)}$ is fulfilled. A route ${m\in\mathcal{M}}$ is fulfilled if all its trips are fulfilled, \ie
+\begin{align*}
+	t\in\Cupdot_{v\in\mathcal{V}} d_v && \text{for all } t\in M^{-1}(m)
+\end{align*}
+\end{enumerate}
+
+\end{definition}
+
+After defining feasible schedules we state the costs that arise for it.
+
+\begin{definition}[Costs of a schedule]
+\label{def:costs}
+
+Consider a feasible schedule according to \Cref{def:feasible_schedule}. We define the following types of costs:
+
+\begin{enumerate}
+	\item{Vehicle cost $\cv$: unit cost for each vehicle used}
+	\item{Deadhead cost $\cd_{s,t}$ for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}, t\in\mathcal{T}\cupdot\mathcal{R}$:\\
+	cost if a vehicle drives to a trip or a refuel station without a customer using it}
+	\item{Trip cost $\ct_t$ for $t\in\mathcal{T}$: cost for fulfilling a trip}
+	\item{Route cost $\croute_m$ for $m\in\mathcal{M}$: cost for fulfilling a route}
+\end{enumerate}
+
+\end{definition}
+
+The vehicle costs are unit costs for each vehicle that is used to fulfill trips. If a vehicle does not serve any trips, \ie its duty is empty, then no vehicle costs occur for this vehicle. The deadhead costs arise for all the deadhead trips that some vehicle takes. The trip costs and route costs arise if this trips or route is fulfilled.
+
+In summary, we formalize our problem as follows: Find a feasible schedule according to \Cref{def:feasible_schedule} such that the overall cost of the schedule as defined in \Cref{def:costs} is minimized.
 
 \paragraph{Additional Assumptions} \parfill
 
@@ -173,7 +231,7 @@ There are no zero-time rentals.
 	\zstart_t < \zend_t && \text{for all } t\in\mathcal{T}
 \end{align}
 
-We assume the Triangle Inequalities for $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$ and $r,t\in\mathcal{T}\cupdot\mathcal{R}$:
+We assume the Triangle Inequalities for time, fuel consumption and cost. For $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$ and $r,t\in\mathcal{T}\cupdot\mathcal{R}$ holds:
 \begin{align}
 \label{eq:triangle_inequality}
 	t_{s,t} \leq t_{s,r} + t_{r,t} && \cd_{s,t} \leq \cd_{s,r} + \cd_{r,t} && \fd_{s,t} \leq \fd_{s,r} + \fd_{r,t}
@@ -187,39 +245,41 @@ From $\eqref{eq:nonnegativ_cost}$ and $\eqref{eq:triangle_inequality}$ we get:
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
+\newpage
+
 \section{Classification}
 \label{sec:classification}
 
-We want to classify our problem in relation to other known problems in literature and state the difficulty of these problems.
+We aim to classify our problem in relation to other known problems in the literature and state the difficulty of these problems.\fxnote{application: bus}
 
 \paragraph{Vehicle Scheduling Problems} \parfill
 
-According to the structure of the problem stated in \Cref{sec:problem_description}, we regard the field of vehicles scheduling problems (VSP). \cite{Bunte_Kliewer} define the (VSP) as follows: \enquote{Given a set of timetabled trips with fixed travel (departure and arrival) times and start and end locations as well as traveling times between all pairs of end stations, the objective is to find an assignment of trips to vehicles such that each trip is covered exactly once, each vehicle performs a feasible sequence of trips and the overall costs are minimized.} The complexity of some different variants of the (VSP) is regarded by \cite{Lenstra_Kan}.
+According to the structure of the problem stated in \Cref{sec:problem_description}, we regard the field of vehicle scheduling problems (VSP). \cite{Bunte_Kliewer} define the VSP as follows: \enquote{Given a set of timetabled trips with fixed travel (departure and arrival) times and start and end locations as well as traveling times between all pairs of end stations, the objective is to find an assignment of trips to vehicles such that each trip is covered exactly once, each vehicle performs a feasible sequence of trips and the overall costs are minimized.} The complexity of some variants of the VSP is regarded by \cite{Lenstra_Kan}.
 
-A similar problem formulation is the dial-a-ride problem (DARP). \cite{Cordeau_Laporte} discuss the differences of the (DARP) to other vehicle routing problems and write: \enquote{What makes the DARP different from most such routing problems is the human perspective. When transporting passengers, reducing user inconvenience must be balanced against minimizing operating costs.} The basic formulations of (VSP) and (DARP) are the same, therefore we use the formulation (VSP).
+A similar problem formulation is the dial-a-ride problem (DARP). \cite{Cordeau_Laporte} discuss the differences of the DARP to other vehicle routing problems and write: \enquote{What makes the DARP different from most such routing problems is the human perspective. When transporting passengers, reducing user inconvenience must be balanced against minimizing operating costs.} The basic formulations of VSP and DARP are the same, therefore we use the formulation of VSP.
 
 \paragraph{Depot Variants} \parfill 
 
-In \cite{Bunte_Kliewer}, there are two main variants for the (VSP) with respect to the fact where vehicles start and return. In the single depot case (SD-VSP), there is one depot from where all vehicles start. After usage, all vehicles return to this depot. The multiple depot case (MD-VSP) means that there is more than one depot and from each depot starts a certain number of vehicles. After usage, each vehicle returns to the depot from where it has started. 
+In \cite{Bunte_Kliewer}, there are two main variants for the VSP with respect to where vehicles start and return to. In the single depot case (SD-VSP), there is one depot from where all vehicles start. After usage, all vehicles return to this depot. The multiple depot case (MD-VSP) means that there is more than one depot and from each depot a certain number of vehicles starts. After usage, each vehicle returns to the depot from where it has started. 
 
-In order to make our problem more realistic, we have more than one depot. We have more than one vehicle and each vehicle starts from its start position. The vehicles do not have a certain point, where there have to return after usage,  \ie they can stay, wherever the last trip of their duty ends. \cite{Daduna_Paixao} claim that \enquote{if the vehicle[s] are allowed to return to a depot different from its origin depot, [...] the problem can be solved as a single depot instance.} We see, that our problem is in the single depot case (SD-VSP) concerning the depot variant.
+In order to make our problem more realistic, we model more than one depot. There are more than one vehicle where each vehicle starts at its specific start position. The vehicles do not have a certain point where they have to return to after usage, \ie they can stay wherever the last trip of their duty ends. \cite{Daduna_Paixao} claim that \enquote{if the vehicle[s] are allowed to return to a depot different from its origin depot, [...] the problem can be solved as a single depot instance.} We see that our problem is in the single depot case SD-VSP concerning the depot variant.
 
-In \cite{Dantzig_Fulkerson} is proven that (SD-VSP) can be solved in polynomial time, \ie (SD-VSP) is in $\mathcal{P}$. In contrast, the multiple depot case (MD-VSP) is $\mathcal{NP}$-hard as shown in \cite{Bertossi_Carraresi}.
+In \cite{Dantzig_Fulkerson}, it is proven that SD-VSP can be solved in polynomial time, \ie SD-VSP is in $\mathcal{P}$. In contrast, the multiple depot case MD-VSP is $\mathcal{NP}$-hard as shown in \cite{Bertossi_Carraresi}.
 
 \paragraph{Additional Constraints} \parfill
 
-In the basic (SD-VSP), all existing trips have to be fulfilled. For more generality, there were additional cover constraints introduced in the underlying master theses. There are \enquote{costumers with sets of alternative trips out of which exactly one trip shall be fulfilled, respectively.} (\cite[p.10]{Kaiser_Knoll}) In our problem, even more general cover constraints are required. We have costumers with sets of alternative routes, consisting of trips; for each costumer, exactly one route has to be fulfilled, \ie each of its trips is fulfilled. We call these constraints \enquote{multi-leg} cover constraints and write the problem (VSP-MC). This is a generalization to the previous cover constraints, as can be seen easily by rewriting them: There are costumers with sets of alternative routes, where each route consists of exactly one trip. According to this reformulation, we call the primary constraints \enquote{single-leg} cover constraints and write the problem (VSP-SC). We see in \Cref{sec:complexity} that (VSP-SC) is already $\mathcal{NP}$-hard.
+In the basic SD-VSP, all existing trips have to be fulfilled. For more generality, additional cover constraints have been introduced in the underlying master theses. There are \enquote{customers with sets of alternative trips out of which exactly one trip shall be fulfilled, respectively.} (\cite[p.~10]{Kaiser}, \cite[p.~10]{Knoll}) In our problem, even more general cover constraints are required. There are customers with sets of alternative routes, consisting of trips; for each customer, exactly one route has to be fulfilled, \ie each of its trips is fulfilled. We call these constraints \enquote{multi-leg} cover constraints and write the problem VSP-MC. This is a generalization to the previous cover constraints, as can be seen easily by rewriting them: There are customers with sets of alternative routes, where each route consists of exactly one trip. According to this reformulation, we call the primary constraints \enquote{single-leg} cover constraints and write the problem VSP-SC. We see in \Cref{sec:complexity} that VSP-SC is already $\mathcal{NP}$-hard.
 
-We further have to respect the fuel constraints. In literature, there are named general resources like time, mileage or fuel, summarized in the general term \enquote{route constraints} (cf. \cite[p. 16]{Bunte_Kliewer}, \cite{Raff}). The respective problems with route constraints are called (SD-VSP-RC) and (MD-VSP-RC). \cite{Freling_Paixao} describe  the (VSP) with time constraints, \cite{Raff} presents the (VSP) with path constraints, what is a more general formulation. In these models, a vehicle returns to the depot after the respective resource is exhausted, while the vehicle has the possibility to refuel in our model. The problem with not refilling the resource is a special case of the problem with the possibility to refill the resource. We see in \Cref{sec:complexity} that (SD-VSP-RC) is already $\mathcal{NP}$-hard.
+We further have to respect the fuel constraints. The literature (cf. \cite{Bunte_Kliewer}, \cite{Raff}) names general resources like time, mileage or fuel, summarized in the general term \enquote{route constraints}. The respective problems with route constraints are called SD-VSP-RC and MD-VSP-RC. \cite{Freling_Paixao} describe  the VSP with time constraints, \cite{Raff} presents the VSP with path constraints, which is a more general formulation. In these models, a vehicle returns to the depot after the respective resource is exhausted, while the vehicle has the possibility to refuel in our model. The problem with not refilling the resource is a special case of the problem with the possibility to refill the resource. We see in \Cref{sec:complexity} that SD-VSP-RC is already $\mathcal{NP}$-hard.
 
-In summary, we have a problem with two types of constraints where each individually makes the problem $\mathcal{NP}$-hard. The first one is the multi-leg cover constraint and the second one is the fuel constraint. The only difference to \cite{Kaiser_Knoll} is that the single-leg cover constraint is replaced by the multi-leg cover constraint. Their solution methods are extended to the requirements in this thesis. To the knowledge of the author, a combination of these constraints, as well as these constraints on their own, are not treated in literature so far.
+In summary, we have a problem with two types of constraints which individually make the problem $\mathcal{NP}$-hard, namely multi-leg cover constraint and the fuel constraint. The only difference to \cite{Kaiser} and \cite{Knoll} is that the single-leg cover constraint is replaced by the multi-leg cover constraint. Their solution methods are extended to our requirements in this thesis. To the knowledge of the author, a combination of these constraints, as well as these constraints on their own, have not been treated in the literature.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \section{Complexity}
 \label{sec:complexity}
 
-We regard the complexity of our problem. As we have seen in \Cref{sec:classification}, the problem can be modeled as a single depot vehicle scheduling problem (SD-VSP) with resource constraints, the possibility of refueling and multi-leg cover constraints. The (SD-VSP) itself can be solved in polynomial time, which is proven by \cite{Dantzig_Fulkerson}. It can be formulated as minimum-cost flow problem. If we extend the basic formulation with one of the additional constraints, it gets $\mathcal{NP}$-hard.
+We regard the complexity of our problem. As we have seen in \Cref{sec:classification}, the problem can be modeled as a single depot vehicle scheduling problem SD-VSP with resource constraints, the possibility of refueling and multi-leg cover constraints. The SD-VSP itself can be solved in polynomial time, which is proven by \cite{Dantzig_Fulkerson}. It can be formulated as a minimum-cost flow problem. If we extend the basic formulation with one of the additional constraints, it becomes $\mathcal{NP}$-hard.
 
 \begin{theorem}[VSP with resource constraints]
 \label{th:complexity_VSPRC}
@@ -228,7 +288,7 @@ The vehicle scheduling problem with resource constraints and the special objecti
 
 \end{theorem}
 
-This theorem is proven in \cite[p. 11]{Kaiser_Knoll} by a polynomial reduction of the bin packing problem. This theorem holds for the case of resource constraints without the possibility of refilling the resources. Since this is a special case of resource constraints with refueling, this problem is also $\mathcal{NP}$-hard. 
+This theorem is proven in \cite[p.~11]{Kaiser} and\cite[p.~11]{Knoll} by a polynomial reduction of the bin packing problem. This theorem holds for the case of resource constraints without the possibility of refilling the resources. Since this is a special case of resource constraints with refueling, this problem is also $\mathcal{NP}$-hard. 
 
 \begin{theorem}[VSP with cover constraints]
 \label{th:complexity_VSPSC}
@@ -237,7 +297,7 @@ The vehicle scheduling problem with cover constraints and the special objective 
 
 \end{theorem}
 
-This theorem is proven in \cite[p. 12]{Kaiser_Knoll} by a polynomial reduction of the set cover problem. This theorem treats the case of single-leg cover constraints.
+This theorem is proven in \cite[p.~12]{Kaiser} and \cite[p.~12]{Knoll} by a polynomial reduction of the set cover problem. This theorem treats the case of single-leg cover constraints.
 
 \begin{theorem}[VSP with multi-leg cover constraints]
 \label{th:complexity_VSPMC}
@@ -248,7 +308,7 @@ The vehicle scheduling problem with multi-leg cover constraints and the special 
 
 \begin{proof}
 
-We prove this statement by a polynomial reduction of the (VSP-SC). Consider a (VSP-SC) with vehicles $\hat{\mathcal{V}}$, costumers $\hat{\mathcal{C}}$, trips $\hat{\mathcal{T}}$ and the function $\hat{C}:\hat{\mathcal{T}}\to\hat{\mathcal{C}}$ that maps trips to their respective costumers. The problem is defined in detail in \cite[pp. 5-8]{Kaiser_Knoll}. We create the corresponding (VSP-MC) as follows: $\mathcal{V}:=\hat{\mathcal{V}}$, $\mathcal{C}:=\hat{\mathcal{C}}$, $\mathcal{T}:=\hat{\mathcal{T}}$ stay the same. We define the multimodal routes as one-element sequence for each trip
+We prove this statement by a polynomial reduction of the VSP-SC. Consider a VSP-SC with vehicles $\hat{\mathcal{V}}$, customers $\hat{\mathcal{C}}$, trips $\hat{\mathcal{T}}$ and the function $\hat{C}:\hat{\mathcal{T}}\to\hat{\mathcal{C}}$ that maps trips to their respective customers. The problem is defined in detail in \cite{Kaiser} and \cite{Knoll}. We create the corresponding VSP-MC as follows: $\mathcal{V}:=\hat{\mathcal{V}}$, $\mathcal{C}:=\hat{\mathcal{C}}$, $\mathcal{T}:=\hat{\mathcal{T}}$ stay the same. We define the multimodal routes as one-element sequences for each trip
 \begin{align*}
 	\mathcal{M}:=\left\{(t)\mid t\in\hat{\mathcal{T}}\right\}
 \end{align*}
@@ -257,38 +317,38 @@ and the mappings
 	M:\mathcal{T}\to\mathcal{M} \text{, } M(t) = (t), && C:\mathcal{M}\to\mathcal{C} \text{, } C(m) = \hat{C}(t) && \text{for } t\in m \text{ unique.}
 \end{align*}
 
-The solution of (VSP-SC) can easily be mapped to a solution of the corresponding (VSP-MC) and vice versa. If a trip is chosen in (VSP-SC), the respective route is chosen in (VSP-MC). Then, every trip of this route is fulfilled and the costumer is satisfied. The other way round, if a route is chosen in (VSP-MC), the trip contained in this route is chosen in (VSP-SC) and the costumer is satisfied. The feasibility of the vehicle duties is not affected by this procedure.
+The solution of VSP-SC can easily be mapped to a solution of the corresponding VSP-MC and vice versa. If a trip is chosen in VSP-SC, the respective route is chosen in VSP-MC. Then, every trip of this route is fulfilled and the customer is satisfied. The other way round, if a route is chosen in VSP-MC, the trip contained in this route is chosen in VSP-SC and the customer is satisfied. The feasibility of the vehicle duties is not affected by this procedure.
 
-This is a polynomial reduction, (VSP-SC) is is $\mathcal{NP}$-hard by \Cref{th:complexity_VSPSC} and hence (VSP-MC) is $\mathcal{NP}$-hard.
+This is a polynomial reduction, VSP-SC is $\mathcal{NP}$-hard by \Cref{th:complexity_VSPSC} and hence VSP-MC is $\mathcal{NP}$-hard.
 
 \end{proof}
 
-With \Cref{th:complexity_VSPRC} and \Cref{th:complexity_VSPMC} we can see, that our problem gets $\mathcal{NP}$-hard only with cover constraints or with resource constraints and considering the number of vehicles.
+With \Cref{th:complexity_VSPRC} and \Cref{th:complexity_VSPMC} we can see that our problem gets $\mathcal{NP}$-hard only with cover constraints or with resource constraints and considering the number of vehicles.
 
-The problem gets even harder, as we do not only consider the number of vehicles but include the operational cost and penalty terms for costumer preferences. Further, we want to have the possibility to refuel during the process, \ie we have negative resource cost. Finally, we want to apply both of these constraints simultaneously. 
+The problem becomes even harder, as we do not only consider the number of vehicles but include the operational cost and penalty terms for customer preferences. Further, we want to have the possibility to refuel during the process, \ie we have negative resource cost. Finally, we aim to apply both of these constraints simultaneously. 
 
-We will model our problem as a mixed-integer linear program in a size polynomial in the input size. Therefore, it is possible to verify a solution in polynomial time. This means, our problem is $\mathcal{NP}$-complete.
+We will model our problem as a mixed-integer linear program in a size polynomial in the input size. Therefore, it is possible to verify a solution in polynomial time. This means our problem is $\mathcal{NP}$-complete.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\section{Approaches in Literature}
+\section{Approaches in the Literature}
 
-In the previous sections we have seen, that the problem we are dealing with is very hard. We cannot expect to find a algorithm that solves the problem running in polynomial time. Therefore we focus on the field of meta heuristics. Using them it is possible to find a good solution for realistic instances in reasonable time. The field of the vehicle scheduling problems is highly researched and there are many solution approaches available in literature. \cite{Bunte_Kliewer} provide an extensive overview for both problems (SD-VSP) and (MD-VSP). We have classified our problem as (SD-VSP) with resource constraints and multi-leg cover constrains. This is only a small extension to the problem treated in the underlying theses, which contained single-leg cover constraints. \cite{Kaiser} and \cite{Knoll} already discussed the concerning approaches in literature. Since their problem is the basis of our problem and the theses have been published only a short time before this, we can expect their literature approaches to be almost complete. Thus we refer to \cite[pp. 13-15]{Kaiser} and \cite[pp. 13-15]{Knoll} for more details. To the knowledge of the author there is no work of cover constraints in context with vehicle scheduling available in literature.
+In the previous sections we have seen that the problem we are dealing with is very hard. We cannot expect to find an algorithm that solves the problem running in polynomial time. Therefore we focus on the field of meta heuristics. Using them it is possible to find a good solution for realistic instances in reasonable time. The field of the vehicle scheduling problems is highly researched and there are many solution approaches available in the literature. \cite{Bunte_Kliewer} provide an extensive overview for both problems SD-VSP and MD-VSP. We have classified our problem as a SD-VSP with resource constraints and multi-leg cover constrains. This is only a small extension to the problem treated in the underlying theses, which contained single-leg cover constraints. \cite{Kaiser} and \cite{Knoll} already discussed the concerning approaches in the literature. Since their problem is the basis of our problem and the theses were published only a short time before this, we can expect their literature approaches to be almost complete. Thus we refer to \cite[pp. 13-15]{Kaiser} and \cite[pp. 13-15]{Knoll} for more details. To the knowledge of the author there is no work of cover constraints in the context of vehicle scheduling available in the literature.
 
 \paragraph{Electric Vehicle Scheduling Problem} \parfill
 
-The most related problems in literature are the Alternative-Fuel Vehicle Scheduling Problem (AF-VSP), treated by \cite{Adler} and the Electric Vehicle Scheduling Problem (E-VSP), treated by \cite{Wen}. Both denote a (MD-VSP) with resource constraints and refuel stations. While \cite{Adler} restrict the problem to full charging in conjunction with a fixed charging time, \cite{Wen} allow a partial charging and treats the charging time as a linear function. Thus, the differences of (E-VSP) to our problem is that cover constraints are not considered there. 
+The closest-related problems in literature are the Alternative-Fuel Vehicle Scheduling Problem (AF-VSP), treated by \cite{Adler} and the Electric Vehicle Scheduling Problem (E-VSP), treated by \cite{Wen}. Both denote a MD-VSP with resource constraints and refuel stations. While \cite{Adler} restrict the problem to full charging in conjunction with a fixed charging time, \cite{Wen} allow partial charging and treat the charging time as a linear function. Thus, the differences of E-VSP to our problem is that cover constraints are not considered there. 
 
-Besides a mathematical problem formulation, \cite{Wen} provide an \enquote{Adaptive Large Neighborhood Search} heuristic (ALNS) in order to tackle the problem. We present a rough outline of this algorithm. First, an initial solution is created by a greed heuristic. From this solution, a certain number of trips is deleted (destroy method). After this, several new feasible duties are created by inserting respective trips with lowest cost increasing at certain positions (repair method). Finally, the new duties are selected with minimal total cost, such that the duties cover each trip and the depot constraints are fulfilled. There are several destroy and repair methods presented and there is a deterministic and a randomized version of the heuristic.
+Besides a mathematical problem formulation, \cite{Wen} provide an \enquote{Adaptive Large Neighborhood Search} heuristic (ALNS) in order to tackle the problem. We present a rough outline of this algorithm. First, an initial solution is created by a greedy heuristic. From this solution, a certain number of trips is deleted (destroy method). After this, several new feasible duties are created by inserting respective trips with lowest cost increasing at certain positions (repair method). Finally, the new duties are selected with minimal total cost, such that the duties cover each trip and the depot constraints are fulfilled. There are several destroy and repair methods presented and there is a deterministic and a randomized version of the heuristic.
 
 We do not examine the possibility of extending (ALNS) in order to cope with cover constraints. We adapt only the solution methods developed by \cite{Kaiser} and \cite{Knoll}.
 
 \paragraph{Approaches to Model Refuel Points} \parfill
 
-There is no straight-forward procedure to model the refuel points. It is not possible to use them individually in a task graph since several vehicles may use the same refuel point.
+There is no straightforward procedure to model the refuel points. It is not possible to use them individually in a task graph since several vehicles may use the same refuel point.
 
-In order to model refuel points for the (VRP), \cite{Erdogan_Miller-Hooks} and \cite{Felipe} include several copies of the refuel points, each for one potential visit between two nodes. This guarantees that a refuel point can be visited more than once. The number of used copies is not specified there. While \cite{Erdogan_Miller-Hooks} considers only complete refueling, in \cite{Felipe} partial refueling is allowed.
+In order to model refuel points for the vehicle routing problem (VRP), \cite{Erdogan_Miller-Hooks} and \cite{Felipe} include several copies of the refuel points, each for one potential visit between two nodes. This guarantees that a refuel point can be visited more than once. The number of used copies is not specified there. While \cite{Erdogan_Miller-Hooks} considers only complete refueling, in \cite{Felipe} partial refueling is allowed.
 
-In literature concerning the (VSP), \cite{Wen} create two copies for each refuel point. One copy is set between the depot and the trip, the other is set after the trip. With this, they guarantee that a vehicle is able to refuel before and after each trip. There are constraints that prevent a car from visiting the same refuel station twice. With this formulation $2|\mathcal{T}||\mathcal{R}|$ refuel point nodes are needed. In other (VSP) models, a preprocessing of the graph removes arcs between trips that cannot be fulfilled after another due to time. Using this refuel point modeling, the complete graph has to be considered in order to model a partial refueling and a feasible timing of the routes is ensured by explicit constraints.
+In the literature concerning the VSP, \cite{Wen} create two copies for each refuel point. One copy is set between the depot and the trip, the other is set after the trip. With this, they guarantee that a vehicle is able to refuel before and after each trip. There are constraints that prevent a car from visiting the same refuel station twice. With this formulation $2|\mathcal{T}||\mathcal{R}|$ refuel point nodes are needed. In other VSP models, a preprocessing of the graph removes arcs between trips that cannot be fulfilled after another due to time. Using this refuel point modeling, the complete graph has to be considered in order to model partial refueling and feasible timing of the routes is ensured by explicit constraints.
 
-In the underlying theses (\cite{Kaiser}, \cite{Knoll}), a copy of each refuel point between each pair of feasible trips is created. With this method it is possible to determine the respective charging time individually in advance and modeling partial refueling is easy. In the task graph, time infeasible arcs are removed in advance and are not treated by additional constraints. In the worst case there are needed ${\frac{1}{2}|\mathcal{R}||\mathcal{T}|^2}$ refuel point nodes. In order to reduce the size of the task graph, they provide a preprocessing on the refuel points nodes, based on Pareto optimality. Using this for realistic instances, most of the copies can be eliminated without cutting the optimal solution.
+In the underlying theses (\cite{Kaiser}, \cite{Knoll}), a copy of each refuel point between each pair of feasible trips is created. With this method it is possible to determine the respective charging time individually in advance and modeling partial refueling is easy. In the task graph, time-infeasible arcs are removed in advance and are not treated by additional constraints. In the worst case, ${\frac{1}{2}|\mathcal{R}||\mathcal{T}|^2}$ refuel point nodes are needed. In order to reduce the size of the task graph, they provide a preprocessing on the refuel point nodes, based on Pareto-optimality. Using this for realistic instances, most of the copies can be eliminated without cutting the optimal solution.
