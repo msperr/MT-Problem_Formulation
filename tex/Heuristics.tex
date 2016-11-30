@@ -234,7 +234,7 @@ Let $i\in[n]$. For a set of start points $\Vhat_i$, a set of end points $\Phat_i
 
 and arc set
 \begin{align*}
-	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\mathcal{T}\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \\
+	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\Ti\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \\
 	& \cupdot\left(\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
 \end{align*}
 
@@ -271,7 +271,7 @@ The trip costs are handled as before. If a trip is fulfilled, it is fulfilled in
 
 The fixed vehicle costs require a different treatment. If a duty begins at a start point or finishes at an end point, the vehicle cost of this duty arises already in the partial instance where the start, respectively end point is created. Therefore, the arcs ${\left\{\ds\right\}\times\Vhat_i}$ have no vehicle cost, the arcs ${\left\{\ds\right\}\times\left(\Ti\cupdot\Phat_i\right)}$ have vehicles cost $\cv$. Since the vehicle cost for an end point are already paid in the other partial instance, the arcs ${\Phat_i\times\left\{\de\right\}}$ have negative vehicle cost. This means, a duty beginning at a start point and finishing at an end point has negative vehicle cost, since the vehicle cost has already occurred twice, in the partial instance where the start, respectively end point was created.
 
-Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for $i\in[n]\backslash\{1\}$.
+Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for $i\in[n]\backslash\{1\}$.\fxnote{ct for ds -> t are not handled}
 
 \newpage
 
@@ -296,7 +296,7 @@ Since the cover constraints are left out in this formulation, also the route cos
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
-As mentioned before, the partial instance $I_1$ plays a special role since here the vehicles are introduced. We have ${\Vhat_1=\mathcal{V}}$. This requires some changes in the formulation. All duties have to start with a vehicle node, therefore all nodes out of ${\left\{\ds\right\}\times\left(\mathcal{T}_1\cupdot\Vhat_1\right)}$ are deleted. This graph is denoted as ${\overline{G}_1 = \left(\overline{V}_1,\overline{A}_1\right)}$.
+As mentioned before, the partial instance $I_1$ plays a special role since here the vehicles are introduced. We have ${\Vhat_1=\mathcal{V}}$. This requires some changes in the formulation. All duties have to start with a vehicle node, therefore all nodes out of ${\left\{\ds\right\}\times\left(\mathcal{T}_1\cupdot\Vhat_1\right)}$ are\fxnote{P instead of V} deleted. This graph is denoted as ${\overline{G}_1 = \left(\overline{V}_1,\overline{A}_1\right)}$.
 The objective function is modified, too. Each vehicles causes vehicle costs $\cv$. Thus, the term 
 \begin{align*}
 	\left(\sum_{s\in\Ti\cupdot\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv
