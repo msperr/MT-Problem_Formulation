@@ -1,7 +1,6 @@
 \contentsline {fixme}{Note: Check customer and costumer}{1}{chapter.1}
 \contentsline {fixme}{Note: Check linebreak for in-text formulas}{1}{chapter.1}
 \contentsline {fixme}{Note: Lagrange Heuristic for customer-dependent splitting as outlook}{1}{chapter.1}
-\contentsline {fixme}{Note: Remove KK16 in bibliography}{1}{chapter.1}
 \contentsline {fixme}{Note: Minimize duty cost in heuristical solution}{1}{chapter.1}
 \contentsline {fixme}{Note: CMILPi: FuelLinkage, wo. ds}{1}{chapter.1}
 \contentsline {fixme}{Note: ft for r in chapter 3}{7}{Item.7}
@@ -10,9 +9,8 @@
 \contentsline {fixme}{Note: widehat}{17}{definition.7}
 \contentsline {fixme}{Note: Remove splitting of vehicles}{24}{definition.9}
 \contentsline {fixme}{Note: Only vehicles available in 1st splitting considered}{24}{definition.9}
-\contentsline {fixme}{Note: partial instance I}{28}{remark.2}
-\contentsline {fixme}{Note: ct for ds -> t are not handled}{31}{section*.53}
-\contentsline {fixme}{Note: P instead of V}{32}{section*.66}
-\contentsline {fixme}{Note: This is done according to the procedure in ...}{43}{section*.78}
+\contentsline {fixme}{Note: notation of end(d)}{28}{algocf.1}
+\contentsline {fixme}{Note: To Do}{28}{theorem.4}
+\contentsline {fixme}{Note: This is done according to the procedure in ...}{42}{section*.78}
 \contentsline {fixme}{Note: l+1}{65}{section*.120}
 \contentsline {fixme}{Note: adapt b-vector}{66}{section*.121}

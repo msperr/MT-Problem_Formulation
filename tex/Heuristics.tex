@@ -21,7 +21,7 @@ We first define the splitting of the instance and the arising adaptions of task 
 
 \subsection{Splitting the Problem}
 
-In order to create the partial instances, we define splittings of $\mathcal{V}$ and $\mathcal{T}$. In contrast to \cite{Knoll}, we define the splittings in a general way.
+In order to create the partial instances, we define splittings of $\mathcal{T}$. In contrast to \cite{Knoll}, we define the splittings in a general way.
 
 \begin{definition}[Splitting]
 \label{def:splitting}
@@ -131,133 +131,119 @@ Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 \subsection{General Setting}
 \label{sec:general_setting}
 
-In this section, we describe the general setting of the Successive Heuristics. First we describe how the partial task graph is created, given a splitting of $\mathcal{T}$. It is based on $\overline{G}$ and contains start and end points, which are created in the partial instances solved before this. Then we discuss the order in which the partial instances are solved. The first partial instance is a special instance since there the vehicles come into play. Therefore, this instance is solved last. We explain how start and end points are are created out of a partial solution. Finally, we describe the feasible connection of the partial instances to an overall solution.
+In this section, we describe the general setting of the heuristic.
 
-\paragraph{Order of Solving the Partial Instances} \parfill
+\paragraph{Order of the Partial Instances} \parfill
 
-Consider a splitting $\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$ for $\mathcal{T}$. Let $\sigma\in S_n$ be a permutation of $[n]$ with $\sigma(n)=1$. $\sigma$ indicates in which order the partial instances are solved. This means, partial instance $\sigma(i)\in[n]$ is solved at the $i$-th position, the first partial instance is solved at last. The actual specification of $\sigma$ follows in the description of the respective heuristic. 
+For each splitting, we create a partial instance. Each partial instance contains exactly the trips of the respective splitting and some endpoints. How the endpoints are created is explained afterwards. The first partial instance additionally contains the vehicle set. The partial instances are solved successively from the beginning to the start. For each partial instance, a partial solution is computed which is based on the already solved partial instances. In the first partial instances, which is solved last, the duties are actually connected to the respective vehicles.
 
-\paragraph{Determination of Start and End Points} \parfill
+This heuristic is directly applied from \cite[Sec. 10.4]{Knoll}. As presented there, the partial instances can be arranged arbitrarily. They argue that the setting with ordering from the end to the beginning suits best to the underlying instance structure. Therefore present only this approach here.
 
-The sets of start points $\Vhat_i$ and end points $\Phat_i$ are initially empty for all $i\in[n]$. Assume that we have solved the partial instance $\sigma(i)$ just now. Based on the received partial solution, we update the start point set of the next partial instance after $\sigma(i)$ and we update the end point set of the next partial instance before $\sigma(i)$ which is not yet solved. This means, we update $\Vhat_{\sigma(j)}$ and $\Phat_{\sigma(k)}$ for ${j=\argmin_{j>i}\left\{\sigma(j)\mid \sigma(j)>\sigma(i)\right\}}$ and ${k=\argmin_{k>i}\left\{\sigma(k)\mid \sigma(k)<\sigma(i)\right\}}$.
+\paragraph{Determination of the Endpoints} \parfill
 
-For each duty of the partial solution that does either visit no node out of $\Vhat_{\sigma(i)}$ or no node out of $\Phat_{\sigma(i)}$, we create a start point and/or an end point. If a duty starts with a trip or an end point $s$, we create an end point out of it. The end point $t$ has the following properties
+The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. Now assume that we have solved $I_{i+1}$ for $i\in[n-1]$ right now. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
+
+Each duty of $S_{i+1}$ consists of a sequence of trips out of $\mathcal{T}_{i+1}$ and refuel points and possibly ends with an end point out of $\Phat_{i+1}$. It is possible that a duty only consists of an end point. For each duty we create an end point in $\Phat_i$. If the duty starts with a trip or end point $s$, we create the end point $t$ with the following properties
 \begin{align*}
 	\pstart_t = \pend_t := \pstart_s && \zstart_t = \zend_t := \zstart_s && f_t^0 := e_s + \ft_s
 \end{align*}
 
-where $e_s$ is the respective value of decision variable $e$ in the partial solution. We add $t$ to the end point set $\Phat_{\sigma(k)}$. If a duty ends with a trip or a start point $s$, we create a start point out of it. The start point $t$ has the following properties
-\begin{align*}
-	\pstart_t = \pend_t := \pend_s && \zstart_t = \zend_t := \zend_s && f_t^0 := e_s
-\end{align*}
+where $e_s$ is the respective value of decision variable $e$ in the partial solution. We add $t$ to the end point set $\Phat_i$.
 
-where $e_s$ is the respective value of decision variable $e$ in the partial solution. We add $t$ to the start point set $\Vhat_{\sigma(j)}$.
+For each end point $t$, we call the respective trips $s$ from where it is created, the trip representing $t$. If an end point $t$ is created from an end point $s$, the trip representing $t$ is the trip representing $s$. Note, that each end point ${t\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${s\in\mathcal{T}}$ representing it.
 
-For each start or end point $t$, we call the respective trip $s$ from where it is created, the trip representing $t$. If a start point $t$ is created from a start point $s$, the trip representing $t$ is the trip representing $s$. Note, that each start point ${t\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${s\in\mathcal{T}}$ representing it. This works analogously for end points.
-
-\begin{remark}
-
-Since $\sigma(n)=1$, the set ${\left\{k>i\mid\sigma(k)<\sigma(i)\right\}}$ is never empty for $i\in[n-1]$. Therefore, it is always possible to create an end point. If there is no later partial instance left, which is not yet solved, \ie ${\left\{j>i\mid\sigma(j)>\sigma(i)\right\}=\emptyset}$, then we create no start points out of $\sigma(i)$. If a duty consists of exactly one trip, then we create both a start and an end point for this trip.
-
-\end{remark}
-
-The partial instance $I_1$\fxnote{partial instance I} has a special role. In this instance, we have no start points, but we include the vehicle set $\mathcal{V}$. Therefore, we set ${\Vhat_1:=\mathcal{V}}$. Since $I_1$ is solved last, here is decided which vehicles are actually used. 
-
-\begin{algorithm}
-	\SetAlgoLined
-	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}, \mathcal{V}, \sigma\in S_n$ with $\sigma(n)=1$}
-	\KwOut{overall solution $S$}
-	\lForEach{$i\in[n]$}{$\Vhat_{\sigma(i)}\gets\emptyset$, $\Phat_{\sigma(i)}\gets\emptyset$}
-	\ForEach{$i\in[n-1]$}{
-		solve $I_{\sigma(i)}$, receive partial solution~$S_{\sigma(i)}$ with duty set~$D_{\sigma(i)}$\;
-		$j=\argmin_{j>i}\left\{\sigma(j)\mid\sigma(j)>\sigma(i)\right\}, k=\argmin_{k>i}\left\{\sigma(k)\mid\sigma(k)<\sigma(i)\right\}$\;
-		\ForEach{$D_{\sigma(i)}\ni d=\left(s_1,\dots,s_l\right)$}{
-			\If{$s_1\in\mathcal{T}_{\sigma(i)}\cupdot\Phat_{\sigma(i)}$}{
-				create end point $t$\;
-				$\pstart_t\gets\pstart_{s_1}, \pend_t\gets\pstart_{s_1}, \zstart_t\gets\zstart_{s_1}, \zend_t\gets\zstart_{s_1}, f_t^0\gets e_{s_1} + \ft_{s_1}$\;
-				$\Phat_{\sigma(k)}\gets\Phat_{\sigma(k)}\cup\{t\}$\;
-			}
-			\If{$s_l\in\Vhat_{\sigma(i)}\cupdot\mathcal{T}_{\sigma(i)}$}{
-				create start point $t$\;
-				$\pstart_t\gets\pend_{s_l}, \pend_t\gets\pend_{s_l}, \zstart_t\gets\zend_{s_l}, \zend_t\gets\zend_{s_l}, f_t^0 := e_{s_l}$\;
-				$\Vhat_{\sigma(j)}\gets\Vhat_{\sigma(j)}\cup\{t\}$\;
-			}
-		}
-	}
-	$\Vhat_1\gets\mathcal{V}$\;
-	solve $I_1$, receive partial solution~$S_1$ with duty set~$D_1$\;
-	\ForEach{$D_1\ni d = \left(s_1,\dots,s_l\right)$}{
-		\Repeat{Duty finished}{
-			\If{$s_l\in\bigcup_{i=1}^{n}\Phat_i$}{
-				determine duty $d'=\left(t_1,\dots,t_{l'}\right)$ with $t_1$ representing $s_l$\;
-				$d\gets\left(s_1,\dots,s_{l-1},t_1,\dots,t_{l'}\right)$\;
-			}
-			\ElseIf{$\exists d'\in\bigcup_{i=1}^{n} D_i$ \st $s_l$ represents $t_1\in\bigcup_{i=1}^{n}\Vhat_i$}{
-				determine duty $d'=\left(t_1,\dots,t_{l'}\right)$\;
-				$d\gets\left(s_1,\dots,s_l,t_2,\dots,t_{l'}\right)$\;
-			}
-			\lElse{Duty finished}
-		}
-	}
-	\Return{$S$ with duties $d\in D_1$}
-	\caption{Successive Heuristic (general setting) \label{alg:successive_heuristic}}
-\end{algorithm}
+The partial instance~$I_1$ has a special role. This instance additionally has a start point set $\Vhat_1$ which consists of the vehicle set. Each duty of the partial solution $S_1$ starts with a vehicle $v\in\mathcal{V}$, consists of trips out of $\mathcal{T}_1$ and refuel points and possibly ends with an endpoint out of $\Phat_1$. It is possible that a duty only consists of a vehicle.
 
 \paragraph{Feasible Connection of Partial Solutions} \parfill
 
 In order to generate an overall solution which is feasible for $\eqref{eq:MMILP}$, we connect the partial solutions. Let ${\left\{S_1,\dots S_n\right\}}$ be the partial solutions, solved as described before with the start and end points created as before. The connection works as follows:
 
-For each duty of $S_1$, we check whether it ends with an end point $t\in\bigcup_{i=1}^n\Phat_i$. We call this duty start duty.
+For each duty out of $S_1$, we check whether it ends with an end point $t\in\bigcup_{i=1}^n\Phat_i$. We call this duty start duty.
 \begin{itemize}
-	\item{If it does, we delete the end point and append the duty of $S_i$ for ${i\in[n]\backslash\{1\}}$, that starts with the trip representing $t$, to the start duty. We then restart this procedure with the new end of the start duty.}
-	\item{If it does not, it ends with a trip or start point ${t\in\left(\mathcal{T}\cupdot\bigcup_{i=1}^n\Vhat_i\right)}$. We check whether there is a duty in $S_i$ for ${i\in[n]\backslash\{1\}}$, that starts with a start point represented by $t$. If such a duty exists, we append it without the start point to the start duty. We then restart this procedure with the new end of the start duty. If no such duty exists, this start duty is finished}.
+	\item
+		If it does, we delete the end point and append the duty of $S_i$ for ${i\in[n]\backslash\{1\}}$ that starts with the trips representing $t$ to the start duty. We then restart this procedure with the new end of the start duty.
+	\item
+		If it does not, the start duty is finished.
 \end{itemize}
 
-\Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
+Every end point $t\in\Phat_i$ for $i\in[n]$ has to be covered by some duty out of $S_i$. This ensures that each all duties of the partial solutions are finally part of the overall solution. \Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
+
+\begin{algorithm}[htb]
+	\SetAlgoLined
+	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}, \mathcal{V}$}
+	\KwOut{overall solution $S$}
+	\lForEach{$i\in[n]$}{$\Phat_i\gets\emptyset$}
+	\ForEach{$i=n-1,\dots,2$}{
+		solve $I_i$, receive partial solution~$S_i$ with duty set~$D_i$\;
+		\ForEach{$D_i\ni d=\left(s_1,\dots,s_l\right)$}{
+			create end point $t$\;
+			$\pstart_t\gets\pstart_{s_1}, \pend_t\gets\pstart_{s_1}, \zstart_t\gets\zstart_{s_1}, \zend_t\gets\zstart_{s_1}, f_t^0\gets e_{s_1} + \ft_{s_1}$\;
+			$\Phat_{i-1}\gets\Phat_{i-1}\cup\{t\}$\;
+		}
+	}
+	$\Vhat_1\gets\mathcal{V}$\;
+	solve $I_1$, receive partial solution~$S_1$ with duty set~$D_1$\;
+	\ForEach{$d\in D_1$}{
+		\While{$\operatorname{end}(d)\in\bigcup_{i=1}^{n}\Phat_i$}{
+			determine duty $d'=\left(t_1,\dots,t_{l'}\right)$ with $t_1$ representing $t$\;
+			delete $\operatorname{end}(d)$ from $d$\;
+			append $d'$ to $d$\;
+		}
+	}
+	\Return{$S$ with duties $D_1$}
+	\caption{Successive Heuristic (general setting) \label{alg:successive_heuristic}}
+\end{algorithm}\fxnote{notation of end(d)}
+
+\begin{theorem}[Feasibility of the connection]
+
+Feasible in MMILP without cover constraints? 
+Consider that splitting is not specified. Why is it feasible nevertheless?
+Feasible in successive heuristic -> feasible in SMILP
+\fxnote{To Do}
+
+\end{theorem}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Identifying the Subproblems}
+\subsection{Solving the Subproblems}
 
 Given a splitting of $\mathcal{T}$, we describe how the subproblems of $\eqref{eq:SMILP}$ are created. For each partial trip set $\mathcal{T}_i$, we solve a partial instance $I_i$. We call the solution of a partial instance $I_i$ partial solution $S_i$. 
 
 \paragraph{Partial Instances} \parfill
 
-First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains the partial sets from the splittings of $\mathcal{T}$. The partial task graph $\overline{G}_i$ for $i\in[n]$ only contains the respective partial trip set $\Ti$. It additionally contains a start point set $\hat{\mathcal{V}}_i$ and an end point set $\hat{\mathcal{P}}_i$. How these sets are defined is explained in \Cref{sec:general_setting}.
+First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains the partial sets from the splittings of $\mathcal{T}$. For ${i\in[n]\backslash\{1\}}$, the partial task graph $\overline{G}_i$ contains the respective partial trip set $\Ti$ and an end point set $\Phat_i$. How these sets are defined is explained in \Cref{sec:general_setting}. The partial task graph~$\overline{G}_1$ is introduced later.
 
 \begin{definition}[Partial Transformed Task Graph]
 
-Let $i\in[n]$. For a set of start points $\Vhat_i$, a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task graph is the directed graph $\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$ with vertex set
+Let ${i\in[n]\backslash\{1\}}$. For a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task grah is the directed graph ${\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)}$ with vertex set
 \begin{align*}
-	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Vhat_i\cupdot\Ti\cupdot\Phat_i
+	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Ti\cupdot\Phat_i
 \end{align*}
 
 and arc set
 \begin{align*}
-	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\left(\Vhat_i\cupdot\Ti\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \\
-	& \cupdot\left(\left(\Vhat_i\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
+	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\Ti\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \cupdot\left(\left(\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
 \end{align*}
 
 \end{definition}
 
-\paragraph{Solving of the Partial Instances} \parfill
+\paragraph{Solving the Partial Instances} \parfill
 
 In order to solve each partial instance, we create a formulation which is based on the partial transformed task graph $\overline{G}_i$. The flow constraints and the fuel constraints are basically the same as in $\eqref{eq:SMILP}$, restricted to $\overline{G}_i$. This formulation is only a basic structure for the partial instances. Some details are depending on the actual choice of the splitting and left out here. We discuss these issues later.
 
-In the partial instance, there is no vehicle set anymore. Instead we ensure that each start and each end point is visited. This is necessary such that the subsequent connection of the solutions is feasible. Therefore we replace $\eqref{eq:MMILP:vehicles}$ by
+In the partial instance, there is no vehicle set anymore. Instead we ensure that each end point is visited. This is necessary such that the subsequent connection of the solutions is feasible. Therefore we replace $\eqref{eq:MMILP:vehicles}$ by
 \begin{align}
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \label{eq:CMILP:start_end_points}
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \label{eq:CMILP:start_end_points}
 \end{align}
 
-For start and end points, we are given initial fuel levels. The initial fuel level for a start point indicates the still available fuel from the end of the previous partial duty. The initial fuel level for an end point indicates the required fuel for the start of the next partial duty. Therefore, these fuel levels work as boundaries for the duties considered in this partial instance. In order to guarantee this, we introduce the constraints
+For the end points, we are given initial fuel levels. It indicates the required fuel for the start of the next partial duty. Therefore, these fuel levels work as boundaries for the duties considered in this partial instance. In order to guarantee this, we introduce the constraints
 \begin{align}
-	& e_s \leq f^0_s && \text{for all } s\in\Vhat_i \label{eq:CMILP:initial_fuel} \\
 	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \label{eq:CMILP:final_fuel}
 \end{align}
 
 Since there are no vehicles in the partial instance, the constraint $\eqref{eq:MMILP:initial_fuel}$ is dropped.
 
-We introduce two additional constraints. If a duty starts or ends with a trip, then the fuel at the start or at the end of this duty has to be in certain boundaries $f^{\min}$ or $f^{\max}$, respectively. How these boundaries are actually defined, is part of the heuristic. The constraints are the following:
+We introduce two additional constraints. If a duty starts or ends with a trip, then the fuel at the start or at the end of this duty is bounded by $f^{\min}$ or $f^{\max}$, respectively. How these boundaries are actually defined, is part of the heuristic. The constraints are the following:
 \begin{align}
 	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmax} \\
 	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmin}
@@ -267,21 +253,18 @@ As mentioned before, it requires some additional work to include the cover const
 
 \paragraph{Cost Function} \parfill
 
-The trip costs are handled as before. If a trip is fulfilled, it is fulfilled in exactly one partial instance and the trip cost is included there. The deadhead costs between two trips $s,t\in\Ti$ are the same as before. If start and end points are included, the behavior is as follows: Each start and end point represents a trip of an already solved partial instance. The deadhead cost after this trip (if it is a start point) or before this trip (if it is an end point) has not occurred up to now. The deadhead cost including a start or an end point is therefore the same as the deadhead cost with the trip representing it.
+The trip costs are handled as before. If a trip is fulfilled, it is fulfilled in exactly one partial instance and the trip cost is included there. The deadhead costs between two trips $s,t\in\Ti$ are the same as before. If end points are included, this behaves as follows: Each end point represents a trip of an already solved partial instance. The deadhead cost before this trip has not occurred yet. The deadhead cost including an end point is therefore the same as the deadhead cost with the trip representing it.
 
-The fixed vehicle costs require a different treatment. If a duty begins at a start point or finishes at an end point, the vehicle cost of this duty arises already in the partial instance where the start, respectively end point is created. Therefore, the arcs ${\left\{\ds\right\}\times\Vhat_i}$ have no vehicle cost, the arcs ${\left\{\ds\right\}\times\left(\Ti\cupdot\Phat_i\right)}$ have vehicles cost $\cv$. Since the vehicle cost for an end point are already paid in the other partial instance, the arcs ${\Phat_i\times\left\{\de\right\}}$ have negative vehicle cost. This means, a duty beginning at a start point and finishing at an end point has negative vehicle cost, since the vehicle cost has already occurred twice, in the partial instance where the start, respectively end point was created.
+The fixed vehicle costs require a different treatment. If a duty ends with and end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. This results in the model as follows: The arcs ${\Ti\times\de}$ have vehicle cost $\cv$. In all other arcs that are incident with $\ds$ or $\de$ there is no vehicle cost.
 
-Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for $i\in[n]\backslash\{1\}$.\fxnote{ct for ds -> t are not handled}
-
-\newpage
+Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv}$} \nonumber \\
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Noutoi(\ds)\backslash\Phat_i} x_{\ds, t}\ct}$} \nonumber \\
 	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
 	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Vhat_i\cup\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
 	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
-	& e_s \leq f_s^0 & & \text{for all } s\in\Vhat_i \tag{\ref{eq:CMILP:initial_fuel}} \\
 	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
 	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
 	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
@@ -296,18 +279,38 @@ Since the cover constraints are left out in this formulation, also the route cos
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
-As mentioned before, the partial instance $I_1$ plays a special role since here the vehicles are introduced. We have ${\Vhat_1=\mathcal{V}}$. This requires some changes in the formulation. All duties have to start with a vehicle node, therefore all nodes out of ${\left\{\ds\right\}\times\left(\mathcal{T}_1\cupdot\Vhat_1\right)}$ are\fxnote{P instead of V} deleted. This graph is denoted as ${\overline{G}_1 = \left(\overline{V}_1,\overline{A}_1\right)}$.
-The objective function is modified, too. Each vehicles causes vehicle costs $\cv$. Thus, the term 
+As mentioned before, the partial instance~$I_1$ plays a special role since the vehicles are introduced there. The vehicle set $\mathcal{V}$ is added to the partial task graph and all duties start with a vehicle. We show how the formulation $(\operatorname{SMILP}_1)$ differs from $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
+
+\begin{definition}[Partial Transformed Task Graph]
+
+Let $i=1$. For a set of vehicles $\mathcal{V}$, a set of end points $\Phat_1$ and the partial trip set $\mathcal{T}_1$, the partial transformed task graph for $I_1$ is the directed graph $\overline{G}_1=\left(\overline{V}_1,\overline{A}_1\right)$ with vertex set
 \begin{align*}
-	\left(\sum_{s\in\Ti\cupdot\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv
+	\overline{V}_1 := \left\{\ds,\de\right\}\cupdot\mathcal{V}\cupdot\mathcal{T}_1\cupdot\Phat_1
 \end{align*}
 
-in the objective function is replaced by
+and arc set
 \begin{align*}
-	\left(\sum_{s\in\Vhat_1} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv
+	\overline{A}_1 := & \left(\left\{\ds\right\}\times\mathcal{V}\right)\cupdot\left\{(s,t)\in\left(\mathcal{V}\cupdot\Ti\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \cupdot\left(\left(\mathcal{V}\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
+\end{align*}.
+
+\end{definition}
+
+With introducing the vehicles we have to respect the initial fuel of the vehicles. Hence we add the constraint
+\begin{align}
+	& e_s \leq f^0_s && \text{for all } s\in\mathcal{V} \tag{\ref{eq:MMILP:initial_fuel}}
+\end{align}
+
+to $(\operatorname{SMILP}_1)$.
+
+The objective function is also modified. Each vehicle with a non-empty duty causes vehicle cost~$\cv$. Further, for all duties that end with an end point, the vehicle cost is already paid in the later partial instance. The vehicle cost are therefore subtracted for these duties. Thus, the term
+\begin{align*}
+	\sum_{s\in\Ti} x_{s,\de}\cv
 \end{align*}
 
-We call this formulation $(\operatorname{SMILP}_1)$.
+is replaced by
+\begin{align*}
+	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv
+\end{align*}
 
 %########################################################################################################################################
 %#
