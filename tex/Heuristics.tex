@@ -18,6 +18,7 @@ We first define the splitting of the instance and the arising adaptions of task 
 %########################################################################################################################################
 
 \section{Successive Heuristics}
+\label{sec:successive_heuristics}
 
 \subsection{Splitting the Problem}
 
@@ -29,7 +30,7 @@ In order to create the partial instances, we define splittings of $\mathcal{T}$.
 Let $n\in\mathbb{N}$ and let
 \begin{align*}
 	\mathcal{T}=\Cupdot_{i=1}^n\Ti
-\end{align*}\fxnote{Remove splitting of vehicles}
+\end{align*}
 
 be a partition of the set of trips. Then we call $\left\{\Ti\mid i\in[n]\right\}$ splitting of $\mathcal{T}$ and $\Ti$ partial trip set.\fxnote{Only vehicles available in 1st splitting considered}
 
@@ -37,7 +38,7 @@ be a partition of the set of trips. Then we call $\left\{\Ti\mid i\in[n]\right\}
 
 \paragraph{Adaption of the Task Graph} \parfill
 
-We transform our task graph such that it contains the splitting as defined in \Cref{def:splitting}. For this, we introduce so called split points connecting the partial sets. Arcs that connected two partial sets before, take a detour over the respective split point in the transformed graph.
+We transform our task graph such that it contains the splitting as defined in \Cref{def:splitting}. For this, we introduce so called split points connecting the partial sets. Arcs that connect two partial sets in the original formulation, take a detour over the respective split point in the transformed graph.
 
 \begin{definition}[Transformed Task Graph]
 
@@ -131,49 +132,45 @@ Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 \subsection{General Setting}
 \label{sec:general_setting}
 
-In this section, we describe the general setting of the heuristic.
+In this section, we describe the general setting of the heuristic. Let $\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$ be a splitting. For each partial trip set, we create a partial instance ${I_1,\dots,I_n}$ which contains exactly the partial trip set $\mathcal{T}_i$ and some endpoints $\Phat_i$. How these endpoints are created is explained afterwards. The partial instance~$I_1$ additionally contains the vehicle set. The partial instances are solved from the end to the start, \ie ${I_n,\dots,I_1}$ are solved successively. For each partial instance~$I_i$, a partial solution~$S_i$ is computed which is based on the already solved partial instances. In $I_1$ which is solved last, the partial duties are actually assigned to the vehicles. Finally the partial solutions are feasibly connected to an overall solution.
 
-\paragraph{Order of the Partial Instances} \parfill
-
-For each splitting, we create a partial instance. Each partial instance contains exactly the trips of the respective splitting and some endpoints. How the endpoints are created is explained afterwards. The first partial instance additionally contains the vehicle set. The partial instances are solved successively from the beginning to the start. For each partial instance, a partial solution is computed which is based on the already solved partial instances. In the first partial instances, which is solved last, the duties are actually connected to the respective vehicles.
-
-This heuristic is directly applied from \cite[Sec. 10.4]{Knoll}. As presented there, the partial instances can be arranged arbitrarily. They argue that the setting with ordering from the end to the beginning suits best to the underlying instance structure. Therefore present only this approach here.
+This heuristic is directly applied from \cite[Sec.~10.4]{Knoll}. As presented there, the order in which the partial instances are solved can be stated arbitrarily as long as $I_1$ is solved last. They argue that the setting with ordering from the end to the start suits best to the underlying instance structure. Therefore we present only this approach here.
 
 \paragraph{Determination of the Endpoints} \parfill
 
-The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. Now assume that we have solved $I_{i+1}$ for $i\in[n-1]$ right now. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
+The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. For ${i\in[n-1]}$ assume that we have solved $I_{i+1}$ right now. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
 
 Each duty of $S_{i+1}$ consists of a sequence of trips out of $\mathcal{T}_{i+1}$ and refuel points and possibly ends with an end point out of $\Phat_{i+1}$. It is possible that a duty only consists of an end point. For each duty we create an end point in $\Phat_i$. If the duty starts with a trip or end point $s$, we create the end point $t$ with the following properties
 \begin{align*}
 	\pstart_t = \pend_t := \pstart_s && \zstart_t = \zend_t := \zstart_s && f_t^0 := e_s + \ft_s
 \end{align*}
 
-where $e_s$ is the respective value of decision variable $e$ in the partial solution. We add $t$ to the end point set $\Phat_i$.
+where $e_s$ is the respective value of decision variable $e$ in the $S_{i+1}$. We add $t$ to the end point set $\Phat_i$.
 
-For each end point $t$, we call the respective trips $s$ from where it is created, the trip representing $t$. If an end point $t$ is created from an end point $s$, the trip representing $t$ is the trip representing $s$. Note, that each end point ${t\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${s\in\mathcal{T}}$ representing it.
+For each end point $t$, we call the respective trip $s$ from where it is created, the trip representing $t$. If an end point $t$ is created from an end point $s$, the trip representing $t$ is the trip representing $s$. Note that each end point ${t\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${s\in\mathcal{T}}$ representing it.
 
-The partial instance~$I_1$ has a special role. This instance additionally has a start point set $\Vhat_1$ which consists of the vehicle set. Each duty of the partial solution $S_1$ starts with a vehicle $v\in\mathcal{V}$, consists of trips out of $\mathcal{T}_1$ and refuel points and possibly ends with an endpoint out of $\Phat_1$. It is possible that a duty only consists of a vehicle.
+The partial instance~$I_1$ has a special role. This instance additionally contains the vehicle set. Each duty of the partial solution $S_1$ starts with a vehicle $v\in\mathcal{V}$, consists of trips out of $\mathcal{T}_1$ and refuel points and possibly ends with an endpoint out of $\Phat_1$. It is possible that a duty only consists of a vehicle.
 
 \paragraph{Feasible Connection of Partial Solutions} \parfill
 
 In order to generate an overall solution which is feasible for $\eqref{eq:MMILP}$, we connect the partial solutions. Let ${\left\{S_1,\dots S_n\right\}}$ be the partial solutions, solved as described before with the start and end points created as before. The connection works as follows:
 
-For each duty out of $S_1$, we check whether it ends with an end point $t\in\bigcup_{i=1}^n\Phat_i$. We call this duty start duty.
+For each duty in $S_1$, we check whether it ends with an end point $t\in\bigcup_{i=1}^n\Phat_i$. We call this duty start duty.
 \begin{itemize}
 	\item
-		If it does, we delete the end point and append the duty of $S_i$ for ${i\in[n]\backslash\{1\}}$ that starts with the trips representing $t$ to the start duty. We then restart this procedure with the new end of the start duty.
+		If it does, we delete the end point and append the duty of $S_i$ for ${i\in[n]\backslash\{1\}}$ that starts with the trip representing $t$ to the start duty. We then restart this procedure with the new end of the start duty.
 	\item
-		If it does not, the start duty is finished.
+		If it does not, the start duty is finished and we continue with the next duty in $S_1$.
 \end{itemize}
 
-Every end point $t\in\Phat_i$ for $i\in[n]$ has to be covered by some duty out of $S_i$. This ensures that each all duties of the partial solutions are finally part of the overall solution. \Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
+In the partial instances has to be ensured that each end point ${t\in\Phat_i}$ is covered by some duty in $S_i$. This guarantees that all duties of the partial solutions are finally part of the overall solution. \Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
 
 \begin{algorithm}[htb]
 	\SetAlgoLined
-	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}, \mathcal{V}$}
-	\KwOut{overall solution $S$}
+	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$, vehicle set $\mathcal{V}$}
+	\KwOut{overall solution $S$ with duty set $D$}
 	\lForEach{$i\in[n]$}{$\Phat_i\gets\emptyset$}
-	\ForEach{$i=n-1,\dots,2$}{
+	\ForEach{$i=n,\dots,2$}{
 		solve $I_i$, receive partial solution~$S_i$ with duty set~$D_i$\;
 		\ForEach{$D_i\ni d=\left(s_1,\dots,s_l\right)$}{
 			create end point $t$\;
@@ -181,37 +178,35 @@ Every end point $t\in\Phat_i$ for $i\in[n]$ has to be covered by some duty out o
 			$\Phat_{i-1}\gets\Phat_{i-1}\cup\{t\}$\;
 		}
 	}
-	$\Vhat_1\gets\mathcal{V}$\;
 	solve $I_1$, receive partial solution~$S_1$ with duty set~$D_1$\;
-	\ForEach{$d\in D_1$}{
-		\While{$\operatorname{end}(d)\in\bigcup_{i=1}^{n}\Phat_i$}{
-			determine duty $d'=\left(t_1,\dots,t_{l'}\right)$ with $t_1$ representing $t$\;
-			delete $\operatorname{end}(d)$ from $d$\;
-			append $d'$ to $d$\;
+	\ForEach{$D_1\ni d=\left(s_1,\dots,s_l\right)$}{
+		$t\gets s_l$\;
+		\While{$t\in\bigcup_{i=1}^{n}\Phat_i$}{
+			determine duty $d'=\left(s_{l+1},\dots,s_{l'}\right)$ with $t_{l+1}\in\mathcal{T}$ representing $t$\;
+			$d\gets\left(s_1,\dots,s_{l-1},s_{l+1},\dots,s_{l'}\right)$\;
+			$t\gets s_{l'}; l\gets l'-1$\;
 		}
 	}
-	\Return{$S$ with duties $D_1$}
+	$D\gets D_1$\;
+	\Return{S, D}
 	\caption{Successive Heuristic (general setting) \label{alg:successive_heuristic}}
-\end{algorithm}\fxnote{notation of end(d)}
-
-\begin{theorem}[Feasibility of the connection]
-
-Feasible in MMILP without cover constraints? 
-Consider that splitting is not specified. Why is it feasible nevertheless?
-Feasible in successive heuristic -> feasible in SMILP
-\fxnote{To Do}
-
-\end{theorem}
+\end{algorithm}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Solving the Subproblems}
 
-Given a splitting of $\mathcal{T}$, we describe how the subproblems of $\eqref{eq:SMILP}$ are created. For each partial trip set $\mathcal{T}_i$, we solve a partial instance $I_i$. We call the solution of a partial instance $I_i$ partial solution $S_i$. 
+We describe how the partial instances ${I_1,\dots,I_n}$ are solved. We create a task graph containing $\Ti$ and $\Phat_i$ and solve this partial instance similar to the $\eqref{eq:SMILP}$. We first describe the procedure for ${i\in[n]\backslash\{1\}}$. Finally we explain the modifications to solve~$I_1$.
 
-\paragraph{Partial Instances} \parfill
+\begin{remark}
 
-First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains the partial sets from the splittings of $\mathcal{T}$. For ${i\in[n]\backslash\{1\}}$, the partial task graph $\overline{G}_i$ contains the respective partial trip set $\Ti$ and an end point set $\Phat_i$. How these sets are defined is explained in \Cref{sec:general_setting}. The partial task graph~$\overline{G}_1$ is introduced later.
+The formulation developed here is only a basic structure for solving the partial instances. The realization of the cover constraints depends on the splitting method. Since there are several approaches to split the trip set, we refer to \Cref{sec:customer_dependent_splitting} and \Cref{sec:time_dependent_splitting} for the actual description of the cover constraints. The route costs heavily depend on the cover constraints and are thus also neglected here. The in \Cref{sec:successive_heuristics} developed approach solely is not appropriate to gain meaningful results. Since the cover constraints are completely left out here, the empty solution is feasible and is obviously the cost-minimal solution.
+
+\end{remark}
+
+\paragraph{Task Graph} \parfill
+
+First we define the task graph with which we can solve the partial instances. The transformed task graph $\overline{G}$ covers the complete instance, but contains already the partial trip sets of the splitting. We divide $\overline{G}$ into partial task graphs. For ${i\in[n]\backslash\{1\}}$, the partial task graph $\overline{G}_i$ contains the respective partial trip set $\Ti$ and the end point set $\Phat_i$. The graph is defined as follows:
 
 \begin{definition}[Partial Transformed Task Graph]
 
@@ -227,16 +222,18 @@ and arc set
 
 \end{definition}
 
+In the partial instance are no vehicles. Thus each duty starts with a trip or end point.
+
 \paragraph{Solving the Partial Instances} \parfill
 
-In order to solve each partial instance, we create a formulation which is based on the partial transformed task graph $\overline{G}_i$. The flow constraints and the fuel constraints are basically the same as in $\eqref{eq:SMILP}$, restricted to $\overline{G}_i$. This formulation is only a basic structure for the partial instances. Some details are depending on the actual choice of the splitting and left out here. We discuss these issues later.
+Let ${i\in[n]\backslash\{1\}}$. In order to solve each partial instance, we create a formulation which is based on the partial transformed task graph $\overline{G}_i$. The flow constraints and the fuel constraints are basically the same as in $\eqref{eq:SMILP}$, restricted to $\overline{G}_i$. 
 
-In the partial instance, there is no vehicle set anymore. Instead we ensure that each end point is visited. This is necessary such that the subsequent connection of the solutions is feasible. Therefore we replace $\eqref{eq:MMILP:vehicles}$ by
+As mentioned before, there is no vehicle set any more. Instead all endpoints have to be visited. Therefore we replace $\eqref{eq:MMILP:vehicles}$ by
 \begin{align}
 	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \label{eq:CMILP:start_end_points}
 \end{align}
 
-For the end points, we are given initial fuel levels. It indicates the required fuel for the start of the next partial duty. Therefore, these fuel levels work as boundaries for the duties considered in this partial instance. In order to guarantee this, we introduce the constraints
+We are given initial fuel levels for the end points. They indicate the required fuel for the start of the next partial duty. These fuel levels work as lower bounds for the end of the duties in this partial instance. Therefore we introduce the constraints
 \begin{align}
 	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \label{eq:CMILP:final_fuel}
 \end{align}
@@ -249,18 +246,15 @@ We introduce two additional constraints. If a duty starts or ends with a trip, t
 	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmin}
 \end{align}
 
+While solving the partial instances partial duties are created. For ${i\in[n]\backslash\{1\}}$, the number of these duties is not bounded so far. The number of duties in $S_{i+1}$ equals $\vert\Phat_i\vert$. If ${\vert\Phat_1\vert > \vert\mathcal{V}\vert}$, the partial instance~$I_1$ is infeasible and then the complete heuristic is infeasible. In order to prevent this, we restrict the number of created duties by the following inequality:
+\begin{align}
+	\sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \label{eq:CMILP:strengthening}
+\end{align}
+
 As mentioned before, it requires some additional work to include the cover constraints into the partial instances. The fulfilling of the cover constraints is also part of the respective heuristic and therefore $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are left out in this formulation.
 
-\paragraph{Cost Function} \parfill
-
-The trip costs are handled as before. If a trip is fulfilled, it is fulfilled in exactly one partial instance and the trip cost is included there. The deadhead costs between two trips $s,t\in\Ti$ are the same as before. If end points are included, this behaves as follows: Each end point represents a trip of an already solved partial instance. The deadhead cost before this trip has not occurred yet. The deadhead cost including an end point is therefore the same as the deadhead cost with the trip representing it.
-
-The fixed vehicle costs require a different treatment. If a duty ends with and end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. This results in the model as follows: The arcs ${\Ti\times\de}$ have vehicle cost $\cv$. In all other arcs that are incident with $\ds$ or $\de$ there is no vehicle cost.
-
-Since the cover constraints are left out in this formulation, also the route cost is not treated here. This is also defined with the specification of the splitting. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
-
 \begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Noutoi(\ds)\backslash\Phat_i} x_{\ds, t}\ct}$} \nonumber \\
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_c}$} \nonumber \\
 	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
 	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
 	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
@@ -272,10 +266,19 @@ Since the cover constraints are left out in this formulation, also the route cos
 	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
 	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
 	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
+	& \sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \tag{\ref{eq:CMILP:strengthening}} \\
 	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
 	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
 	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
 \end{align}
+
+\paragraph{Cost Function} \parfill
+
+The cost function is also modified. The deadhead cost between trips ${s,t\in\Ti}$ are the same as in the $\eqref{eq:SMILP}$. Between trips ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$, there is an end point ${t'\in\Phat_i}$ with $t$ representing $t'$ if $t$ starts another partial duty in $S_j$. The deadhead cost $\cd_{s,t}$ is treated in $I_i$ as $\cd_{s,t'}$ and the trip cost $\ct_t$ is treated in $I_j$. Therefore the trip cost for the trip starting a duty arises additionally.
+
+The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost.
+
+Besides the cover constraints also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
@@ -290,27 +293,39 @@ Let $i=1$. For a set of vehicles $\mathcal{V}$, a set of end points $\Phat_1$ an
 
 and arc set
 \begin{align*}
-	\overline{A}_1 := & \left(\left\{\ds\right\}\times\mathcal{V}\right)\cupdot\left\{(s,t)\in\left(\mathcal{V}\cupdot\Ti\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \cupdot\left(\left(\mathcal{V}\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right)
-\end{align*}.
+	\overline{A}_1 := & \left(\left\{\ds\right\}\times\mathcal{V}\right)\cupdot\left\{(s,t)\in\left(\mathcal{V}\cupdot\Ti\right)\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \cupdot\left(\left(\mathcal{V}\cupdot\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right).
+\end{align*}
 
 \end{definition}
 
-With introducing the vehicles we have to respect the initial fuel of the vehicles. Hence we add the constraint
+With introducing the vehicles we have to respect their initial fuel. Hence we add the constraint
 \begin{align}
 	& e_s \leq f^0_s && \text{for all } s\in\mathcal{V} \tag{\ref{eq:MMILP:initial_fuel}}
 \end{align}
 
 to $(\operatorname{SMILP}_1)$.
 
-The objective function is also modified. Each vehicle with a non-empty duty causes vehicle cost~$\cv$. Further, for all duties that end with an end point, the vehicle cost is already paid in the later partial instance. The vehicle cost are therefore subtracted for these duties. Thus, the term
+The objective function is also modified. Each vehicle with a non-empty duty causes vehicle cost~$\cv$. Further, for all duties that end with an end point, the vehicle cost is already paid in a later partial instance and is therefore subtracted for these duties. Thus, the term of the objective function
 \begin{align*}
 	\sum_{s\in\Ti} x_{s,\de}\cv
 \end{align*}
 
-is replaced by
+is replaced in $(\operatorname{SMILP}_1)$ by
 \begin{align*}
 	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv
 \end{align*}
+
+\begin{theorem}[Feasibility of the connection]
+
+Let $S$ be a solution that is created with the procedure of \Cref{sec:general_setting} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:SMILP}$.
+
+\end{theorem}
+
+\begin{proof}
+
+Proof\fxnote{Proof}
+
+\end{proof}
 
 %########################################################################################################################################
 %#
@@ -321,13 +336,13 @@ is replaced by
 \section{Customer-dependent Splitting}
 \label{sec:customer_dependent_splitting}
 
-In this section, we introduce customer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their customers' start times. This means, that all trips of a route and all routes of a customer are in the same splitting. This has the advantage, that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is potentially not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
+In this section, we introduce the customer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their customers' start times. Therefore all trips of a route and all routes of a customer are in the same splitting. The advantage is that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut off in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
 
 \paragraph{Splitting} \parfill
 
 The customer-dependent splitting is defined as follows:
 
-\begin{definition}[customer-dependent Splitting]
+\begin{definition}[Customer-dependent Splitting]
 \label{def:customer_dependent_splitting}
 
 Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We first define a splitting of the customers $\mathcal{C}=\Cupdot_{i=1}^n\mathcal{C}_i$ as
@@ -339,18 +354,9 @@ Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. W
 	\end{cases}
 \end{align*}
 
-Based on the customer splitting, we define the splittings of $\mathcal{T}$ and $\mathcal{V}$ as
+Based on the customer splitting, we define the splitting of $\mathcal{T}$ as
 \begin{align*}
 	\Ti := \left\{t\in\mathcal{T}\mid (M\circ C)(t)\in\mathcal{C}_i\right\} && \text{for } i\in[n]
-\end{align*}
-
-and
-\begin{align*}
-	\Vi := \begin{cases}
-		\left\{v\in\mathcal{V}\mid z_v\leq c_1\right\} & \text{for } i=1 \\
-		\left\{v\in\mathcal{V}\mid c_{i-1}<z_v\leq c_i\right\} & \text{for } i\in[n-1]\backslash\{1\} \\
-		\left\{v\in\mathcal{V}\mid c_{n-1}<z_v\right\} & \text{for } i=n.
-	\end{cases}
 \end{align*}
 
 \end{definition}
@@ -359,14 +365,14 @@ We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref
 
 \paragraph{Solving of the Partial Instances} \parfill
 
-The formulation is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints are not considered so far. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since for a customer $c\in\mathcal{C}_i$ all trips are in the splitting $\Ti$, only the cover constraints concerning these customers are included in partial instance $I_i$. We therefore add the following constraints:
+The formulation of the partial instances is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints are not considered so far. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since for a customer $c\in\mathcal{C}_i$ all trips are in the splitting $\Ti$, only the cover constraints concerning these customers are included in partial instance $I_i$. We therefore add the following constraints:
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:CMILP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \label{eq:CMILP:route} \\
 	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \label{eq:CMILP:um}
 \end{align}
 
-The route cost is not considered in $\eqref{eq:SMILPi}$ so far. Again, we have to consider only the route costs belonging to $c\in\mathcal{C}_i$. We therefore add the following term to the objective function
+Further, the route costs are not considered in $\eqref{eq:SMILPi}$ so far. We again have to consider only the route costs belonging to $c\in\mathcal{C}_i$. We therefore add the following term to the objective function
 \begin{align*}
 	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m
 \end{align*}

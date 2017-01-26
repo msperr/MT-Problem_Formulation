@@ -71,7 +71,7 @@ Class=LaTeXView
 Document=tex\Mathematical_Models.tex
 
 [Frame3_View0,0]
-TopLine=152
+TopLine=175
 Cursor=7777
 
 [Frame4]
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=476
-Cursor=25443
+TopLine=351
+Cursor=23959
 
 [Frame5]
 Flags=0
