@@ -127,6 +127,24 @@ The customer constraints $\eqref{eq:MMILP:customer}$ are not affected by transfo
 
 Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 
+\paragraph{Model Equivalence} \parfill
+
+\begin{theorem}
+
+Let $S$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ is also a feasible solution of the $\eqref{eq:MMILP}$ and the objective values coincide.
+
+\end{theorem}
+
+Previously in this subsection, the task graph and the constraints are modified in such a way that the feasibility in $\eqref{eq:MMILP}$ is not destroyed. Connections between ${s\in\mathcal{V}\cupdot\mathcal{T}}$ and ${t\in\mathcal{T}}$ via a split point ${t'\in\mathcal{P}}$, \ie ${(s,t'),(t',t)\in\overline{A}}$, are only feasible if ${s\prec t}$, \ie ${(s,t)\in A}$. Therefore these connections are feasible in $\eqref{eq:MMILP}$. Visiting a refuel point during $\left(s,t'\right)$ in $\overline{A}$ means visiting a refuel point during $(s,t)$ in $A$, visiting a refuel point during $\left(t',t\right)$ is not feasible in $\eqref{eq:SMILP}$. The fuel states and the fuel constraints are adapted feasibly and the cover constraints are not affected by the transformation.
+
+The objective function is adapted such that the trip and deadhead costs arise for the same trips, the vehicle and route costs are not affected by the transformation.
+
+\begin{remark}
+
+Note that a feasible solution in $\eqref{eq:MMILP}$ is not necessarily feasible in $\eqref{eq:SMILP}$. If there are ${s,t\in\mathcal{T}}$ with ${s\prec t}$ and ${s\in\mathcal{T}_{i+1}}, {t\in\Ti}$, then $s$ and $t$ cannot be connected in the transformed task graph. This issue is further discussed in \Cref{sec:customer_dependent_splitting}.
+
+\end{remark}
+
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{General Setting}
@@ -316,8 +334,9 @@ is replaced in $(\operatorname{SMILP}_1)$ by
 \end{align*}
 
 \begin{theorem}[Feasibility of the connection]
+\label{thm:equivalence_heuristic_SMILP}
 
-Let $S$ be a solution that is created with the procedure of \Cref{sec:general_setting} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:SMILP}$.
+Let $S$ be a solution that is created with the procedure of \Cref{sec:general_setting} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$.
 
 \end{theorem}
 
@@ -342,7 +361,7 @@ In this section, we introduce the customer-dependent splitting. In contrast to t
 
 The customer-dependent splitting is defined as follows:
 
-\begin{definition}[Customer-dependent Splitting]
+\begin{definition}[Customer-dependent splitting]
 \label{def:customer_dependent_splitting}
 
 Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We first define a splitting of the customers $\mathcal{C}=\Cupdot_{i=1}^n\mathcal{C}_i$ as
@@ -381,6 +400,22 @@ We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$.
 
 \paragraph{Model Equivalence} \parfill
 
+\begin{theorem}
+
+Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:MMILP}$.
+
+\end{theorem}
+
+\begin{proof}
+
+Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. The $(\operatorname{CMILP}_i)$ builds on the $(\operatorname{SMILP}_i)$ and additionally contains the variables $u_m$ and the constraints $\eqref{eq:CMILP:customer}, \eqref{eq:CMILP:route}$ and $\eqref{eq:CMILP:um}$. Therefore each feasible solution of the $(\operatorname{CMILP}_i)$ is also feasible in $(\operatorname{SMILP}_i)$.
+
+According to \Cref{thm:equivalence_heuristic_SMILP}, solution~$S$ is feasible in $\eqref{eq:MMILP}$ except for the cover constraints. Let $c\in\mathcal{C}$ arbitrary. Then there is a unique $i\in[n]$ with ${c\in\mathcal{C}_i}$. In $(\operatorname{CMILP}_i)$ exist decision variables $u_m$ for all ${m\in C^{-1}(c)}$ and then $\eqref{eq:MMILP:customer}$ follows directly from $\eqref{eq:CMILP:customer}$. Let ${m\in\mathcal{M}}$ arbitrary. There is a unique ${i\in[n]}$ with ${m\in C^{-1}(\mathcal{C}_i)}$ and all trips ${t\in m}$ are in $(\operatorname{CMILP}_i)$. Then $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:um}$ follow directly from $\eqref{eq:CMILP:route}$ and $\eqref{eq:CMILP:um}$. 
+
+Therefore $S$ is a feasible solution of $\eqref{eq:MMILP}$.
+
+\end{proof}
+
 This heuristic formulation is not equivalent to the original formulation $\eqref{eq:MMILP}$. This is shown by the following example.
 
 \begin{example}
@@ -414,10 +449,21 @@ Although the formulations are not equivalent, we can give an estimation on the o
 
 For $n\geq 3$, consider a customer set $\mathcal{C}$ and split points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
 \begin{itemize}
-	\item{customer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
-	\item{customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} L_{\operatorname{C}}(c)}$}
+	\item{Customer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
+	\item{Customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} L_{\operatorname{C}}(c)}$}
 	\item{Splitting Length: $\displaystyle{L_{\operatorname{S}} := \min_{i\in[n-1]} c_{i+1}-c_i}$}
 \end{itemize}
+
+\end{definition}
+
+\begin{definition}
+
+Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of a solution with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}\cupdot\mathcal{R}}$. We define the cost of a duty as
+\begin{align*}
+	\operatorname{cost}(d) := \cv + \cd_{v,t_1} + \sum_{i=1}^{k-1} \left(\ct_{t_i} + \cd_{t_i, t_{i+1}}\right) + \ct_{t_k}
+\end{align*}
+
+where $\ct_r := 0$ for $r\in\mathcal{R}$.
 
 \end{definition}
 

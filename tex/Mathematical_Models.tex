@@ -1,4 +1,5 @@
 \chapter{Mathematical Models}
+\label{ch:mathematical_models}
 
 We introduce the mathematical model, with which we want to solve the previously described problem. We define the underlying task graph and develop then an arc flow formulation on this graph. The main idea is to model a flow on the vehicles and the trips. This flow has to fulfill additional requirements such that the cover constraints and the fuel constraints are fulfilled. As mentioned before, the public transport trips are not part of the input. We therefore consider only the car trips in the mathematical model.
 
@@ -9,7 +10,7 @@ We introduce the task graph, on which the model is based. It is a directed graph
 \begin{definition}[Task Graph]
 \label{def:taskgraph}
 
-Let $\ds,\de$ be special vertices describing the source and sink of the vehicle flow.\fxnote{G task graph, Ghat extended task graph} We define the task graph as $G=(V,A)$\fxnote{widehat}, where
+Let $\ds,\de$ be special vertices describing the source and sink of the vehicle flow. We define the task graph as $G=(V,A)$, where
 \begin{align*}
 	V:=\left\{\ds,\de\right\}\cupdot\mathcal{V}\cupdot\mathcal{T}
 \end{align*}
@@ -172,3 +173,23 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:es} \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:MMILP:um}
 \end{align}
+
+\newpage
+
+\paragraph{Expressing the Solution} \parfill
+
+In the further procedure, we use the following two different notations for expressing a feasible solution of the $\eqref{eq:MMILP}$:
+\begin{enumerate}
+	\item The quadruple $\left(x, z, e, u\right)$ as solution of the mixed-integer linear program. This notation is used in \Cref{ch:mathematical_models}.\label{itm:mmilp}
+	\item A set of lists where each list starts with a vehicle and contains trips and refuel points. This notation is used in \Cref{sec:problem_description} and each list is called duty.\label{itm:duty}
+\end{enumerate}
+
+\begin{remark}
+
+These formulations can be converted into each other as shown in the following procedure. 
+
+Let $\left(x, z, e, u\right)$ be a feasible solution of the $\eqref{eq:MMILP}$. For each $v\in\mathcal{V}$ create a duty with $v$ as the first item. Iteratively append the next item $t\in\mathcal{T}$ with ${x_{s,t}=1}$ where $s$ is the current last item of the duty. Repeat this until ${x_{s,\de}=1}$. Finally for all subsequent ${s\in\mathcal{V}\cupdot\mathcal{T}}$ and ${t\in\mathcal{T}}$, insert ${r\in\Rst}$ in the duty between $s$ and $t$ if ${z_{s,r,t}=1}$.
+
+In the other way round, set ${x_{\ds,v}=1}$ for all ${v\in\mathcal{V}}$. For all subsequent trips ${s\in\mathcal{V}\cupdot\mathcal{T}}$ and ${t\in\mathcal{T}}$ in some duty set ${x_{s,t}=1}$. If there is a refuel point ${r\in\Rst}$ between $s$ and $t$, set ${x_{s,t}=1}$ and ${z_{s,r,t}=1}$. For each last trip ${t\in\mathcal{T}}$ set ${x_{t,\de}=1}$. If the duty is empty, \ie only ${v\in\mathcal{V}}$ is in the duty, set ${x_{v,\de}=1}$. There is no unique determination for fuel variables. One possibility is to set ${e_v=1}$ for all ${v\in\mathcal{V}}$ and determine ${e_t}$ for all ${t\in\mathcal{T}}$ according to the fuel consumption and the refueling. For ${t\in\mathcal{T}}$ that are not covered by some duty, we can set ${e_t=0}$. We set ${u_m=1}$ if some ${t\in m}$ is covered and ${u_m=0}$ otherwise.
+
+\end{remark}
