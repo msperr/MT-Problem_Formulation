@@ -456,7 +456,7 @@ For $n\geq 3$, consider a customer set $\mathcal{C}$ and split points $c_i$ for 
 
 \end{definition}
 
-\begin{definition}
+\begin{definition}[Duty cost]
 
 Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of a solution with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}\cupdot\mathcal{R}}$. We define the cost of a duty as
 \begin{align*}
@@ -467,78 +467,160 @@ where $\ct_r := 0$ for $r\in\mathcal{R}$.
 
 \end{definition}
 
-\begin{theorem}
+Although a feasible solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. We discuss conditions when we can guarantee these bounds. 
 
-For $n\geq 3$, consider the problem with customer set $\mathcal{C}$ and split points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. Let
+In the following, we regard the vehicle duties only as lists of trips. We assume the respective refuel points to be given as additional information. We write ${s\prec t}$ if $(s,t)$ is feasible in the $\eqref{eq:MMILP}$, \ie ${(s,t)\in A}$.  We write ${s\to t}$ if the connection $(s,t)$ is feasible in $(\operatorname{CMILP})$, \ie ${(s,t)\in\overline{A}}$ or ${\exists t'\in\mathcal{P}}$ with ${(s,t'),(t',t)\in\overline{A}}$.
+
+\begin{lemma}
+\label{lem:doubleduties}
+
+Let $S=\left(x,z,e,u\right)$ be a feasible solution of the $\eqref{eq:MMILP}$ and let $c_i$ be split points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$. Let
 \begin{align}
-\label{eq:LCLS}
-	L_{\operatorname{C}}\leq L_{\operatorname{S}}
+	L_{\operatorname{C}}\leq L_{\operatorname{S}}\label{eq:LCLS}
 \end{align}
 
-Let $d:=\left(t_1,\dots,t_k\right)$ be the duty of a vehicle of a feasible solution of the $\eqref{eq:MMILP}$. Then, there are duties $d_1\cupdot d_2=d$, where $d_1,d_2$ are part of a feasible solution of $(\operatorname{CMILP})$. Moreover, there holds
+Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of $S$ with vehicle $v\in\mathcal{V}$. If $d$ is not feasible in $(\operatorname{CMILP})$, let $a$ be the smallest index such that ${t_a\not\to t_{a+1}}$ and let ${v'\in\mathcal{V}}$ with
 \begin{align}
-	\operatorname{cost}\left(d_1\right)+\operatorname{cost}\left(d_2\right)\leq 2\cdot\operatorname{cost}\left(d\right).
+	z_{v'} + t_{v',t_{a+1}}\leq\zstart_{t_{a+1}}\label{eq:doubleduties:time}
 \end{align}
 
-\end{theorem}
+and
+\begin{align}
+	f^0_{v'}\geq e_{t_{a+1}} + \fd_{v',t_{a+1}}.\label{eq:doubleduties:fuel}
+\end{align}
+
+Then there are duties $d_1,d_2$ with ${d_1\cupdot d_2=d\cupdot\left\{v'\right\}}$ such that $d_1,d_2$ are part of a feasible solution of the $(\operatorname{CMILP})$.
+
+Let additionally
+\begin{align}
+	\cd_{v',t_{a+1}}\leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_j + \cd_{j,j+1}\right) \label{eq:doubleduties:cost}
+\end{align}
+
+Then the cost of the duties $d_1,d_2$ is at most twice the original cost, \ie
+\begin{align*}
+	\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right)
+\end{align*}
+
+\end{lemma}
+
+\begin{remark}
+
+This statement also holds if there is a ${r\in\mathcal{R}_{v',t_{a+1}}}$ such that
+\begin{align*}
+	f^0_{v'}\geq e_{t_{a+1}} + \left(\fd_{v',r}+\ft_r+\fd_{r,t_{a+1}}\right) &&	\cd_{v',r}+\cd_{r,t_{a+1}}\leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_j + \cd_{j,j+1}\right)
+\end{align*}
+
+\end{remark}
 
 \begin{proof}
 
-We consider the vehicle duty $d=\left(t_1,\dots t_k\right)$. We write $s\prec t$ according to \Cref{def:partial_order}, i.e. $(s,t)$ is feasible in $\eqref{eq:MMILP}$. We write $s\to t$ iff $(s,t)$ is feasible in (CMILP).
+If $d$ is feasible in $\operatorname{CMILP}$, the result is obvious. Therefore we consider a vehicle duty ${d=\left(v,t_1,\dots,t_k\right)}$ that is not feasible in $\operatorname{CMILP}$ and $a$ as the smallest index with ${t_a\not\to t_{a+1}}$.
 
-Consider $s\prec t$ with $s\not\to t$ and customers $C_s:=(M\circ C)(s)$ and $C_t:=(M\circ C)(t)$. Then $s$ is in a later splitting than $t$. There are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n]$ with
+Consider ${s\prec t}$ with ${s\not\to t}$ and customers ${b_s:=\left(M\circ C\right)(s)}$ and ${b_t:=\left(M\circ C\right)(t)}$. Then $s$ is in a later splitting than $t$. Using ${c_{0}:=-\infty}, {c_{n+1}:=+\infty}$, there are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n]$ with
 \begin{align*}
-	\zstart_s < \zstart_t && \zstart_{C_t}\leq c_l <\zstart_{C_s} && c_l+L_{\operatorname{S}}\leq c_{l+1} && \zstart_{C_s}\leq \zstart_s\leq \zstart_{C_s}+L_{\operatorname{C}}
+	\zstart_s < \zstart_t && \zstart_{b_t}\leq c_l <\zstart_{b_s} && c_l+L_{\operatorname{S}}\leq c_{l+1} && \zstart_{b_s}\leq \zstart_s\leq \zstart_{b_s}+L_{\operatorname{C}}
 \end{align*}
 
 Since $\eqref{eq:LCLS}$, holds
 \begin{gather*}
-	\zstart_{C_s} \leq \zstart_s < \zstart_t\leq\zstart_{C_t}+L_{\operatorname{C}} \leq c_l+L_{\operatorname{C}} \leq c_l+L_{\operatorname{S}} \leq c_{l+1} \\
-	\zstart_{C_t} \geq \zstart_t-L_{\operatorname{C}} > \zstart_s-L_{\operatorname{C}} \geq \zstart_{C_s}-L_{\operatorname{C}} > c_l-L_{\operatorname{C}}\geq c_l-L_{\operatorname{S}}\geq c_{l-1}
+	\zstart_{b_s} \leq \zstart_s < \zstart_t\leq\zstart_{b_t}+L_{\operatorname{C}} \leq c_l+L_{\operatorname{C}} \leq c_l+L_{\operatorname{S}} \leq c_{l+1} \\
+	\zstart_{b_t} \geq \zstart_t-L_{\operatorname{C}} > \zstart_s-L_{\operatorname{C}} \geq \zstart_{b_s}-L_{\operatorname{C}} > c_l-L_{\operatorname{C}}\geq c_l-L_{\operatorname{S}}\geq c_{l-1}
 \end{gather*}
 
-and therefore $t\in\mathcal{T}_l,s\in\mathcal{T}_{l+1}$. Here, we use $c_{0}:=-\infty,c_{n+1}:=+\infty$.
+and therefore $t\in\mathcal{T}_l,s\in\mathcal{T}_{l+1}$.
 
-\paragraph{Feasibility} \proofparfill
+In summary, we have shown the following equivalence: Let ${s\prec t}$ and ${t\in\mathcal{T}_l}$. Then
+\begin{align*}
+	s\to t \Leftrightarrow s\in\Cupdot_{j=1}^l T_j && s\not\to t \Leftrightarrow s\in\mathcal{T}_{l+1}
+\end{align*}
 
-For arbitrary $i\in[k-2]$ holds: $t_i\prec t_{i+1}\prec t_{i+2}$, therefore also $t_i\prec t_{i+2}$. We prove that $t_{i+2}$ can be appended after $t_{i}$ or $t_{i+1}$. We differentiate between the following cases:
-\begin{enumerate}
-	\item{$t_{i+1}\to t_{i+2}$:}
-		Clear.
-	\item{$t_{i+1}\not\to t_{i+2}$:}
-		Then holds $t_{i+2}\in\mathcal{T}_l$ and $t_{i+1}\in\mathcal{T}_{l+1}$ for some $l\in[k]$. From $t_i\prec t_{i+2}$ follows $t_i\in\bigcup_{j=1}^{l+1}\mathcal{T}_j$. Therefore $t_i\to t_{i+1}$ or $t_i\to t_{i+2}$.
-	\begin{itemize}
-		\item{$t_i\to t_{i+2}$:}
-			Clear.
-		\item{$t_i\not\to t_{i+2}$:}
-			Then holds $t_{i+2}\in\mathcal{T}_l$ and $t_i,t_{i+1}\in\mathcal{T}_{l+1}$ and therefore $t_i\to t_{i+1}$. For $i'\geq i$ holds $t_{i'}\in\bigcup_{j=l}^n \mathcal{T}_j$ and therefore $t_{i+1}\to t_{i'}$ or $t_{i+2}\to t_{i'}$. Thus, every later trip can be appended after on of these duties.
-	\end{itemize}
-\end{enumerate}
+Note that the relation~$\preceq$ is an equivalence relation on $d$. Due to the cover constraints, there are no ${s,t\in d}$ with ${\left(M\circ C\right)(s)=\left(M\circ C\right)(t)}$ and ${M(s)\neq M(t)}$ and hence transitivity holds.
 
-We have seen that two duties $d_1,d_2$ can fulfill the trips of duty $d$, such that $d_1$ and $d_2$ are feasible in (CMILP). Each trip can be appended to $d_1$ or to $d_2$.
+\paragraph{Time Feasibility} \proofparfill
+
+For all ${i\in[k-2]}$ holds: ${t_i\prec t_{i+1}\prec t_{i+2}}$ and therefore ${t_i\prec t_{i+2}}$. We show how we construct feasible duties $d_1,d_2$ such that ${s\to t}$ holds for all subsequent trips $s,t$ in one duty. We initially set the duties
+\begin{align*}
+	d_1 := \left(v,t_1,\dots,t_a\right) && d_2 := \left(v',t_{a+1}\right)
+\end{align*}
+
+which is feasible by assumption. For each ${i\in\left\{a+2,\dots, k\right\}}$, let $t$ be the last trips of $d_1$. Append $t_i$ to $d_1$ if $\left(t,t_i\right)$ is feasible in $(\operatorname{SMILP})$, else to $d_2$. We prove that $t_i$ can always be feasibly appended to one of the duties:
+
+In each step, let $l_1$ and $l_2$ be such that for the last trip $t$ of $d_1$ and $d_2$ holds ${t\in\mathcal{T}_{l_1}}$ and ${t\in\mathcal{T}_{l_2}}$, respectively. We prove the feasibility by induction over ${i\in\left\{a+1,\dots, k\right\}}$.
+\begin{itemize}
+	\item{Induction Base:}
+		Trip~$t_{a+1}$ is feasibly appended to $d_2$ because of $\eqref{eq:doubleduties:time}$. After appending $t_{a+1}$ holds ${l_1>l_2}$ because of $t_a\not\to t_{a+1}$. 
+	\item{Induction Hypothesis:} 
+		For each ${i\in\left\{a+2,\dots, k\right\}}$, trip~$t_{a+1}$ can be appended to $d_1$ or $d_2$. Afterwards still holds ${l_1>l_2}$.
+	\item{Induction Step:}
+		Let ${t_i\in\mathcal{T}_l}$. Since $t_j\prec t_i$ for all ${j\in[i-1]}$ holds ${l+1\geq l_1}$ and since ${l_1>l_2}$ holds ${l\geq l_2}$. Thus $t_i$ can be appended to $d_1$ or $d_2$. If $t_j$ is appended to $d_2$ then holds ${l_2 := l<l_1}$, else ${l_1 := l>l_2}$. Therefore still holds ${l_1>l_2}$.
+\end{itemize}
+
+In summary, we have proven that each trip ${t\in d}$ can be feasibly appended either to $d_1$ or to $d_2$ and the vehicles $v$ and $v'$ are feasibly assigned to the duties $d_1$ and $d_2$, respectively.
+
+\paragraph{Fuel Feasibility} \proofparfill
+
+After proving that we can construct duties $d_1,d_2$ that are feasible in $(\operatorname{SMILP})$ \wrt time, we examine the fuel states in the duties and when refuel points are visited. We consider $d_1,d_2$ as constructed in the previous part. Let $i\in[n-1]$ and let ${z_{t_i,r,t_{i+1}}=1}$ for some ${r\in\mathcal{R}_{t_i,t_{i+1}}}$, \ie refuel point~$r$ is visited between the trips $t_i$ and $t_{i+1}$. We distinguish the following cases:
+\begin{itemize}
+	\item{$i<a$:}
+		Then ${t_i,t_{i+1}\in d_1}$ and $r$ is set between $t_i$ and $t_{i+1}$ in $d_1$.
+	\item{$i\geq a$:}
+		Refuel point $r$ is inserted in both duties. Let ${j^-_1:=\max\left\{j\leq i\mid t_j\in d_1\right\}}$, ${j^+_1:=\min\left\{j>i\mid t_j\in d_1\right\}}$, $j^-_2,j^+_2$ analogously. If $j^+_1$ exists, insert $r$ between $t_{j^-_1}$ and $t_{j^+_1}$ in duty~$d_1$. If $j^+_2$ exists, insert $r$ between $t_{j^-_2}$ and $t_{j^+_2}$ in duty~$d_2$.
+\end{itemize}
+
+We now regard duty~$d_1$ and simply write ${t^-:=t_{j^-_1}}$ and ${t^+:=t_{j^+_1}}$. We prove that there is a copy ${r'\in\mathcal{R}_{t^-,t^+}}$ that belongs to the same refuel point as ${r\in\mathcal{R}_{t_i,t_{i+1}}}$. We define the trip time ${t_t := \zend_{t} - \zstart_{t}}$.
+
+From $\eqref{eq:triangle_inequality_ext}$ and ${r\in\mathcal{R}_{t_i,t_{i+1}}}$ follows
+\begin{align*}
+	& \zend_{t^-} + t_{t^-,r'} + t_{r',t^+} \\
+	\leq & \zend_{t^-} + \sum_{j=j^-_1+1}^i \left(t_{t_{j-1},t_{j}} + t_{t_j}\right) + t_{t_i,r} + t_{r,t_{i+1}} + \sum_{j=i+1}^{j^+_1-1} \left(t_{t_j} + t_{t_{j},t_{j+1}}\right) \\
+	\leq & \zend_{t_i} + t_{t_i,r} + t_{r,t_{i+1}} + \zstart_{t^+} - \zstart_{t_{j+1}} \\
+	\leq & \zstart_{t^+}
+\end{align*}
+
+and therefore ${r'\in\mathcal{R}_{t^-,t^+}}$. From the triangle inequalities we can also see:
+\begin{align*}
+	\zstart_{t^+} - \zend_{t^-} - t_{t^-,r} - t_{r,t^+} \geq \zstart_{t_{i+1}} - \zend_{t_i} - t_{t_i,r} - t_{r,t_{i+1}}
+\end{align*}
+
+This means that the refueling time between $t^-_1$ and $t^+_1$ is longer and thus the negative fuel consumption is smaller. Therefore ${\ft_{r'}\leq\ft_{r}}$.
+
+This works analogously for $d_2$ with $t_{j^-_2}$ and $t_{j^+_2}$. We apply this procedure to all refuel points in the original duty $d$.
+
+Let $e_t\in[0,1]$ be feasible fuel states for ${t\in d}$. We prove that these fuel states are still feasible in $d_1$ and $d_2$. For the first trips, we distinguish the duties:
+\begin{itemize}
+	\item{Duty~$d_1$:}
+		The values of $e_v$ and ${e_{t_1},\dots,e_{t_a}}$ are still feasible since $f^0_v$ and all the trip connections do not change.
+	\item{Duty~$d_2$:}
+		From condition $\eqref{eq:doubleduties:fuel}$ follows directly that $e_{t_{a+1}}$ is a feasible fuel state.
+\end{itemize}
+
+Let $t_i,t_{i'}$ be subsequent trips in $d_1$ or $d_2$ with no refuel point in-between. From $\eqref{eq:MMILP:fuel_consumption}$ and the triangle inequalities follows that
+\begin{align*}
+	e_{t_{i'}} \leq e_{t_i} - \sum_{j=i+1}^{i'} \left(\fd_{t_{j-1},t_j}+\ft_{t_j}\right) \leq e_{t_i} - \left(\fd_{t_i,t_{i'}} + \ft_{t_{i'}}\right)
+\end{align*}
+
+From $\ft_{r'}\leq\ft_{r}$ as shown before and the triangle inequalities we additionally see that the fuel states are still feasible if a refuel point $r'$ lies between $t_i$ and $t_{i+1}$.
+
+So far, we have neglected the case that more than one refuel point is visited between two trips of the same duty. This is for example ${d=\left(v,t_1,r_1,t_2,r_2,t_3\right)}$ with ${t_1,t_3\in d_1}$ and ${t_2\in d_2}$. As claimed in \Cref{sec:problem_description}, it is not allowed to visit more than one refuel point between two trips. Therefore we assume without proof that we can insert some refuel point ${r\in\mathcal{R}}$ between each pair of subsequent trips and receive a feasible solution.
+
+In summary, we have proven that the refuel points can be visited in $d_1$ and $d_2$ analogously to the original duty and then the original fuel states are still feasible in the new duties.
 
 \paragraph{Costs} \proofparfill
 
-The costs of duty $d$ are
-\begin{align*}
-	\operatorname{cost}(d)=\cv+\cd_{v,t_1}+\ct_{t_1}+\sum_{i=2}^k \left(\cd_{t_{i-1},t_i}+\ct_{t_i}\right).
-\end{align*}
+After constructing the duties $d_1$ and $d_2$, we show that the cost of the duties in not more than twice the original cost.
 
-Each duty $d_1,d_2$ has cost $\cd_{t,t'}+\ct_{t'}+\cd_{t',t''}$ if trip $t'$ is covered and cost $\cd_{t,t''}$ if not. According to $\eqref{eq:triangle_inequality_ext}$, the costs for not covering the trip do not exceed the costs for covering. Therefore we have
+We first prove that ${\operatorname{cost}\left(d_1\right)\leq\operatorname{cost}\left(d\right)}$. The vehicle cost $\cv$ is the same in $d_1$ and $d$. The trip cost $\ct$ of $d_1$ is smaller than the trip cost of $d$ since ${d_1\subseteq d}$. The deadhead cost $\cd_{v,t_1}$ coincides since the same vehicle is used in $d_1$ and $d$. All other deadhead costs of $d_1$ are smaller because of the triangle inequalities.
+
+For duty~$d_2$, we first regard the deadhead cost from the vehicle $v'$ to the first trip $t_{a+1}$. Due to condition~$\eqref{eq:doubleduties:cost}$, the total cost up to trip~$t_{a+1}$ is smaller than in the original duty. All subsequent trip and deadhead costs are smaller as argued before. Also the vehicle cost $\cv$ is the same in $d_2$ and $d$.
+
+Therefore we have
 \begin{align*}
 	\operatorname{cost}\left(d_1\right)+\operatorname{cost}\left(d_2\right)\leq 2\cdot\operatorname{cost}\left(d\right).
 \end{align*}
 
+This concludes the proof.
+
 \end{proof}
-
-\begin{corollary}
-
-Consider the problem with $L_{\operatorname{C}}\leq L_{\operatorname{S}}$. Let $S_1$ be a feasible solution of $\eqref{eq:MMILP}$. Then there exists a solution $S_2$ feasible also in $(\operatorname{CMILP})$.
-\begin{align*}
-	\operatorname{val}\left(S_2\right)\leq 2\cdot\operatorname{val}\left(S_1\right)
-\end{align*}
-
-\end{corollary}
 
 %########################################################################################################################################
 %#

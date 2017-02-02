@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=116
-Cursor=4269
+TopLine=104
+Cursor=3974
 
 [Frame1]
 Flags=0
@@ -35,7 +35,7 @@ Class=LaTeXView
 Document=tex\Introduction.tex
 
 [Frame1_View0,0]
-TopLine=25
+TopLine=16
 Cursor=5237
 
 [Frame2]
@@ -71,8 +71,8 @@ Class=LaTeXView
 Document=tex\Mathematical_Models.tex
 
 [Frame3_View0,0]
-TopLine=219
-Cursor=14111
+TopLine=156
+Cursor=8480
 
 [Frame4]
 Flags=0
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=747
-Cursor=37218
+TopLine=650
+Cursor=39444
 
 [Frame5]
 Flags=0
@@ -110,25 +110,7 @@ Document=Literatur.bib
 TopLine=0
 Cursor=458
 
-[Frame6]
-Flags=0
-ShowCmd=1
-MinPos.x=-1
-MinPos.y=-1
-MaxPos.x=-1
-MaxPos.y=-1
-NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1574
-NormalPos.bottom=627
-Class=LaTeXView
-Document=tex\Previous_Formulations.tex
-
-[Frame6_View0,0]
-TopLine=0
-Cursor=1931
-
 [SessionInfo]
-FrameCount=7
+FrameCount=6
 ActiveFrame=0
 
