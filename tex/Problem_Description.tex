@@ -237,19 +237,19 @@ We assume the Triangle Inequalities for time, fuel consumption and cost. For $s\
 	t_{s,t} \leq t_{s,r} + t_{r,t} && \cd_{s,t} \leq \cd_{s,r} + \cd_{r,t} && \fd_{s,t} \leq \fd_{s,r} + \fd_{r,t}
 \end{align}
 
-From $\eqref{eq:nonnegativ_cost}$ and $\eqref{eq:triangle_inequality}$ we get for all $s,r,t\in\mathcal{T}$:
+From $\eqref{eq:nonnegativ_cost}$ - $\eqref{eq:triangle_inequality}$ we get for all $s,r,t\in\mathcal{T}$:
 \begin{align}
-	\cd_{s,t} \leq \cd_{s,r} + \ct_{r} + \cd_{r,t} && t_{s,t}\leq t_{s,r} + \left(\zend_r - \zstart_r\right) + t_{r,t} \label{eq:triangle_inequality_ext}
+	t_{s,t} & \leq t_{s,r} + \left(\zend_r - \zstart_r\right) + t_{r,t} \label{eq:triangle_inequality_time} \\
+	\fd_{s,t} & \leq \fd_{s,r} + \ft_{r} + \fd_{r,t} \label{eq:triangle_inequality_fuel} \\
+	\cd_{s,t} & \leq \cd_{s,r} + \ct_{r} + \cd_{r,t} \label{eq:triangle_inequality_cost}
 \end{align}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\newpage
-
 \section{Classification}
 \label{sec:classification}
 
-We aim to classify our problem in relation to other known problems in the literature and state the difficulty of these problems.\fxnote{application: bus}
+We aim to classify our problem in relation to other known problems in the literature and state the difficulty of these problems.
 
 \paragraph{Vehicle Scheduling Problems} \parfill
 

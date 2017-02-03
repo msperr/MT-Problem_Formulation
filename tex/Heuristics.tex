@@ -355,7 +355,7 @@ Proof\fxnote{Proof}
 \section{Customer-dependent Splitting}
 \label{sec:customer_dependent_splitting}
 
-In this section, we introduce the customer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their customers' start times. Therefore all trips of a route and all routes of a customer are in the same splitting. The advantage is that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut off in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
+In this section, we introduce the customer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their customers' start times. Therefore all trips of a route and all routes of a customer are in the same partial trip set. The advantage is that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut off in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
 
 \paragraph{Splitting} \parfill
 
@@ -384,14 +384,14 @@ We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref
 
 \paragraph{Solving the Partial Instances} \parfill
 
-The formulation of the partial instances is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints are not considered so far. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since for a customer $c\in\mathcal{C}_i$ all trips are in the splitting $\Ti$, only the cover constraints concerning these customers are included in partial instance $I_i$. We therefore add the following constraints:
+The formulation of the partial instances is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints have not been considered there. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since a customer $c\in\mathcal{C}_i$ has all his trips in~$\Ti$, only the cover constraints concerning these customers are included in partial instance~$I_i$. We therefore add the following constraints:
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:CMILP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m \label{eq:CMILP:route} \\
 	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \label{eq:CMILP:um}
 \end{align}
 
-Further, the route costs are not considered in $\eqref{eq:SMILPi}$ so far. We again have to consider only the route costs belonging to $c\in\mathcal{C}_i$. We therefore add the following term to the objective function
+Further the route costs are not considered in $\eqref{eq:SMILPi}$ so far. We again have to consider only the route costs belonging to $c\in\mathcal{C}_i$. We therefore add the following term to the objective function
 \begin{align*}
 	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m
 \end{align*}
@@ -400,7 +400,10 @@ We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$.
 
 \paragraph{Model Equivalence} \parfill
 
+In the following, we examine whether the formulations $\eqref{eq:MMILP}$ and $(\operatorname{CMILP})$ are equivalent. We show that each solution that is computed with the heuristic is actually a feasible solution of the original problem. On the other hand, we provide a counterexample, in which the optimal solution is not a feasible outcome of the heuristic.
+
 \begin{theorem}
+\label{thm:equivalence_CMILP_MMILP}
 
 Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:MMILP}$.
 
@@ -412,42 +415,45 @@ Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and t
 
 According to \Cref{thm:equivalence_heuristic_SMILP}, solution~$S$ is feasible in $\eqref{eq:MMILP}$ except for the cover constraints. Let $c\in\mathcal{C}$ arbitrary. Then there is a unique $i\in[n]$ with ${c\in\mathcal{C}_i}$. In $(\operatorname{CMILP}_i)$ exist decision variables $u_m$ for all ${m\in C^{-1}(c)}$ and then $\eqref{eq:MMILP:customer}$ follows directly from $\eqref{eq:CMILP:customer}$. Let ${m\in\mathcal{M}}$ arbitrary. There is a unique ${i\in[n]}$ with ${m\in C^{-1}(\mathcal{C}_i)}$ and all trips ${t\in m}$ are in $(\operatorname{CMILP}_i)$. Then $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:um}$ follow directly from $\eqref{eq:CMILP:route}$ and $\eqref{eq:CMILP:um}$. 
 
-Therefore $S$ is a feasible solution of $\eqref{eq:MMILP}$.
+Therefore $S$ is a feasible solution of the $\eqref{eq:MMILP}$.
 
 \end{proof}
 
-This heuristic formulation is not equivalent to the original formulation $\eqref{eq:MMILP}$. This is shown by the following example.
+\Cref{thm:equivalence_CMILP_MMILP} shows that each heuristical solution is a feasible solution. Now we show that a feasible solution is not necessarily feasible in the heuristic using a customer-dependent splitting.
 
 \begin{example}
+\label{ex:equivalence_MMILP_CMILP}
 
-Let $t_1$, $t_2$, $t_3$ with $t_1\prec t_2\prec t_3$ be trips with the properties shown in \Cref{tab:customer_heuristic_example}
+Let ${\mathcal{T}=\left\{t_1, t_2, t_3\right\}}$ with ${t_1\prec t_2\prec t_3}$ and the properties as shown in \Cref{tab:customer_heuristic_example}
 
 \begin{table}[htb]
 	\centering
 	\begin{tabular}{c|cccc}
-		Trip & Start & End & Route & customer \\
+		Trip & Start & End & Route & Customer \\
 		\hline
-		$t_1$ & 8:00 & 8:15 & $m_1$ & $C_1$ \\
-		$t_2$ & 8:30 & 8:45 & $m_2$ & $C_2$ \\
-		$t_3$ & 9:00 & 9:15 & $m_1$ & $C_1$ \\
+		$t_1$ & 8:00 & 8:15 & $m_1$ & $b_1$ \\
+		$t_2$ & 8:30 & 8:45 & $m_2$ & $b_2$ \\
+		$t_3$ & 9:00 & 9:15 & $m_1$ & $b_1$ \\
 	\end{tabular}
 	\caption{Trips}
 	\label{tab:customer_heuristic_example}
 \end{table}
 
-In this case, customer $C_1$ uses public transport between 8:15 and 9:00. The duty $\left(t_1,t_2,t_3\right)$ is a feasible result of the $\eqref{eq:MMILP}$.
+We can see easily that the duty ${d=\left(t_1,t_2,t_3\right)}$ is a feasible solution. 
 
-If there is a split point at 8:15 then the splittings are $\mathcal{T}_1=\left\{t_1,t_3\right\},\mathcal{T}_2=\left\{t_2\right\}$. Hence, there is one split point $\operatorname{SP}_1\left(t_2\right)$ with $\zstart_{\operatorname{SP}_1\left(t_2\right)} =$ 8:30. The partial solution of instance~$1$ is $\left(t_1,t_3\right)$ and $t_3\not\prec \operatorname{SP}_1\left(t_2\right)$. Thus, the partial solutions cannot be feasibly connected to the solution $\left(t_1,t_2,t_3\right)$.
+If we not set a time point ${c_1 := \text{8:15}}$, then the partial trips sets are ${\mathcal{T}_1=\left\{t_1,t_3\right\}}$ and ${\mathcal{T}=\left\{t_2\right\}}$. There is one split point ${\operatorname{SP}_1\left(t_2\right)}$ with ${\zstart_{\operatorname{SP}_1\left(t_2\right)} = \text{8:30}}$ and thus ${t_3\not\prec\operatorname{SP}_1\left(t_2\right)}$. The connection of $t_2$ and $t_3$ is not feasible in this heuristic and therefore the duty~$d$ is not feasible.
 
 \end{example}
 
-With this example we have seen, that the formulations $(\operatorname{CMILP})$ and $\eqref{eq:MMILP}$ are not equivalent. It is even possible, that an optimal solution of $\eqref{eq:MMILP}$ is not feasible in $(\operatorname{CMILP})$.
+\paragraph{Quality of the Heuristical Solution} \parfill
 
-Although the formulations are not equivalent, we can give an estimation on the objective value when we make some restrictions.
+Although the optimal solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. Based on an arbitrary feasible solution we inspect where this solution becomes infeasible in the heuristic and if we can construct a new solution which is feasible there. Depending on the initial solution, we aim to receive upper bounds for the total cost of the new solution. 
 
-\begin{definition}
+The only reason that makes a duty~$d$ infeasible in the customer-dependent heuristic is when an earlier trip $s$ is located in a later partial trip set than $t$ and therefore the connection between $s$ and $t$ is deleted. Under certain conditions it is possible to create new duties $d_1$ and $d_2$ covering all trips of~$d$ where $d_1$ and $d_2$ are feasible in the heuristic. To realize these duties, we also need an additional vehicle that covers duty~$d_2$. Having these additional vehicles, we construct a new solution whose total cost is bounded by twice the original cost.
 
-For $n\geq 3$, consider a customer set $\mathcal{C}$ and split points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
+\begin{definition}[Customer extension and splitting length]
+
+Consider a customer set $\mathcal{C}$ and time points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
 \begin{itemize}
 	\item{Customer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
 	\item{Customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} L_{\operatorname{C}}(c)}$}
@@ -456,9 +462,14 @@ For $n\geq 3$, consider a customer set $\mathcal{C}$ and split points $c_i$ for 
 
 \end{definition}
 
-\begin{definition}[Duty cost]
+The customer extension and the splitting length are important values for investigation the behavior of the heuristic. If the customer extension is small, the possibility of customer overlapping is restricted. If additionally the splitting length is large, the number of partial trip set affected by a single customer is small. Since only the overlapping of customers causes the infeasibilities, these are  desirable issues.
 
-Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of a solution with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}\cupdot\mathcal{R}}$. We define the cost of a duty as
+We make the next definitions in order to specify the cost of a solution and its duties.
+
+\begin{definition}[Duty cost]
+\label{def:dutycost}
+
+Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a non-empty duty of a solution with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}\cupdot\mathcal{R}}$. We define the cost of a duty as
 \begin{align*}
 	\operatorname{cost}(d) := \cv + \cd_{v,t_1} + \sum_{i=1}^{k-1} \left(\ct_{t_i} + \cd_{t_i, t_{i+1}}\right) + \ct_{t_k}
 \end{align*}
@@ -467,14 +478,14 @@ where $\ct_r := 0$ for $r\in\mathcal{R}$.
 
 \end{definition}
 
-Although a feasible solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. We discuss conditions when we can guarantee these bounds. 
+Only the route costs~$\croute$ have been neglected in \Cref{def:dutycost}. Note that the total cost of a solution consists of the costs of all of its duties and the route costs of all the selected routes. We refer to the total cost of a solution as $\operatorname{cost}\left(S\right)$ and to the number of non-empty duties as $\operatorname{duties}\left(S\right)$. 
 
-In the following, we regard the vehicle duties only as lists of trips. We assume the respective refuel points to be given as additional information. We write ${s\prec t}$ if $(s,t)$ is feasible in the $\eqref{eq:MMILP}$, \ie ${(s,t)\in A}$.  We write ${s\to t}$ if the connection $(s,t)$ is feasible in $(\operatorname{CMILP})$, \ie ${(s,t)\in\overline{A}}$ or ${\exists t'\in\mathcal{P}}$ with ${(s,t'),(t',t)\in\overline{A}}$.
+In the following lemma, we construct two heuristic-feasible duties $d_1$ and $d_2$ from each duty $d$. This construction requires the customer extension to be bounded by the splitting length. It further requires an additional vehicle that can be prepended to the additional duty. Only in this lemma, we denote the vehicle duties as lists of trips and assume the respective refuel points to be given as additional information. We write ${s\prec t}$ if $(s,t)$ is feasible in the $\eqref{eq:MMILP}$, \ie ${(s,t)\in A}$.  We write ${s\to t}$ if the connection $(s,t)$ is feasible in $(\operatorname{CMILP})$, \ie ${(s,t)\in\overline{A}}$ or there is a ${t'\in\mathcal{P}}$ with ${(s,t'),(t',t)\in\overline{A}}$.
 
 \begin{lemma}
 \label{lem:doubleduties}
 
-Let $S=\left(x,z,e,u\right)$ be a feasible solution of the $\eqref{eq:MMILP}$ and let $c_i$ be split points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$. Let
+Let $S=\left(x,z,e,u\right)$ be a feasible solution of the $\eqref{eq:MMILP}$ and let $c_i$ be time points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$. Let
 \begin{align}
 	L_{\operatorname{C}}\leq L_{\operatorname{S}}\label{eq:LCLS}
 \end{align}
@@ -486,7 +497,7 @@ Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of $S$ with vehicle $v\in\mathc
 
 and
 \begin{align}
-	f^0_{v'}\geq e_{t_{a+1}} + \ft_{t_{a+1}} + \fd_{v',t_{a+1}}.\label{eq:doubleduties:fuel}
+	f^0_{v'}\geq e_{t_{a+1}} + \fd_{v',t_{a+1}} + \ft_{t_{a+1}}.\label{eq:doubleduties:fuel}
 \end{align}
 
 Then there are duties $d_1,d_2$ with ${d_1\cupdot d_2=d\cupdot\left\{v'\right\}}$ such that $d_1,d_2$ are part of a feasible solution of the $(\operatorname{CMILP})$.
@@ -507,12 +518,12 @@ Then the cost of the duties $d_1,d_2$ is at most twice the original cost, \ie
 
 If $d$ is feasible in $\operatorname{CMILP}$, the result is obvious. Therefore we consider a vehicle duty ${d=\left(v,t_1,\dots,t_k\right)}$ that is not feasible in $\operatorname{CMILP}$ and $a$ as the smallest index with ${t_a\not\to t_{a+1}}$.
 
-Consider ${s\prec t}$ with ${s\not\to t}$ and customers ${b_s:=\left(M\circ C\right)(s)}$ and ${b_t:=\left(M\circ C\right)(t)}$. Then $s$ is in a later splitting than $t$. Using ${c_{0}:=-\infty}, {c_{n+1}:=+\infty}$, there are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n]$ with
+Consider ${s\prec t}$ with ${s\not\to t}$ and customers ${b_s:=\left(M\circ C\right)(s)}$ and ${b_t:=\left(M\circ C\right)(t)}$. If $s$ and $t$ is in the same partial trip set, then $(s,t)$ is feasible. If $s$ is in an earlier partial trip set, $s$ and $t$ are connected via a split point. Thus $s$ is in a later partial trip set. Using ${c_{0}:=-\infty}, {c_n:=+\infty}$, there are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n-1]$ with
 \begin{align*}
 	\zstart_s < \zstart_t && \zstart_{b_t}\leq c_l <\zstart_{b_s} && c_l+L_{\operatorname{S}}\leq c_{l+1} && \zstart_{b_s}\leq \zstart_s\leq \zstart_{b_s}+L_{\operatorname{C}}
 \end{align*}
 
-Since $\eqref{eq:LCLS}$, holds
+From $\eqref{eq:LCLS}$ follows:
 \begin{gather*}
 	\zstart_{b_s} \leq \zstart_s < \zstart_t\leq\zstart_{b_t}+L_{\operatorname{C}} \leq c_l+L_{\operatorname{C}} \leq c_l+L_{\operatorname{S}} \leq c_{l+1} \\
 	\zstart_{b_t} \geq \zstart_t-L_{\operatorname{C}} > \zstart_s-L_{\operatorname{C}} \geq \zstart_{b_s}-L_{\operatorname{C}} > c_l-L_{\operatorname{C}}\geq c_l-L_{\operatorname{S}}\geq c_{l-1}
@@ -529,51 +540,54 @@ Note that the relation~$\preceq$ is an equivalence relation on $d$. Due to the c
 
 \paragraph{Time Feasibility} \proofparfill
 
-For all ${i\in[k-2]}$ holds: ${t_i\prec t_{i+1}\prec t_{i+2}}$ and therefore ${t_i\prec t_{i+2}}$. We show how we construct feasible duties $d_1,d_2$ such that ${s\to t}$ holds for all subsequent trips $s,t$ in one duty. We initially set the duties
+For all ${i\in[k-2]}$ holds: ${t_i\prec t_{i+1}\prec t_{i+2}}$ and therefore ${t_i\prec t_{i+2}}$. We show how we construct feasible duties $d_1,d_2$ such that ${s\to t}$ holds for all subsequent trips $s$ and $t$ in one duty. We initially set the duties
 \begin{align*}
 	d_1 := \left(v,t_1,\dots,t_a\right) && d_2 := \left(v',t_{a+1}\right)
 \end{align*}
 
-which is feasible by assumption. For each ${i\in\left\{a+2,\dots, k\right\}}$, let $t$ be the last trips of $d_1$. Append $t_i$ to $d_1$ if $\left(t,t_i\right)$ is feasible in $(\operatorname{SMILP})$, else to $d_2$. We prove that $t_i$ can always be feasibly appended to one of the duties:
+which is feasible by assumption. For each ${i\in\left\{a+2,\dots, k\right\}}$, let $t$ be the current last trip of $d_1$. Append $t_i$ to $d_1$ if $\left(t,t_i\right)$ is feasible in $(\operatorname{SMILP})$, else to $d_2$. We prove that $t_i$ can always be feasibly appended to one of the duties:
 
-In each step, let $l_1$ and $l_2$ be such that for the last trip $t$ of $d_1$ and $d_2$ holds ${t\in\mathcal{T}_{l_1}}$ and ${t\in\mathcal{T}_{l_2}}$, respectively. We prove the feasibility by induction over ${i\in\left\{a+1,\dots, k\right\}}$.
+In each step, choose ${l_1,l_2\in[n]}$ as the indices such that for the current last trip $t$ of $d_1$ and $d_2$ holds ${t\in\mathcal{T}_{l_1}}$ and ${t\in\mathcal{T}_{l_2}}$, respectively. We prove the feasibility by induction over ${i\in\left\{a+1,\dots, k\right\}}$.
 \begin{itemize}
 	\item{Induction Base:}
 		Trip~$t_{a+1}$ is feasibly appended to $d_2$ because of $\eqref{eq:doubleduties:time}$. After appending $t_{a+1}$ holds ${l_1>l_2}$ because of $t_a\not\to t_{a+1}$. 
 	\item{Induction Hypothesis:} 
-		For each ${i\in\left\{a+2,\dots, k\right\}}$, trip~$t_{a+1}$ can be appended to $d_1$ or $d_2$. Afterwards still holds ${l_1>l_2}$.
+		For each ${i\in\left\{a+2,\dots, k\right\}}$, trip~$t_i$ can be appended to $d_1$ or $d_2$. Afterwards still holds ${l_1>l_2}$.
 	\item{Induction Step:}
-		Let ${t_i\in\mathcal{T}_l}$. Since $t_j\prec t_i$ for all ${j\in[i-1]}$ holds ${l+1\geq l_1}$ and since ${l_1>l_2}$ holds ${l\geq l_2}$. Thus $t_i$ can be appended to $d_1$ or $d_2$. If $t_j$ is appended to $d_2$ then holds ${l_2 := l<l_1}$, else ${l_1 := l>l_2}$. Therefore still holds ${l_1>l_2}$.
+		Choose ${l\in[n]}$ such that ${t_i\in\mathcal{T}_l}$. Since $t_j\prec t_i$ for all ${j\in[i-1]}$ holds ${l+1\geq l_1}$ and since ${l_1>l_2}$ holds ${l\geq l_2}$. Thus $t_i$ can be appended to $d_1$ or $d_2$. If ${l<l_1}$ then $t_i$ is appended to $d_2$ and ${l_2 := l<l_1}$. Else $t_i$ is appended to $d_1$ and ${l_1 := l>l_2}$. Therefore still holds ${l_1>l_2}$.
 \end{itemize}
 
 In summary, we have proven that each trip ${t\in d}$ can be feasibly appended either to $d_1$ or to $d_2$ and the vehicles $v$ and $v'$ are feasibly assigned to the duties $d_1$ and $d_2$, respectively.
 
 \paragraph{Fuel Feasibility} \proofparfill
 
-After proving that we can construct duties $d_1,d_2$ that are feasible in $(\operatorname{SMILP})$ \wrt time, we examine the fuel states in the duties and when refuel points are visited. We consider $d_1,d_2$ as constructed in the previous part. Let $i\in[n-1]$ and let ${z_{t_i,r,t_{i+1}}=1}$ for some ${r\in\mathcal{R}_{t_i,t_{i+1}}}$, \ie refuel point~$r$ is visited between the trips $t_i$ and $t_{i+1}$. We distinguish the following cases:
+After proving that we can construct duties $d_1$ and $d_2$ that are feasible in $(\operatorname{SMILP})$ \wrt time, we examine the fuel states in the duties and visiting the refuel points. We consider $d_1,d_2$ as constructed in the previous part. Let $i\in[n-1]$ and let ${z_{t_i,r,t_{i+1}}=1}$ for some ${r\in\mathcal{R}_{t_i,t_{i+1}}}$, \ie refuel point~$r$ is visited between the trips $t_i$ and $t_{i+1}$. We distinguish the following cases:
 \begin{itemize}
 	\item{$i<a$:}
 		Then ${t_i,t_{i+1}\in d_1}$ and $r$ is set between $t_i$ and $t_{i+1}$ in $d_1$.
 	\item{$i\geq a$:}
-		Refuel point $r$ is inserted in both duties. Let ${j^-_1:=\max\left\{j\leq i\mid t_j\in d_1\right\}}$, ${j^+_1:=\min\left\{j>i\mid t_j\in d_1\right\}}$, $j^-_2,j^+_2$ analogously. If $j^+_1$ exists, insert $r$ between $t_{j^-_1}$ and $t_{j^+_1}$ in duty~$d_1$. If $j^+_2$ exists, insert $r$ between $t_{j^-_2}$ and $t_{j^+_2}$ in duty~$d_2$.
+		Refuel point $r$ is inserted in both duties. Let ${j^-_1:=\max\left\{j\leq i\mid t_j\in d_1\right\}}$, ${j^+_1:=\min\left\{j>i\mid t_j\in d_1\right\}}$, $j^-_2,j^+_2$ analogously for $d_2$. If $j^+_1$ exists, insert $r$ between $t_{j^-_1}$ and $t_{j^+_1}$ in duty~$d_1$. If $j^+_2$ exists, insert $r$ between $t_{j^-_2}$ and $t_{j^+_2}$ in duty~$d_2$.
 \end{itemize}
 
-We now regard duty~$d_1$ and simply write ${t^-:=t_{j^-_1}}$ and ${t^+:=t_{j^+_1}}$. We prove that there is a copy ${r'\in\mathcal{R}_{t^-,t^+}}$ that belongs to the same refuel point as ${r\in\mathcal{R}_{t_i,t_{i+1}}}$. We define the trip time ${t_t := \zend_{t} - \zstart_{t}}$.
+We now regard duty~$d_1$ and simply write ${t^-:=t_{j^-_1}}$ and ${t^+:=t_{j^+_1}}$. We prove that there is a refuel point copy ${r'\in\mathcal{R}_{t^-,t^+}}$ that belongs to the same refuel point as ${r\in\mathcal{R}_{t_i,t_{i+1}}}$. For simplicity of notation, we define the trip time ${t_t := \zend_{t} - \zstart_{t}}$ for ${t\in\mathcal{T}}$.
 
-From $\eqref{eq:triangle_inequality_ext}$ and ${r\in\mathcal{R}_{t_i,t_{i+1}}}$ follows
+From $\eqref{eq:triangle_inequality_time}$ and ${r\in\mathcal{R}_{t_i,t_{i+1}}}$ follows
 \begin{align*}
 	& \zend_{t^-} + t_{t^-,r'} + t_{r',t^+} \\
 	\leq & \zend_{t^-} + \sum_{j=j^-_1+1}^i \left(t_{t_{j-1},t_{j}} + t_{t_j}\right) + t_{t_i,r} + t_{r,t_{i+1}} + \sum_{j=i+1}^{j^+_1-1} \left(t_{t_j} + t_{t_{j},t_{j+1}}\right) \\
-	\leq & \zend_{t_i} + t_{t_i,r} + t_{r,t_{i+1}} + \zstart_{t^+} - \zstart_{t_{j+1}} \\
+	\leq & \zend_{t_i} + t_{t_i,r} + t_{r,t_{i+1}} + \left(\zstart_{t^+} - \zstart_{t_{j+1}}\right) \\
 	\leq & \zstart_{t^+}
 \end{align*}
 
-and therefore ${r'\in\mathcal{R}_{t^-,t^+}}$. From the triangle inequalities we can also see:
+and therefore ${r'\in\mathcal{R}_{t^-,t^+}}$. From $\eqref{eq:triangle_inequality_time}$ we can also see that the refueling time between $t^-$ and $t^+$
 \begin{align*}
-	\zstart_{t^+} - \zend_{t^-} - t_{t^-,r} - t_{r,t^+} \geq \zstart_{t_{i+1}} - \zend_{t_i} - t_{t_i,r} - t_{r,t_{i+1}}
+	\left(\zstart_{t^+} - t_{r,t^+}\right) - \left(\zend_{t^-} + t_{t^-,r}\right) \geq \left(\zstart_{t_{i+1}} - t_{r,t_{i+1}}\right) - \left(\zend_{t_i} + t_{t_i,r}\right)
 \end{align*}
 
-This means that the refueling time between $t^-_1$ and $t^+_1$ is longer and thus the negative fuel consumption is smaller. Therefore ${\ft_{r'}\leq\ft_{r}}$.
+is longer than the refueling time between $t_i$ and $t_{i+1}$ and thus the negative fuel consumption is smaller. Therefore
+\begin{align}
+	\ft_{r'}\leq\ft_{r} \label{eq:doubleduties:refuelpoint}
+\end{align}
 
 This works analogously for $d_2$ with $t_{j^-_2}$ and $t_{j^+_2}$. We apply this procedure to all refuel points in the original duty $d$.
 
@@ -585,12 +599,12 @@ Let $e_t\in[0,1]$ be feasible fuel states for ${t\in d}$. We prove that these fu
 		From condition $\eqref{eq:doubleduties:fuel}$ follows directly that $e_{t_{a+1}}$ is a feasible fuel state.
 \end{itemize}
 
-Let $t_i,t_{i'}$ be subsequent trips in $d_1$ or $d_2$ with no refuel point in-between. From $\eqref{eq:MMILP:fuel_consumption}$ and the triangle inequalities follows that
+Let $t_i,t_{i'}$ be subsequent trips in $d_1$ or $d_2$ with no refuel point in-between. From $\eqref{eq:triangle_inequality_fuel}$ and $\eqref{eq:MMILP:fuel_consumption}$ follows that
 \begin{align*}
 	e_{t_{i'}} \leq e_{t_i} - \sum_{j=i+1}^{i'} \left(\fd_{t_{j-1},t_j}+\ft_{t_j}\right) \leq e_{t_i} - \left(\fd_{t_i,t_{i'}} + \ft_{t_{i'}}\right)
 \end{align*}
 
-From $\ft_{r'}\leq\ft_{r}$ as shown before and the triangle inequalities we additionally see that the fuel states are still feasible if a refuel point $r'$ lies between $t_i$ and $t_{i+1}$.
+From $\eqref{eq:doubleduties:refuelpoint}$ we additionally see that the fuel states are still feasible if a refuel point $r'$ lies between $t_i$ and $t_{i+1}$.
 
 So far, we have neglected the case that more than one refuel point is visited between two trips of the same duty. This is for example ${d=\left(v,t_1,r_1,t_2,r_2,t_3\right)}$ with ${t_1,t_3\in d_1}$ and ${t_2\in d_2}$. As claimed in \Cref{sec:problem_description}, it is not allowed to visit more than one refuel point between two trips. Therefore we assume without proof that we can insert some refuel point ${r\in\mathcal{R}}$ between each pair of subsequent trips and receive a feasible solution.
 
@@ -600,9 +614,9 @@ In summary, we have proven that the refuel points can be visited in $d_1$ and $d
 
 After constructing the duties $d_1$ and $d_2$, we show that the cost of the duties in not more than twice the original cost.
 
-We first prove that ${\operatorname{cost}\left(d_1\right)\leq\operatorname{cost}\left(d\right)}$. The vehicle cost $\cv$ is the same in $d_1$ and $d$. The trip cost $\ct$ of $d_1$ is smaller than the trip cost of $d$ since ${d_1\subseteq d}$. The deadhead cost $\cd_{v,t_1}$ coincides since the same vehicle is used in $d_1$ and $d$. All other deadhead costs of $d_1$ are smaller because of the triangle inequalities.
+We first prove that ${\operatorname{cost}\left(d_1\right)\leq\operatorname{cost}\left(d\right)}$. The vehicle cost $\cv$ is the same in $d_1$ and $d$. The trip cost $\ct$ of $d_1$ is smaller than the trip cost of $d$ since ${d_1\subseteq d}$. The deadhead cost $\cd_{v,t_1}$ coincides since the same vehicle is used in $d_1$ and $d$. All other deadhead costs of $d_1$ are smaller due to $\eqref{eq:triangle_inequality_cost}$.
 
-For duty~$d_2$, we first regard the deadhead cost from the vehicle $v'$ to the first trip $t_{a+1}$. Due to condition~$\eqref{eq:doubleduties:cost}$, the total cost up to trip~$t_{a+1}$ is smaller than in the original duty. All subsequent trip and deadhead costs are smaller as argued before. Also the vehicle cost $\cv$ is the same in $d_2$ and $d$.
+For duty~$d_2$, we first regard the deadhead cost~$\cd_{v',t_{a+1}}$. Due to condition~$\eqref{eq:doubleduties:cost}$, the total cost up to trip~$t_{a+1}$ is smaller than in the original duty. All subsequent trip and deadhead costs are smaller as argued for~$d_1$. Also the vehicle cost $\cv$ is the same in $d_2$ and $d$.
 
 Therefore we have
 \begin{align*}
@@ -627,14 +641,14 @@ Then we initially have $d_2:=\left(v',r,t_{a+1}\right)$ and the modified conditi
 
 \end{remark}
 
-Given a duty of a solution that is feasible in the $\eqref{eq:MMILP}$ and an additional vehicle that fulfills certain conditions, we can construct a second duty, such that the duties are feasible in the heuristic, contain the same trips the cost of the duties doubles at most. Based on this result, we aim to construct a feasible solution of the $(\operatorname{CMILP})$ with at most twice the original cost. For this, we particularly need an additional vehicle set, with which the duties are covered. We examine conditions of the additional vehicle set in order to make this procedure possible. Since we do not know the solution in advance, we cannot make assumptions based on this solution, but we need to generalize these conditions to all feasible solutions.
+Given a duty of a solution that is feasible in the $\eqref{eq:MMILP}$ and an additional vehicle that fulfills certain conditions, we can construct a second duty, such that the duties are feasible in the heuristic, contain the same trips and the cost of the duties doubles at most. Based on this result, we aim to construct a feasible solution of the $(\operatorname{CMILP})$ with at most twice the original cost. For this, we particularly need an additional vehicle set, with which the additional duties are covered. We examine conditions of the additional vehicle set in order to make this procedure possible. Since we do not know the solution in advance, we cannot make assumptions based on this solution as we did in \Cref{lem:doubleduties}, but we need to generalize these conditions to all feasible solutions.
 
 \begin{definition}[Conditions]
 \label{def:conditions}
 
-Let $\mathcal{T}$ be a trip set and $c_i$ split points for ${i\in[n-1]}$ with $c_i<c_{i+1}$ for ${i\in[n-2]}$. Let $\mathcal{V}, \mathcal{V}'$ with $\mathcal{V}\subseteq\mathcal{V}'$ be vehicle sets.
+Let $\mathcal{T}$ be a trip set and $c_i$ time points for ${i\in[n-1]}$ with $c_i<c_{i+1}$ for ${i\in[n-2]}$. Let $\mathcal{V}$ and  $\mathcal{V}'$ with ${\mathcal{V}\cap\mathcal{V}'=\emptyset}$ be vehicle sets.
 \begin{enumerate}
-	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Feasibility Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ such that for all ${t\in\mathcal{T}}$ with ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ one of the following conditions is fulfilled:
+	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Feasibility Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'}$ such that for all ${t\in\mathcal{T}}$ with ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ and ${\zstart_t>c_1}$ one of the following conditions is fulfilled:
 	\begin{itemize}
 		\item Feasibility condition without refuel point:
 			\begin{align}
@@ -647,14 +661,13 @@ Let $\mathcal{T}$ be a trip set and $c_i$ split points for ${i\in[n-1]}$ with $c
 				z_{v'} + t_{v',r} + t_{r,t} & \leq \zstart_t \label{eq:doubleduties:timecond_r} \\
 				f^0_{v'} - \left(\fd_{v',r} + \ft_r + \fd_{r,t}\right) & \geq f^0_v - \min\left\{\fd_{v,t},\min_{r'\in\mathcal{R}_{v,t}}\left(\fd_{v,r'}+\ft_{r'}+\fd_{r',t}\right)\right\} \label{eq:doubleduties:fuelcond_r}
 			\end{align}
-	%\end{itemize}
-	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Cost Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ such that for all ${t\in\mathcal{T}}$ with ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ one of the following conditions is fulfilled:
+	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Cost Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'}$ such that for all ${t\in\mathcal{T}}$ with ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ one of the following conditions is fulfilled:
 	\begin{itemize}
-		\item Cost condition without refuel point: $\eqref{eq:doubleduties:timecond}, \eqref{eq:doubleduties:fuelcond}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$
+		\item Cost condition without refuel point: $\eqref{eq:doubleduties:timecond}, \eqref{eq:doubleduties:fuelcond}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$ holds:
 			\begin{align}
 				\cd_{v',t} & \leq \cd_{v,s} + \ct_s + \cd_{s,t} \label{eq:doubleduties:costcond}
 			\end{align}
-		\item Cost condition with refuel point: There is some ${r\in\mathcal{R}_{v',t}}$ such that $\eqref{eq:doubleduties:timecond_r}$, $\eqref{eq:doubleduties:fuelcond_r}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$
+		\item Cost condition with refuel point: There is some ${r\in\mathcal{R}_{v',t}}$ such that $\eqref{eq:doubleduties:timecond_r}$, $\eqref{eq:doubleduties:fuelcond_r}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$ holds:
 			\begin{align}
 				\cd_{v',r} + \cd_{r,t} & \leq \cd_{v,s} + \ct_s + \cd_{s,t} \label{eq:doubleduties:costcond_r}
 			\end{align}
@@ -664,13 +677,14 @@ Let $\mathcal{T}$ be a trip set and $c_i$ split points for ${i\in[n-1]}$ with $c
 \end{definition}
 
 \begin{theorem}
+\label{thm:doubleduties}
 
-Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ which is computed using the vehicle set $\mathcal{V}$. Let $c_i$ be split points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$ and let
+Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ which is computed using the vehicle set $\mathcal{V}$. Let $c_i$ be time points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$ and let
 \begin{align}
 	L_{\operatorname{C}} \leq L_{\operatorname{S}} \tag{\ref{eq:LCLS}}
 \end{align}
 
-Let $\mathcal{V}'$ with $\mathcal{V}\subseteq\mathcal{V}'$ be a vehicle set such that $\mathcal{V}$ and $\mathcal{V}'$ fulfill the Feasibility Condition according to \Cref{def:conditions}. Using the vehicle set $\mathcal{V}'$, there exists a feasible solution $S'$ of the $(\operatorname{CMILP})$ with
+Let $\mathcal{V}'$ with ${\mathcal{V}\cap\mathcal{V}'=\emptyset}$ be a vehicle set such that $\mathcal{V}$ and $\mathcal{V}'$ fulfill the Feasibility Condition according to \Cref{def:conditions}. Using the vehicle set $\mathcal{V}'\cupdot\mathcal{V}$, there exists a feasible solution $S'$ of the $(\operatorname{CMILP})$ with
 \begin{align}
 	\operatorname{duties}\left(S'\right) \leq 2\cdot\operatorname{duties}\left(S\right)
 \end{align}
@@ -691,7 +705,7 @@ Let $a$ be the smallest index with ${t_a\not\to t_{a+1}}$ in $d$. Then holds ${t
 	 \zstart_{t_{a+1}} > \zstart_{t_a} \geq \zstart_{\left(M\circ C\right)\left(t_a\right)} > c_1
 \end{align*}
 
-Further we have $v\prec t_a$, $t_a\prec t_{a+1}$ and $t_a\not\to t_{a+1}$ and therefore ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$. For $v'$ and $t_{a+1}$ holds either $\eqref{eq:doubleduties:timecond}$ and $\eqref{eq:doubleduties:fuelcond}$ or $\eqref{eq:doubleduties:timecond_r}$ and $\eqref{eq:doubleduties:fuelcond_r}$ for some ${r\in\mathcal{R}_{v',t_{a+1}}}$. The implications ${\eqref{eq:doubleduties:timecond}\Rightarrow\eqref{eq:doubleduties:time}}$ or ${\eqref{eq:doubleduties:timecond_r}\Rightarrow\eqref{eq:doubleduties:time_r}}$, respectively, can be seen easily.
+Further we have $v\prec t_a$, $t_a\prec t_{a+1}$ and $t_a\not\to t_{a+1}$ and therefore ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$. For $v'$ and $t_{a+1}$ hold either $\eqref{eq:doubleduties:timecond}$ and $\eqref{eq:doubleduties:fuelcond}$ or $\eqref{eq:doubleduties:timecond_r}$ and $\eqref{eq:doubleduties:fuelcond_r}$ for some ${r\in\mathcal{R}_{v',t_{a+1}}}$. The implications ${\eqref{eq:doubleduties:timecond}\Rightarrow\eqref{eq:doubleduties:time}}$ or ${\eqref{eq:doubleduties:timecond_r}\Rightarrow\eqref{eq:doubleduties:time_r}}$, respectively, can be seen easily.
 
 We can estimate the fuel state from above by the maximal fuel of vehicle~$v$ after serving $t_{a+1}$, \ie
 \begin{align*}
@@ -706,7 +720,7 @@ and therefore $\eqref{eq:doubleduties:fuel}$ follows from $\eqref{eq:doubledutie
 
 The implication ${\eqref{eq:doubleduties:fuelcond_r}\Rightarrow\eqref{eq:doubleduties:fuel_r}}$ works analogously.
 
-As shown before, we have ${t_a\in\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}}$ and therefore $\eqref{eq:doubleduties:cost}$ follows from $\eqref{eq:doubleduties:costcond}$ by
+As shown before, we have ${t_a\in\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}}$ and therefore $\eqref{eq:doubleduties:cost}$ follows from $\eqref{eq:triangle_inequality_cost}$ and $\eqref{eq:doubleduties:costcond}$ by
 \begin{align*}
 	\cd_{v',t_{a+1}} & \leq \cd_{v,t_a} + \ct_{t_a} + \cd_{t_a,t_{a+1}} \\
 	& \leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_{t_j} + \cd_{t_j,t_{j+1}}\right)
@@ -714,17 +728,21 @@ As shown before, we have ${t_a\in\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, 
 
 using the triangle inequalities. The implication ${\eqref{eq:doubleduties:costcond_r}\Rightarrow\eqref{eq:doubleduties:cost_r}}$ works analogously.
 
-Therefore we can apply \Cref{lem:doubleduties} or \Cref{rem:doubleduties} for each duty of $S$ individually. For each duty~$d^v$, we receive duties $d^v_1$ and $d^v_2$, starting with vehicles $v$ and $v'$. If $d^v$ is already feasible, the duty~$d^v_2$ is empty. The duties $d^v_1$ and $d^v_2$ are feasible in $(\operatorname{CMILP})$. We construct the new solution $S'$ with all new duties as constructed in \Cref{lem:doubleduties}. For this, we need the vehicles $v\in\mathcal{V}$ for the duties~$d^v_1$ and the vehicles ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ for the duties~$d^v_2$. Since these duties are feasible in the heuristic, the time constraints and fuel constraints are not violated by $S'$. Since the set of covered trips has not changed during the process, that cover constraints are not violated, too. Therefore, the new solution~$S'$ is a feasible solution of the $(\operatorname{CMILP})$ and
+Therefore we can apply \Cref{lem:doubleduties} or \Cref{rem:doubleduties} for each duty of $S$ individually. For each duty~$d^v$, we receive duties $d^v_1$ and $d^v_2$, starting with vehicles $v$ and $v'$. If $d^v$ is already feasible, the duty~$d^v_2$ is empty. The duties $d^v_1$ and $d^v_2$ are feasible in $(\operatorname{CMILP})$. We construct the new solution $S'$ with all new duties as constructed in \Cref{lem:doubleduties}. For this, we need the vehicles $v\in\mathcal{V}$ for the duties~$d^v_1$ and the vehicles ${v'\in\mathcal{V}'}$ for the duties~$d^v_2$. Since these duties are feasible in the heuristic, the time constraints and fuel constraints are not violated by $S'$. Since the set of covered trips has not changed during the process, that cover constraints are not violated, too. Therefore, the new solution~$S'$ is a feasible solution of the $(\operatorname{CMILP})$ and
 \begin{align*}
 	\operatorname{duties}\left(S'\right) \leq 2\cdot\operatorname{duties}\left(S\right)
 \end{align*}
 
-The cost of solution~$S'$ comprises the vehicle costs $\cv$, the deadhead costs $\cd$, the fuel costs $\ct$ and the route costs $\croute$. Except from the route costs, all costs are already contained in the duty cost. These costs are bounded by ${\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right)}$. As mentioned before, the set of covered trips has not changed and thus the route costs have not changed either. Therefore, we have
+The cost of solution~$S'$ comprises the vehicle cost $\cv$, the deadhead cost $\cd$, the fuel cost $\ct$ and the route cost $\croute$. Except from the route cost, all costs are already contained in the duty cost. These costs are bounded by ${\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right)}$. As mentioned before, the set of covered trips has not changed and thus the route costs have not changed either. Therefore, we have
 \begin{align*}
 	\operatorname{cost}\left(S'\right) \leq 2\cdot\operatorname{cost}\left(S\right)
 \end{align*}
 
 \end{proof}
+
+To sum these results up, we have shown that we can always find a solution that is feasible in the customer-dependent heuristic and its total cost is not more than twice the optimal solution. For this result, we need the condition ${L_{\operatorname{C}}\leq L_{\operatorname{S}}}$. This condition applies for realistic instances, as we will discuss later. Further we need an additional vehicle set with the same size as the original vehicle set and the vehicles have certain requirements concerning their start positions and fuel states. As we regard the problem from the car sharing supplier's point of view, he is able to provide additional vehicles with the demanded properties in order to satisfy the travel request of the customers.
+
+It is important to keep in mind that \Cref{thm:doubleduties} does not provide an approximation factor for the customer-dependent heuristic. We can neither guarantee that we receive a solution $S$ with ${\operatorname{cost}\left(S\right)\leq 2\cdot\operatorname{cost}\left(S^*\right)}$, if we apply \Cref{alg:successive_heuristic} and solve each subproblem with $(\operatorname{CMILP}_i)$ to optimality (not even with the conditions of \Cref{def:conditions}). Nor can we ensure that an existing solution $S$ which is computed with the customer-dependent heuristic fulfills ${\operatorname{cost}\left(S\right)\leq 2\cdot\operatorname{cost}\left(S^*\right)}$. In this context $S^*$ is an optimal solution. \Cref{thm:doubleduties} only says that there exists a solution $S'$ where each subproblem is feasible in $(\operatorname{CMILP}_i)$ and the total cost is at most twice the optimal cost.
 
 %########################################################################################################################################
 %#
