@@ -271,6 +271,14 @@ While solving the partial instances partial duties are created. For ${i\in[n]\ba
 
 As mentioned before, it requires some additional work to include the cover constraints into the partial instances. The fulfilling of the cover constraints is also part of the respective heuristic and therefore $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are left out in this formulation.
 
+\paragraph{Cost Function} \parfill
+
+The cost function is also modified. The deadhead cost between trips ${s,t\in\Ti}$ are the same as in the $\eqref{eq:SMILP}$. Between trips ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$, there is an end point ${t'\in\Phat_i}$ with $t$ representing $t'$ if $t$ starts another partial duty in $S_j$. The deadhead cost $\cd_{s,t}$ is treated in $I_i$ as $\cd_{s,t'}$ and the trip cost $\ct_t$ is treated in $I_j$. Therefore the trip cost for the trip starting a duty arises additionally.
+
+The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost.
+
+Besides the cover constraints also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
+
 \begin{align}
 	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_c}$} \nonumber \\
 	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
@@ -289,14 +297,6 @@ As mentioned before, it requires some additional work to include the cover const
 	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
 	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
 \end{align}
-
-\paragraph{Cost Function} \parfill
-
-The cost function is also modified. The deadhead cost between trips ${s,t\in\Ti}$ are the same as in the $\eqref{eq:SMILP}$. Between trips ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$, there is an end point ${t'\in\Phat_i}$ with $t$ representing $t'$ if $t$ starts another partial duty in $S_j$. The deadhead cost $\cd_{s,t}$ is treated in $I_i$ as $\cd_{s,t'}$ and the trip cost $\ct_t$ is treated in $I_j$. Therefore the trip cost for the trip starting a duty arises additionally.
-
-The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost.
-
-Besides the cover constraints also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
@@ -382,7 +382,7 @@ Based on the customer splitting, we define the splitting of $\mathcal{T}$ as
 
 We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:customer_dependent_splitting} as (CMILP).
 
-\paragraph{Solving of the Partial Instances} \parfill
+\paragraph{Solving the Partial Instances} \parfill
 
 The formulation of the partial instances is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints are not considered so far. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since for a customer $c\in\mathcal{C}_i$ all trips are in the splitting $\Ti$, only the cover constraints concerning these customers are included in partial instance $I_i$. We therefore add the following constraints:
 \begin{align}
@@ -486,14 +486,14 @@ Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a duty of $S$ with vehicle $v\in\mathc
 
 and
 \begin{align}
-	f^0_{v'}\geq e_{t_{a+1}} + \fd_{v',t_{a+1}}.\label{eq:doubleduties:fuel}
+	f^0_{v'}\geq e_{t_{a+1}} + \ft_{t_{a+1}} + \fd_{v',t_{a+1}}.\label{eq:doubleduties:fuel}
 \end{align}
 
 Then there are duties $d_1,d_2$ with ${d_1\cupdot d_2=d\cupdot\left\{v'\right\}}$ such that $d_1,d_2$ are part of a feasible solution of the $(\operatorname{CMILP})$.
 
 Let additionally
 \begin{align}
-	\cd_{v',t_{a+1}}\leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_j + \cd_{j,j+1}\right) \label{eq:doubleduties:cost}
+	\cd_{v',t_{a+1}}\leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_{t_j} + \cd_{t_j,t_{j+1}}\right) \label{eq:doubleduties:cost}
 \end{align}
 
 Then the cost of the duties $d_1,d_2$ is at most twice the original cost, \ie
@@ -502,15 +502,6 @@ Then the cost of the duties $d_1,d_2$ is at most twice the original cost, \ie
 \end{align*}
 
 \end{lemma}
-
-\begin{remark}
-
-This statement also holds if there is a ${r\in\mathcal{R}_{v',t_{a+1}}}$ such that
-\begin{align*}
-	f^0_{v'}\geq e_{t_{a+1}} + \left(\fd_{v',r}+\ft_r+\fd_{r,t_{a+1}}\right) &&	\cd_{v',r}+\cd_{r,t_{a+1}}\leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_j + \cd_{j,j+1}\right)
-\end{align*}
-
-\end{remark}
 
 \begin{proof}
 
@@ -622,6 +613,119 @@ This concludes the proof.
 
 \end{proof}
 
+\begin{remark}
+\label{rem:doubleduties}
+
+\Cref{lem:doubleduties} also holds if instead of $\eqref{eq:doubleduties:time}$, $\eqref{eq:doubleduties:fuel}$ and $\eqref{eq:doubleduties:cost}$ there is a ${r\in\mathcal{R}_{v',t_{a+1}}}$ such that
+\begin{align}
+	z_{v'} + t_{v',r} + t_{r,t_{a+1}} & \leq \zstart_{t_{a+1}} \label{eq:doubleduties:time_r} \\
+	f^0_{v'} - \left(\fd_{v',r}+\ft_r+\fd_{r,t_{a+1}}\right) & \geq e_{t_{a+1}} + \ft_{t_{a+1}} \label{eq:doubleduties:fuel_r} \\
+	\cd_{v',r}+\cd_{r,t_{a+1}} & \leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_j + \cd_{j,j+1}\right) \label{eq:doubleduties:cost_r}
+\end{align}
+
+Then we initially have $d_2:=\left(v',r,t_{a+1}\right)$ and the modified conditions ensure that $d_2$ is still feasible and ${\operatorname{cost}\left(d_2\right)\leq\operatorname{cost}\left(d\right)}$. These conditions give us more flexibility \wrt the initial fuel of $v'$.
+
+\end{remark}
+
+Given a duty of a solution that is feasible in the $\eqref{eq:MMILP}$ and an additional vehicle that fulfills certain conditions, we can construct a second duty, such that the duties are feasible in the heuristic, contain the same trips the cost of the duties doubles at most. Based on this result, we aim to construct a feasible solution of the $(\operatorname{CMILP})$ with at most twice the original cost. For this, we particularly need an additional vehicle set, with which the duties are covered. We examine conditions of the additional vehicle set in order to make this procedure possible. Since we do not know the solution in advance, we cannot make assumptions based on this solution, but we need to generalize these conditions to all feasible solutions.
+
+\begin{definition}[Conditions]
+\label{def:conditions}
+
+Let $\mathcal{T}$ be a trip set and $c_i$ split points for ${i\in[n-1]}$ with $c_i<c_{i+1}$ for ${i\in[n-2]}$. Let $\mathcal{V}, \mathcal{V}'$ with $\mathcal{V}\subseteq\mathcal{V}'$ be vehicle sets.
+\begin{enumerate}
+	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Feasibility Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ such that for all ${t\in\mathcal{T}}$ with ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ one of the following conditions is fulfilled:
+	\begin{itemize}
+		\item Feasibility condition without refuel point:
+			\begin{align}
+				z_{v'} + t_{v',t} & \leq \zstart_t \label{eq:doubleduties:timecond} \\
+				f^0_{v'} - \fd_{v',t} & \geq f^0_v - \min\left\{\fd_{v,t},\min_{r'\in\mathcal{R}_{v,t}}\left(\fd_{v,r'}+\ft_{r'}+\fd_{r',t}\right)\right\} \label{eq:doubleduties:fuelcond}
+			\end{align}
+		\item Feasibility condition with refuel point: There is some ${r\in\mathcal{R}_{v',t}}$ such that
+		\end{itemize}
+			\begin{align}
+				z_{v'} + t_{v',r} + t_{r,t} & \leq \zstart_t \label{eq:doubleduties:timecond_r} \\
+				f^0_{v'} - \left(\fd_{v',r} + \ft_r + \fd_{r,t}\right) & \geq f^0_v - \min\left\{\fd_{v,t},\min_{r'\in\mathcal{R}_{v,t}}\left(\fd_{v,r'}+\ft_{r'}+\fd_{r',t}\right)\right\} \label{eq:doubleduties:fuelcond_r}
+			\end{align}
+	%\end{itemize}
+	\item $\mathcal{V}$ and $\mathcal{V}'$ fulfill the \emph{Cost Condition} if each $v\in\mathcal{V}$ can be assigned to some ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ such that for all ${t\in\mathcal{T}}$ with ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$ one of the following conditions is fulfilled:
+	\begin{itemize}
+		\item Cost condition without refuel point: $\eqref{eq:doubleduties:timecond}, \eqref{eq:doubleduties:fuelcond}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$
+			\begin{align}
+				\cd_{v',t} & \leq \cd_{v,s} + \ct_s + \cd_{s,t} \label{eq:doubleduties:costcond}
+			\end{align}
+		\item Cost condition with refuel point: There is some ${r\in\mathcal{R}_{v',t}}$ such that $\eqref{eq:doubleduties:timecond_r}$, $\eqref{eq:doubleduties:fuelcond_r}$ and for all $s\in\mathcal{T}$ with ${v\prec s, s\prec t, s\not\to t}$
+			\begin{align}
+				\cd_{v',r} + \cd_{r,t} & \leq \cd_{v,s} + \ct_s + \cd_{s,t} \label{eq:doubleduties:costcond_r}
+			\end{align}
+	\end{itemize}
+\end{enumerate}
+
+\end{definition}
+
+\begin{theorem}
+
+Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ which is computed using the vehicle set $\mathcal{V}$. Let $c_i$ be split points for $i\in[n-1]$ with ${c_i<c_{i+1}}$ for ${i\in[n-2]}$ and let
+\begin{align}
+	L_{\operatorname{C}} \leq L_{\operatorname{S}} \tag{\ref{eq:LCLS}}
+\end{align}
+
+Let $\mathcal{V}'$ with $\mathcal{V}\subseteq\mathcal{V}'$ be a vehicle set such that $\mathcal{V}$ and $\mathcal{V}'$ fulfill the Feasibility Condition according to \Cref{def:conditions}. Using the vehicle set $\mathcal{V}'$, there exists a feasible solution $S'$ of the $(\operatorname{CMILP})$ with
+\begin{align}
+	\operatorname{duties}\left(S'\right) \leq 2\cdot\operatorname{duties}\left(S\right)
+\end{align}
+
+If $\mathcal{V}$ and $\mathcal{V}'$ additionally fulfill the Cost Condition according to \Cref{def:conditions}, there exists a feasible solution $S'$ of the $(\operatorname{CMILP})$ with
+\begin{align}
+	\operatorname{cost}\left(S'\right) \leq 2\cdot\operatorname{cost}\left(S\right)
+\end{align}
+
+\end{theorem}
+
+\begin{proof}
+
+Let $S=\left(x,z,e,u\right)$ be a feasible solution of the $\eqref{eq:MMILP}$. We prove that each duty $d$ of $S$ fulfills the conditions of \Cref{lem:doubleduties} or \Cref{rem:doubleduties}. Let ${v\in\mathcal{V}}$ be the vehicle that covers $d$ and ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ be the vehicle assigned to $v$.
+
+Let $a$ be the smallest index with ${t_a\not\to t_{a+1}}$ in $d$. Then holds ${t_a\not\in\mathcal{T}_1}$ and therefore
+\begin{align*}
+	 \zstart_{t_{a+1}} > \zstart_{t_a} \geq \zstart_{\left(M\circ C\right)\left(t_a\right)} > c_1
+\end{align*}
+
+Further we have $v\prec t_a$, $t_a\prec t_{a+1}$ and $t_a\not\to t_{a+1}$ and therefore ${\zstart_t>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}\neq\emptyset}$. For $v'$ and $t_{a+1}$ holds either $\eqref{eq:doubleduties:timecond}$ and $\eqref{eq:doubleduties:fuelcond}$ or $\eqref{eq:doubleduties:timecond_r}$ and $\eqref{eq:doubleduties:fuelcond_r}$ for some ${r\in\mathcal{R}_{v',t_{a+1}}}$. The implications ${\eqref{eq:doubleduties:timecond}\Rightarrow\eqref{eq:doubleduties:time}}$ or ${\eqref{eq:doubleduties:timecond_r}\Rightarrow\eqref{eq:doubleduties:time_r}}$, respectively, can be seen easily.
+
+We can estimate the fuel state from above by the maximal fuel of vehicle~$v$ after serving $t_{a+1}$, \ie
+\begin{align*}
+	e_{t_{a+1}} + \ft_{t_{a+1}} \leq f^0_v - \min\left\{\fd_{v,t_{a+1}}, \min_{r'\in\mathcal{R}_{v,t_{a+1}}}\left(\fd_{v,r'}+\ft_{r'}+\fd_{r',t_{a+1}}\right)\right\}
+\end{align*}
+
+and therefore $\eqref{eq:doubleduties:fuel}$ follows from $\eqref{eq:doubleduties:fuelcond}$ by
+\begin{align*}
+	f^0_{v'} & \geq f^0_v - \min\left\{\fd_{v,t_{a+1}}, \min_{r'\in\mathcal{R}_{v,t_{a+1}}}\left(\fd_{v,r'}+\ft_{r'}+\fd_{r',t_{a+1}}\right)\right\} + \fd_{v',t} \\
+	& \geq e_{t_{a+1}} + \fd_{v',t_{a+1}} + \ft_{t_{a+1}}
+\end{align*}
+
+The implication ${\eqref{eq:doubleduties:fuelcond_r}\Rightarrow\eqref{eq:doubleduties:fuel_r}}$ works analogously.
+
+As shown before, we have ${t_a\in\left\{s\in\mathcal{T}\mid v\prec s, s\prec t, s\not\to t\right\}}$ and therefore $\eqref{eq:doubleduties:cost}$ follows from $\eqref{eq:doubleduties:costcond}$ by
+\begin{align*}
+	\cd_{v',t_{a+1}} & \leq \cd_{v,t_a} + \ct_{t_a} + \cd_{t_a,t_{a+1}} \\
+	& \leq \cd_{v,t_1} + \sum_{j=1}^a \left(\ct_{t_j} + \cd_{t_j,t_{j+1}}\right)
+\end{align*}
+
+using the triangle inequalities. The implication ${\eqref{eq:doubleduties:costcond_r}\Rightarrow\eqref{eq:doubleduties:cost_r}}$ works analogously.
+
+Therefore we can apply \Cref{lem:doubleduties} or \Cref{rem:doubleduties} for each duty of $S$ individually. For each duty~$d^v$, we receive duties $d^v_1$ and $d^v_2$, starting with vehicles $v$ and $v'$. If $d^v$ is already feasible, the duty~$d^v_2$ is empty. The duties $d^v_1$ and $d^v_2$ are feasible in $(\operatorname{CMILP})$. We construct the new solution $S'$ with all new duties as constructed in \Cref{lem:doubleduties}. For this, we need the vehicles $v\in\mathcal{V}$ for the duties~$d^v_1$ and the vehicles ${v'\in\mathcal{V}'\backslash\mathcal{V}}$ for the duties~$d^v_2$. Since these duties are feasible in the heuristic, the time constraints and fuel constraints are not violated by $S'$. Since the set of covered trips has not changed during the process, that cover constraints are not violated, too. Therefore, the new solution~$S'$ is a feasible solution of the $(\operatorname{CMILP})$ and
+\begin{align*}
+	\operatorname{duties}\left(S'\right) \leq 2\cdot\operatorname{duties}\left(S\right)
+\end{align*}
+
+The cost of solution~$S'$ comprises the vehicle costs $\cv$, the deadhead costs $\cd$, the fuel costs $\ct$ and the route costs $\croute$. Except from the route costs, all costs are already contained in the duty cost. These costs are bounded by ${\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right)}$. As mentioned before, the set of covered trips has not changed and thus the route costs have not changed either. Therefore, we have
+\begin{align*}
+	\operatorname{cost}\left(S'\right) \leq 2\cdot\operatorname{cost}\left(S\right)
+\end{align*}
+
+\end{proof}
+
 %########################################################################################################################################
 %#
 %#   Time-dependent Splitting
@@ -667,7 +771,7 @@ and
 
 We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:time_dependent_splitting} as (TMILP).
 
-\paragraph{Solving of the Partial Instances} \parfill
+\paragraph{Solving the Partial Instances} \parfill
 
 Since the trips of the same customer may be in different splittings, we cannot easily guarantee the customer satisfaction only in just one partial instance. We have to put great effort in this issue. Let $\sigma\in S_n$ with $\sigma(n)=1$ be the order in which the partial instances are solved. We first define the earliest solved partial instance, in which a trip of a customer arises, as follows: 
 \begin{align*}

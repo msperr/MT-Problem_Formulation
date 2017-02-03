@@ -211,11 +211,11 @@ Note that this procedure only provides a solution of the LP-relaxation of the ma
 
 %########################################################################################################################################
 %#
-%#   Solving of the Subproblems
+%#   Solving the Subproblems
 %#
 %########################################################################################################################################
 
-\section{Solving of the Subproblems}
+\section{Solving the Subproblems}
 \label{sec:solving_subproblem}
 
 In every step of the master problem, we solve the subproblem $\eqref{eq:SPv}$ for each vehicle $\vinV$. This subproblem is equivalent to the Shortest Path Problem with Resource Constraints (SPPRC). A vehicle duty is expressed as $\ds$-$\de$-path whose first vertex is the respective vehicle $v$. The main resource is the fuel state of the vehicle, where refuel stations have negative fuel consumption. The goal is to find a feasible path with negative reduced cost which is then the new duty. Besides fuel, in the algorithm are used additional resources which describe what multimodal routes are served in this duty.
@@ -719,11 +719,11 @@ Since considering the other resources and contraction of vertices does not destr
 
 %########################################################################################################################################
 %#
-%#   Solving of the Master Problem
+%#   Solving the Master Problem
 %#
 %########################################################################################################################################
 
-\section{Solving of the Master Problem}
+\section{Solving the Master Problem}
 \label{sec:solving_masterproblem}
 
 With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. But this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply the \enquote{Branch-and-Bound} rule in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly taken over by the branching rules created by \cite{Kaiser}. The branching rule concerning the choice of routes is modified.
