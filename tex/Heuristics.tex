@@ -405,7 +405,7 @@ In the following, we examine whether the formulations $\eqref{eq:MMILP}$ and $(\
 \begin{theorem}
 \label{thm:equivalence_CMILP_MMILP}
 
-Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:MMILP}$.
+Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then~$S$ is feasible in $\eqref{eq:MMILP}$.
 
 \end{theorem}
 
@@ -744,6 +744,74 @@ To sum these results up, we have shown that we can always find a solution that i
 
 It is important to keep in mind that \Cref{thm:doubleduties} does not provide an approximation factor for the customer-dependent heuristic. We can neither guarantee that we receive a solution $S$ with ${\operatorname{cost}\left(S\right)\leq 2\cdot\operatorname{cost}\left(S^*\right)}$, if we apply \Cref{alg:successive_heuristic} and solve each subproblem with $(\operatorname{CMILP}_i)$ to optimality (not even with the conditions of \Cref{def:conditions}). Nor can we ensure that an existing solution $S$ which is computed with the customer-dependent heuristic fulfills ${\operatorname{cost}\left(S\right)\leq 2\cdot\operatorname{cost}\left(S^*\right)}$. In this context $S^*$ is an optimal solution. \Cref{thm:doubleduties} only says that there exists a solution $S'$ where each subproblem is feasible in $(\operatorname{CMILP}_i)$ and the total cost is at most twice the optimal cost.
 
+\paragraph{Approximation Factor} \parfill
+
+Finally, we show that the developed heuristic is not a constant-factor approximation. We provide an example where the ratio between the objective values of the heuristic solution and the optimal solution is arbitrarily large.
+
+\begin{example}
+
+Let $M\leq 0$ arbitrary. Let ${\mathcal{V} = \left\{v\right\}}$ and ${\mathcal{T} = \left\{t_1,t_2,t_3\right\}}$ with the properties of \Cref{tab:approximation_example}. 
+
+\begin{table}[htp]
+	\centering
+	\begin{subtable}[h]{.6\textwidth}
+		\centering
+		\begin{tabular}{c|ccccc}
+			Trip & $\zstart_t$ & $\zend_t$ & $M(t)$ & $\left(M\circ C\right)(t)$ & $\ct_t$ \\
+			\hline
+			$t_1$ & $1$ & $2$ & $m_1$ & $b_1$ & 1 \\
+			$t_2$ & $3$ & $5$ & $m_2$ & $b_2$ & 2 \\
+			$t_3$ & $3$ & $4$ & $m_3$ & $b_2$ & 1 \\
+		\end{tabular}
+		\caption{Trips}
+	\end{subtable}
+	~
+	\begin{subtable}[h]{.3\textwidth}
+		\centering
+		\begin{tabular}{c|ccc}
+			& $t_1$ & $t_2$ & $t_3$ \\
+			\hline
+			$v$   & 1 & 3 & 3 \\
+			$t_1$ &   & 1 & 1 \\
+		\end{tabular}
+		\caption{Time between trips}
+	\end{subtable}
+	\caption{Example}
+	\label{tab:approximation_example}
+\end{table}
+
+We set all deadhead cost equal to the time, \ie ${\cd_{s,t}=t_{s,t}}$. Then we increase all deadhead cost leading to $t_3$ by the parameter~$M$. Therefore
+\begin{align*}
+	\cd_{v,t_3} = M+2 && \cd_{t_1,t_3} = M
+\end{align*}
+
+We define the additional values:
+\begin{align*}
+	& \mathcal{R}=\emptyset && f^0_v=1 && \ft_t=0.1 && \fd_{s,t}=0.1 && \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{T} \\
+	& \cv = 0 &&&&&& \croute_m=0 && \text{for all } m\in\mathcal{M} \\
+\end{align*}
+
+The fuel constraints are chosen such that all solutions are feasible \wrt fuel. We have ${v\prec t}$ for all ${t\in\mathcal{T}}$ and ${t_1\prec t_2}, {t_1\prec t_3}$. For customer~$b_1$ the trip~$t_1$ is fulfilled, for customer~$b_2$ either trip~$t_2$ or $t_3$. The optimal solution~$S^*$ consists of one duty $d^*$ with
+\begin{align*}
+	d^* = \left(v, t_1, t_2\right) && \operatorname{cost}\left(S^*\right) = 5
+\end{align*}
+
+We solve this problem via \Cref{alg:successive_heuristic} with $n=2$ and $c_1=2$. Then the partial trip sets are ${\mathcal{T}_1=\left\{t_1\right\}}$ and ${\mathcal{T}_2=\left\{t_2,t_3\right\}}$. We first solve partial instance~$I_2$ where we chose the cheaper trip $t_3$ and receive ${\operatorname{cost}\left(S_2\right)=1}$. Therefore the heuristic solution~$S$ consists of duty $d$ with
+\begin{align*}
+	d = \left(v, t_1, t_3\right) && \operatorname{cost}\left(S\right) = M+3
+\end{align*}
+
+For a heuristic solution $S$ and an optimal solution $S^*$, we have
+\begin{align*}
+	\frac{\operatorname{cost}\left(S\right)}{\operatorname{cost}\left(S^*\right)}\in\Theta(M)
+\end{align*}
+
+in this example.
+
+\end{example}
+
+This is a remarkable result. In the original version of the Successive Heuristics without customers, the heuristic always computes a solution $S$ with ${\operatorname{cost}\left(S\right)\leq n\cdot\operatorname{cost}\left(S^*\right)}$ (cf.~\cite[p.~130]{Knoll}).
+
 %########################################################################################################################################
 %#
 %#   Time-dependent Splitting
@@ -758,30 +826,21 @@ The developed formulation (CMILP) based on a customer-dependent splitting is not
 \subsection{Basic Idea}
 \label{sec:basic_idea}
 
-We define time-dependent splitting similar to \cite{Knoll}. Based on this splitting, we adapt the model and describe the necessary cost estimation.
+We a define time-dependent splitting similar to \cite{Knoll}. Based on this splitting, we adapt the model and describe the necessary cost estimation.
 
 \paragraph{Splitting} \parfill
 
-We split the sets $\mathcal{T}$ and $\mathcal{V}$ according to their start times.
+We split the trip set~$\mathcal{T}$ according to the start times of the trips.
 
 \begin{definition}[Time-dependent Splitting]
 \label{def:time_dependent_splitting}
 
-Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We define the splitting of $\mathcal{T}$ and $\mathcal{V}$ as follows:
+Given time point $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We define the splitting of $\mathcal{T}$ as
 \begin{align*}
 	\Ti := \begin{cases}
 		\left\{t\in\mathcal{T}\mid \zstart_t\leq c_1\right\} & \text{for } i=1 \\
 		\left\{t\in\mathcal{T}\mid c_{i-1}<\zstart_t\leq c_i\right\} & \text{for } i\in[n-1]\backslash\{1\} \\
 		\left\{t\in\mathcal{T}\mid c_{n-1}<\zstart_t\right\} & \text{for } i=n
-	\end{cases}
-\end{align*}
-
-and
-\begin{align*}
-	\Vi := \begin{cases}
-		\left\{v\in\mathcal{V}\mid z_v\leq c_1\right\} & \text{for } i=1 \\
-		\left\{v\in\mathcal{V}\mid c_{i-1}<z_v\leq c_i\right\} & \text{for } i\in[n-1]\backslash\{1\} \\
-		\left\{v\in\mathcal{V}\mid c_{n-1}<z_v\right\} & \text{for } i=n
 	\end{cases}
 \end{align*}
 
@@ -791,37 +850,37 @@ We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref
 
 \paragraph{Solving the Partial Instances} \parfill
 
-Since the trips of the same customer may be in different splittings, we cannot easily guarantee the customer satisfaction only in just one partial instance. We have to put great effort in this issue. Let $\sigma\in S_n$ with $\sigma(n)=1$ be the order in which the partial instances are solved. We first define the earliest solved partial instance, in which a trip of a customer arises, as follows: 
+Since the trips of the same customer may be in different splittings, we cannot easily guarantee the customer satisfaction in just one partial instance. We have to put great effort in this issue. The partial instances are solved from the end to the beginning. Thus the earliest partial instance in which a trip of a customer arises, is defined as follows:
 \begin{align*}
-	\gamma: \mathcal{C}\to[n] && \gamma(c):=\sigma\left(\min\left\{i\in[n]\mid\left((M\circ C)^{-1}(c)\cap\mathcal{T}_{\sigma(i)}\right)\neq\emptyset\right\}\right)
+	\gamma: \mathcal{C}\to[n] && \gamma(c) := \max\left\{i\in[n]\mid\left(\left(M\circ C\right)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
 \end{align*}
 
-Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we define a partition $\mathcal{C}=\left\{\mathcal{C}_1,\dots\mathcal{C}_n\right\}$ as
+Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we define a partition ${\mathcal{C}=\Cupdot_{i=1}^n \mathcal{C}_i}$ as
 \begin{align*}
 	\mathcal{C}_i := \left\{c\in\mathcal{C}\mid \gamma(c)=i\right\} && \text{for } i\in[n]
 \end{align*}
 
-Consider customer $c\in\mathcal{C}$. In partial instance $I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be chosen in advance and all trips ${t\in\left((M\circ C)^{-1}(c)\backslash m\right)}$ are fixed to be neglected.
+Consider an arbitrary customer $c\in\mathcal{C}$. In the partial instance~$I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be chosen in advance and all trips ${t\in(M\circ C)^{-1}(c)\backslash m}$ are fixed to be neglected.
 
-In partial instance $\gamma(c)$ we have at least one trip of $c$. But there are also trips of $c$ that are in other splittings. There are even multimodal routes with no trip in this splitting at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes $m\in C^{-1}(c)$ are considered. Therefore, we try to estimate the costs of the routes in advance. The solving of the partial instances is again based on $\eqref{eq:SMILPi}$.
+In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even multimodal routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. Therefore, we try to estimate the total cost of the routes in advance. Solving the partial instances is again based on $\eqref{eq:SMILPi}$.
 
-For the cover constraints, we again introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$.  Notice that the definition of $\mathcal{C}_i$ is different to the definition in \Cref{sec:customer_dependent_splitting}. In the customer constraints, only the customers in this splitting are considered. The route constraints are restricted to the trips that are actually in this splitting. The cover constraints read as follows:
+We now consider partial instance~$I_i$. For the cover constraints, we introduce the decision variable ${u_m\in\{0,1\}}$ for ${m\in C^{-1}\left(\mathcal{C}_i\right)}$.  Notice that the definition of $\mathcal{C}_i$ is different from \Cref{def:customer_dependent_splitting}. In the customer constraints, only the customers in $\mathcal{C}_i$ are considered. The route constraints are restricted to the trips in $\Ti$. The cover constraints read as follows:
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:TMILP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:TMILP:route} \\
 	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right) \label{eq:TMILP:um}
 \end{align}
 
-For the constraint $\eqref{eq:TMILP:customer}$ it is irrelevant, if the considered route has a trip in this splitting.
+For the constraint $\eqref{eq:TMILP:customer}$ it is irrelevant, if the considered route has a trip in~$\Ti$.
 
 After solving the partial instance, all determined $u_m$ are fixed for the later solved partial instances. The fixed route decisions from the previous partial instances have an impact on this instance, too. 
 
 Let $\bar{u}_m\in[0,1]$ be the fixed route choices from the previous instances. Define
 \begin{align*}
-	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)<\sigma(i)\right\}
+	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)>i\right\}
 \end{align*}
 
-as the customers that are already treated. Then, we introduce the constraint
+as the set of customers that are treated before $I_i$. Then, we introduce the constraint
 \begin{align}
 	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
 \end{align}
@@ -830,12 +889,12 @@ which ensures that the previous route choices are considered.
 
 \paragraph{Cost Estimation} \parfill
 
-In order to choose a route in a partial instance, we have to estimate the costs for all routes of the same customer in all subsequently solved partial instances in advance. The entire cost for the problem consists of vehicle costs $\cv$, trip costs $\ct$, deadhead costs $\cd$ and route costs $\croute$. While we can determine the trip costs and route costs easily for a route, the vehicle costs and trip costs strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route costs and define the estimated route cost as follows:
+We have to select one route of customer~$c$ in the partial instance~$I_{\gamma(c)}$. For this we have to estimate the costs for all routes of~$c$ in advance. But these costs partly arise in the later solved instances. The entire cost for the problem consists of vehicle costs $\cv$, trip costs $\ct$, deadhead costs $\cd$ and route costs $\croute$. While the trip cost and route cost can be determined easily for a route, the vehicle cost and deadhead cost strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route costs and define the estimated route cost as follows:
 \begin{align*}
 	C_1(m) := \croute_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-We use these costs in order to define the modified route costs
+We use these costs in order to define the modified route cost
 \begin{align*}
 	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
@@ -847,58 +906,88 @@ and add the following term to the objective function:
 
 \begin{remark}
 
-The trips in the considered splitting $t\in \left(m\cap\Ti\right)$ are not considered in $\hat{c}^{\operatorname{r}}_m$ since they are already part of the objective function. The other trips $t\in\left(m\backslash\Ti\right)$ are added to $\hat{c}^{\operatorname{r}}_m$, such that they have an impact on the choice of the routes.
+The trips in the considered partial trip set $t\in m\cap\Ti$ are not considered in~$\hat{c}^{\operatorname{r}}_m$ since their trip costs are already part of the objective function. The other trips ${t\in m\backslash\Ti}$ are added to~$\hat{c}^{\operatorname{r}}_m$ such that they have an impact on the choice of the routes.
 
-Consider a trip $t$ that is decided before this partial instance, i.e. $t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)$. Its trip costs $\ct_t$ arise twice in the objective functions. Once in the partial instance $\gamma\left((M\circ C)(t)\right)$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $I_i$ as $\ct_t$. But since in partial instance $I_i$ the trip has fulfilled anyway, this cost is only an additional constant that does not influence the solution. 
+Consider a trip $t$  that is decided before this partial instance, \ie ${t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)}$. Its trip cost $\ct_t$ arises twice in the objective functions. Once in the partial instance $I_{\gamma\left((M\circ C)(t)\right)}$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $I_i$ as $\ct_t$. But since in partial instance $I_i$ the trip is fulfilled anyway, this cost is only an additional constant that does not influence the solution. 
 
 \end{remark}
 
-We denote the formulation $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:route_fix}$ and $\eqref{eq:TMILP:um}$ and the new objective function including modified route costs as $(\operatorname{TMILP}_i)$ for $i\in[n]$.
+We denote the formulation $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:um}$ and $\eqref{eq:TMILP:route_fix}$ and the new objective function including modified route costs as $(\operatorname{TMILP}_i)$ for $i\in[n]$.
+
+\paragraph{Model Equivalence} \parfill
+
+\begin{theorem}
+\label{thm:equivalence_TMILP_MMILP}
+
+Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{TMILP}_i)$ for ${i\in[n]}$. Then~$S$ is feasible in the $\eqref{eq:MMILP}$.
+
+\end{theorem}
+
+\begin{proof}
+
+Proof\fxnote{Proof}
+
+\end{proof}
+
+\begin{theorem}
+\label{thm:equivalence_MMILP_TMILP}
+
+Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$. Then $S$ is feasible in the $(\operatorname{TMILP})$.
+
+\end{theorem}
+
+\begin{proof}
+
+Proof\fxnote{Proof}
+
+\end{proof}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Iterative Approach}
 \label{sec:iterative_approach}
 
-We use the previously developed heuristic for an iterative approach. First, we compute an initial solution while we choose the routes according to cost function $C_1$. Based on this solution, we determine the actual costs of the routes. With this, we can estimate the contribution of a route to the objective function. We compare the estimated route cost to the actual route cost. If the actual route cost is considerably higher than the estimated route cost, it is likely that this route choice was bad. We identify the customer with the worst route choice and solve a subproblem, where we fix all route choices except for the considered customer. Regarding one customer after another, we can iteratively improve the solution.
+We use the previously developed heuristic for an iterative approach. First, we compute an initial solution while we choose the routes according to cost function $C_1$. Based on this solution, we determine the actual costs of the selected routes. With this, we can estimate the contribution of a route to the objective function. We compare the estimated route cost to the actual route cost. If the actual route cost is considerably higher than the estimated route cost, this route choice was likely bad. We identify the customers with the worst route choices and solve a subproblem, where we fix all route choices except for the considered customers. Regarding one customer set after another, we can iteratively improve the solution.
 
 \paragraph{Initial Solution} \parfill
 
-We determine a solution with the heuristic developed in \Cref{sec:basic_idea} with a splitting according to \Cref{def:time_dependent_splitting}. Based on this solution $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$, we determine 
+We determine a solution with \Cref{alg:successive_heuristic} and a splitting according to \Cref{def:time_dependent_splitting}. Based on this solution $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$, we determine 
 \begin{align*}
 	C_1(c) := C_1(m) && \text{for } c\in\mathcal{C}, m\in C^{-1}(c) \text{ with } \bar{u}_m = 1
 \end{align*}
 
-\paragraph{Finding Bad Route Choice} \parfill
+\paragraph{Finding Bad Route Choices} \parfill
 
-Given a solution of the problem, the subproblem is to find a customer with a bad route choice. This means, for this customer there is another route, such that the total cost is lower choosing this route. We can exchange these routes and compute a new solution considering the new route. 
+For an existing solution, the subproblem is to find a customer $\bar{c}$ with a bad route choice. This means, for this customer there is another route, such that the total cost decreases by choosing the other route. We can exchange these routes and compute a new solution considering the new route choice. 
 
-An initial idea is to compute the cost, one route in the solution contributes to the entire solution. Then, we can compare this to the cost, with which we estimated the route costs before. If the actual cost are considerably higher than the estimated cost, this customer is a candidate for exchanging routes. Since we cannot determine the contributing cost exactly, we try to estimate this cost.
+An initial idea is to compute the cost that a route in the solution contributes to the total cost. Then we compare this to the cost with which we have estimated the route cost before. If the actual cost are considerably higher than the estimated cost, this customer is a candidate for exchanging routes. Since we cannot determine the contributing cost exactly, we try to estimate this cost.
 
-Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of $\eqref{eq:MMILP}$. In order to determine the contributing cost for route $m\in\mathcal{M}$, we define the following auxiliary costs for every trip $t\in\mathcal{T}$ of the solution:
-
-Vehicle costs $\cv_t(S)$: Let $v\in\mathcal{V}$ be the vehicle covering $t$ and $k_v$ the number of trips covered by $v$:
+Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a feasible solution of the $\eqref{eq:MMILP}$. In order to determine the contributing cost for route $m\in\mathcal{M}$, we define the following auxiliary costs for every trip $t\in\mathcal{T}$ that is covered in the solution.
+\begin{enumerate}
+	\item{Vehicle cost $\cv_t(S)$:}
+Let $v\in\mathcal{V}$ be the vehicle covering $t$ and $k_v$ the number of trips covered by $v$:
 \begin{align*}
 	\cv_t(S) := \frac{\cv}{k_v}
 \end{align*}
-
-Refueling costs $c^{\operatorname{refuel}}_t(S)$: Let $r\in\mathcal{R}$ be the next refuel station used after $t$ and $T_r$ all trips covered since the last station, let $\bar{z}_{s,r,s'} = 1$:
+	\item{Refueling cost $c^{\operatorname{refuel}}_t(S)$:}
+Let $r\in\mathcal{R}$ be the next refuel station used after $t$ and $T_r$ all trips covered since the last station, let $\bar{z}_{s,r,s'} = 1$:
 \begin{align*}
 	c^{\operatorname{refuel}}_t(S) := \frac{\ft_t}{\sum_{t'\in T_r} \ft_t}\left(\cd_{s,r}+\cd_{r,s'}-\cd_{s,s'}\right)
 \end{align*}
 If the vehicle is not refueled after $t$, then $c^{\operatorname{refuel}}_t(S) := 0$.
-
-Deadhead costs $\cd_t(S)$: Let $s\in\mathcal{V}\cup\mathcal{T},s'\in\mathcal{T}$ be the trips covered directly before and after $t$ by vehicle $v$, i.e. $\bar{x}_{s,t}=\bar{x}_{t,s'}=1$:
+	\item{Deadhead cost $\cd_t(S)$:}
+Let $s\in\mathcal{V}\cup\mathcal{T},s'\in\mathcal{T}$ be the trips covered directly before and after $t$ by vehicle $v$, i.e. $\bar{x}_{s,t}=\bar{x}_{t,s'}=1$:
 \begin{align*}
 	\cd_t(S) := \frac 1 2 \left(\cd_{s,t}+\cd_{t,s'}\right)
 \end{align*}
 If $t$ is the last trip of the duty, i.e. $\bar{x}_{s,t}=\bar{x}_{t,d^{\operatorname{e}}}=1$, then $\cd_t(S) := \frac 1 2 \cd_{s,t}$.
+\end{enumerate}
 
 With these auxiliary costs we can define new route costs which describe the contribution of a multimodal route to the entire solution better:
 
 \begin{definition}[Improved Cost Estimation]
 
-Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the $\eqref{eq:MMILP}$. With the auxiliary costs described before, we define the improved cost estimation for all multimodal routes $m\in\left\{m\in\mathcal{M}\mid \bar{u}_m=1\right\}$:
+Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the $\eqref{eq:MMILP}$. With the auxiliary costs described before, we define the improved cost estimation for all multimodal routes ${m\in\mathcal{M}}$ with ${\bar{u}_m=1}$:
 \begin{align*}
 	C_2(S,m) := C_1(m) + \sum_{t\in m}\left(\cv_t(S) + c^{\operatorname{refuel}}_t(S) + \cd_t(S)\right)
 \end{align*}
@@ -910,20 +999,62 @@ We further define
 
 \end{definition}
 
-Now we can evaluate our previous estimation for the route contribution. If $C_2(S,c)$ is significantly higher than $C_1(S,c)$ then the probability is high that we made a bad route choice for customer $c\in\mathcal{C}$.
+Now we can evaluate the previous estimation for the route contribution. If $C_2(S,c)$ is significantly higher than $C_1(S,c)$ then the probability is high that a bad route has been chosen for customer $c\in\mathcal{C}$.
 
-We therefore determine
-\begin{align*}
-	c^* := \argmax_{c\in\mathcal{C}} \frac{C_2(S,c)}{C_1(S,c)}
-\end{align*}
+After defining an indicator for bad route choices, we decide which of the customers we want to review. It is presumably not profitable to solve a subproblem for a single customer. Instead we create a set ${A\subseteq\mathcal{C}}$ with customers that are reviewed. We aim this procedure to be efficient. To achieve this, the subproblem should significantly decrease the objective value of the solution on the one hand, on the other hand it should be solved very fast. We examine desirable properties of the customer set~$A$.
 
-The probability is high that we made a bad route choice for customer $c^*$. Thus, we look at the route choice for $c^*$ again.
+Let ${c\in\mathcal{C}}$ with ${\bar{m}\in C^{-1}(c)}$ be the route chosen in the solution~$S$. Assume that~$\bar{m}$ is a bad route choice for~$c$ and with changing the route choice a great cost saving can be done. Then the following properties apply:
+\begin{enumerate}
+	\item The ratio $\frac{C_2(S,c)}{C_1\left(\bar{m}\right)}$ is large. \\
+	Although~$\bar{m}$ is a bad route choice, $C_1\left(\bar{m}\right)$ is small enough that~$\bar{m}$ was chosen in the original setting. $C_2\left(S,\bar{m}\right)$ is large enough that the total cost decreases with choosing another route.
+	\item There are ${m\in C^{-1}(c)\backslash\left\{\bar{m}\right\}}$ with ${C_1(m)<C_2(S,c)}$. \\
+	If $\bar{m}$ is a bad choice, better alternatives are available.
+	\item The difference ${C_2(S,c) - C_1\left(\bar{m}\right)}$ is large. \\
+	The cost that is saved by exchanging routes is bounded by this difference.
+	\item The set ${(M\circ C)^{-1}(c)\backslash\mathcal{T}_{\gamma(c)}}$ is large. \\
+	This set contains all trips of $c$ that are not in the partial instance where the route has been chosen. If this set is large, much information about these trips were not available and the route decision is heavily based on the cost estimations. Thus $\bar{m}$ is more likely a bad route choice.
+\end{enumerate}
 
-\begin{remark}
+We have to consider these properties for creating the customer set~$A$. Further we have to keep the subproblem small, such that it can be solved in reasonable time. Therefore we make additional assumptions on~$A$:
+\begin{enumerate}
+\setcounter{enumi}{4}
+	\item The time interval ${[\max_{c\in A}\zend_c, \min_{c\in A}\zstart_c]}$ is small. \\
+	In the subproblem, all duties stay fixed up to this time interval. A small time interval causes a small number of trips that are variable \wrt the duties. This kepps the size of the subproblem small.
+	\item The set ${(M\circ C)^{-1}(A)}$ is small. \\
+	This set contains all trips of one of the customers in~$A$. In the subproblem, all other trips are fixed to be fulfilled. Therefore a small number of trips that are variable \wrt the duties or can be neglected keeps the subproblem small.
+\end{enumerate}
 
-For simplicity of notation, we assume that $S$ is a solution of $\eqref{eq:MMILP}$. This is possible since the formulations (TMILP) and $\eqref{eq:MMILP}$ are equivalent.
+It is not possible to meet the requirements for~$A$ and simultaneously cover all customers with potential bad route choices. Therefore we partition a into several subsets ${A=\Cupdot_{j=1}^n A_j}$. It suffices if $A_j$ fulfill the set requirements for all ${j\in[k]}$. We iteratively execute the subproblem, each with a small customer set~$A_j$.
 
-\end{remark}
+\begin{algorithm}[htb]
+	\SetAlgoLined
+	\KwIn{solution $S$, $\mathcal{C}$, $\bar{m}_c$ for ${c\in\mathcal{C}}$, $r_{\min}, c_{\max}, t_{\max}, n_{\max}$}
+	\KwOut{$\left\{A_1,\dots,A_k\right\}$}
+	\lForEach{$c\in\mathcal{C}$}{determine $C_2(S,c)$}
+	$A\gets\left\{c\in\mathcal{C}\mid\frac{C_2(S,c)}{C_1\left(\bar{m}_c\right)}\geq r_{\min}, \exists m\in C^{-1}(c)\backslash\left\{\bar{m}_c\right\} \text{ with } C_1(m)<C_2(S,c)\right\}$\;
+	$i\gets 1$\;
+	\While{$A\neq\emptyset\land i\leq n_{\max}$}{
+		$\bar{c}\gets\argmax_{c\in A}\left(\frac{C_2(S,c)}{C_1\left(\bar{m}_c\right)}\right)$\;
+		$A_i\gets\left\{c\in A\mid \zstart_{\bar{c}} - \frac{t_{\max}}{2} \leq \zstart_c, \zend_c \leq \zstart_{\bar{c}} + \frac{t_{\max}}{2}\right\}$\;
+		\lWhile{$|A_i| > c_{\max}$}{$A_i\gets A_i\backslash\left\{\argmin_{c\in A_i}\left(\frac{C_2(S,c)}{C_1\left(\bar{m}_c\right)}\right)\right\}$}
+		\lIf{$A_i=\emptyset$}{$A\gets A\backslash\left\{\bar{c}\right\}$}
+		\lElse{$A\gets A\backslash A_i$; $i\gets i+1$}
+	}
+	$k\gets i$\;
+	\Return{$\left\{A_1,\dots,A_k\right\}$}
+	\caption{Determination of critical customers}
+	\label{alg:critical_customers}
+\end{algorithm}
+
+\Cref{alg:critical_customers} shows how we create the customer sets. In order to meet the requirements, we introduce the following parameters:
+\begin{itemize}
+	\item{$r_{\min}$:} The minimal ratio $\frac{C_2(S,c)}{C_1\left(\bar{m}\right)}$ for ${c\in A}$
+	\item{$c_{\max}$:} The maximal number of customers in $A_j$
+	\item{$t_{\max}$:} The maximal time range of the customers in $A_j$
+	\item{$n_{\max}$:} The maximal number of iterations
+\end{itemize}
+
+No guarantee. $A_1=\mathcal{C}$ guarantees optimality but too big. $A=\mathcal{C}$ does not ensure optimality. There can be route choices that are bad in $S^*$ but optimal in current $S$. Not necessarily all properties apply. $C_2$ is only estimated. Subproblem cannot fix all other bad heuristical decisions.
 
 \paragraph{Subproblem} \parfill
 
