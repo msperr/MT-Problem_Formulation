@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=84
-Cursor=70
+TopLine=117
+Cursor=4166
 
 [Frame1]
 Flags=0
@@ -71,8 +71,8 @@ Class=LaTeXView
 Document=tex\Mathematical_Models.tex
 
 [Frame3_View0,0]
-TopLine=62
-Cursor=3696
+TopLine=218
+Cursor=10113
 
 [Frame4]
 Flags=0
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=1628
-Cursor=82587
+TopLine=1350
+Cursor=63414
 
 [Frame5]
 Flags=0
