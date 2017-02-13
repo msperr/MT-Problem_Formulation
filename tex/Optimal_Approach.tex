@@ -57,7 +57,7 @@ Consider a solution of the $\eqref{eq:MMILP}$. This solution can be decomposed i
 \begin{align}
 	X_v := \left\{\vphantom{\{0,1\}^A}\right. & \omit\rlap{$\displaystyle{(x,z,e)\in\left\{0,1\right\}^A \times \{0,1\}^{\left(A\cap\left(\mathcal{V}\cupdot\mathcal{T}\right)^2\right)\times\mathcal{R}} \times [0,1]^{\mathcal{V}\cupdot\mathcal{T}}|}$} \nonumber \\
 	& \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} && \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{\ref{eq:MMILP:flow}} \\
-	& \sum_{s\in\Nin(t)} x_{s,v} = 1 \label{eq:Xv:vehicle} \\
+	& \sum_{s\in\Nin(v)} x_{s,v} = 1 \label{eq:Xv:vehicle} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 0 && \text{for all } t\in\mathcal{V}\backslash\{v\} \label{eq:Xv:other_vehicles} \\
 	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \tag{\ref{eq:MMILP:refuel}} \\
 	& e_s \leq f_s^0 & & \text{for all } s\in\mathcal{V} \tag{\ref{eq:MMILP:initial_fuel}} \\
@@ -223,7 +223,7 @@ In every step of the master problem, we solve the subproblem $\eqref{eq:SPv}$ fo
 \subsection{Shortest Path Problem with Resource Constraints}
 \label{sec:spprc}
 
-In this section, we summarize the crucial results in order to show a label-setting algorithm which solves the (SPPRC) optimally. The respective definitions and the algorithm are shown in detail in \cite{Kaiser} and \cite{Irnich_Desaulniers}. The (SPPRC) is a generalization of the Shortest Path Problem and is $\mathcal{NP}$-hard, as shown in \cite[p.307]{Handler_Zang}. The problem is given by a graph, a set of resources and a relation on every arc that specifies the change of resources along its way. 
+In this section, we summarize the crucial results in order to show a label-setting algorithm which solves the (SPPRC) optimally. The respective definitions and the algorithm are shown in detail in \cite{Kaiser} and \cite{Irnich_Desaulniers}. The (SPPRC) is a generalization of the Shortest Path Problem and is $\mathcal{NP}$-hard, as shown in \cite[p.~307]{Handler_Zang}. The problem is given by a graph, a set of resources and a relation on every arc that specifies the change of resources along its way. 
 
 \begin{definition}[Graph with resource constraints]
 \label{def:graph_resource_constraints}
@@ -483,25 +483,24 @@ for $(c,e,l,b)\in I$. In refuel points we have fuel consumption $\ft_r$, thus we
 	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
 \end{align*}
 
-for $(c,e,l,b)\in I$. 
+for $(c,e,l,b)\in I$.
 
-In a trip $t\in\mathcal{T}$ occur the cost $\ct_t-\gamma_t$, the fuel consumption is $\ft_t$ and the length of the duty increases by $1$. If trip $t$ is fulfilled in this duty, no other trip of the same costumer must be fulfilled, unless from the same route. We therefore define the following auxiliary functions
-\begin{align*}
-	\MC(t) & = \left\{m\in\mathcal{M}\mid C(m)\neq\left(C\circ M\right)(t)\right\} \\
-	\MRoute(t) & = \left\{m\in\mathcal{M}\mid C(m)=\left(C\circ M\right)(t)\land m\neq M(t)\right\}
-\end{align*}
+In a trip ${t\in\mathcal{T}}$ occurs the cost ${\ct_t-\gamma_t}$, the fuel consumption is $\ft_t$ and the length of the duty increases by~$1$. If trip~$t$ is fulfilled in this duty, no other trip of the same customer must be fulfilled, unless it belongs to the same route. Therefore, we introduce an auxiliary function. For the route resource vector ${b\in\bigotimes_{m\in\mathcal{M}}\left[0,|m|\right]}$, we write ${b=\left(b_m\right)_{m\in\mathcal{M}}}$. For each ${t\in\mathcal{T}}$ we define
+\begin{gather*}
+	a^t:\bigotimes_{m\in\mathcal{M}}\left[0,|m|\right] \to \bigotimes_{m\in\mathcal{M}}\left[-1,|m|\right] \\
+	a^t_m(b) = \left\{ \begin{array}{cl} b_m & \text{if } \left(C\circ M\right)(t)\neq C(m) \\ b_m - 1 & \text{if } M(t)=m \\ 0 & \text{if } \left(C\circ M\right)(t)=C(m) \text{ and } M(t)\neq m \end{array} \right.
+\end{gather*}
 
-Note that $\MC(t),\MR(t)\subseteq\mathcal{M}$ are subsets and $M(t)\in\mathcal{M}$ is an element of the route set. We define the resource extension function for $t\in\mathcal{T}$ as
-\fxnote{l+1}
+We define the resource extension function for $t\in\mathcal{T}$ as
 \begin{align}
 	\widetilde{\REF}_{t^-,t^+}(c,e,l,b) := \left(\left(
 	\begin{array}{c}
-		c+\ct_t-\gamma_t \\ e-\ft_t \\ l-1 \\ b_{\MC(t)} \\ 0_{\MRoute(t)} \\ b_{M(t)} - 1
+		c+\ct_t-\gamma_t \\ e-\ft_t \\ l+1 \\ a^t(b)
 	\end{array}
 	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I \label{eq:ref_trip}
 \end{align}
 
-for $(c,e,l,b)\in I$ where $\mathbbm{1}_{\overline{M}(t)}$ is the unit vector of the coordinate $\overline{M}(t)$. Between two trips, we have the cost and the fuel consumption for the deadhead trip and for ${(s,t)\in A\cap\mathcal{T}^2}$
+for $(c,e,l,b)\in I$ where $\mathbbm{1}_{\overline{M}(t)}$ is the unit vector of the coordinate $\overline{M}(t)$. Between two trips, we have the cost and the fuel consumption for the deadhead trip. Therefore we have for ${(s,t)\in A\cap\mathcal{T}^2}$ and ${(c,e,l,b)\in I}$
 \begin{align*}
 	\widetilde{\REF}_{s^+,t^-}(c,e,l,b) := \left(\left(
 	\begin{array}{c}
@@ -510,7 +509,7 @@ for $(c,e,l,b)\in I$ where $\mathbbm{1}_{\overline{M}(t)}$ is the unit vector of
 	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
 \end{align*}
 
-for $(c,e,l,b)\in I$. Between a vehicle and a trip we additionally have to consider the fixed vehicle cost $\cv$, thus the resource extension function is for ${(s,t)\in A\cap\mathcal{V}\times\mathcal{T}}$ defined by
+Between a vehicle and a trip we additionally have to consider the fixed vehicle cost $\cv$, thus the resource extension function for ${(s,t)\in A\cap\mathcal{V}\times\mathcal{T}}$ is defined by
 \begin{align*}
 	\widetilde{\REF}_{s^+,t^-}(c,e,l,b) := \left(\left(
 	\begin{array}{c}
@@ -532,14 +531,14 @@ for all $s,t\in V\backslash\left\{\ds,\de\right\}$. For arcs starting from a ref
 \begin{align*}
 	\REF_{s,t}(c,e,l,b) := \left(\left(
 	\begin{array}{c}
-		c + \cd_{s,t} + \ct_{s,t} - \gamma_t \\ e - \fd_{s,t} - \fd_{s,t} \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+		c + \cd_{s,t} + \ct_{s,t} - \gamma_t \\ e - \fd_{s,t} - \fd_{s,t} \\ l + 1 \\ a^t(b)
 	\end{array}
 	\right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
-\end{align*}\fxnote{adapt b-vector}
+\end{align*}
 
 since $\fd_{s,t}\geq 0$ and $\ft_t\geq 0$. The resources are independent from each other.
 
-For arcs starting at a trip and leading to a refuel point, \ie $(s,r),(s,t)\in A, s\in\mathcal{T}, r\in\Rst$ we have
+For arcs starting at a trip and leading to a refuel point, \ie ${(s,r),(s,t)\in A}, {s\in\mathcal{T}}, {r\in\Rst}$ we have
 \begin{align*}
 	\REF_{s,r}(c,e,l,b) := \left\{ \begin{array}{cl}
 		\left(\left( \begin{array}{c}
@@ -550,7 +549,7 @@ For arcs starting at a trip and leading to a refuel point, \ie $(s,r),(s,t)\in A
 	\end{array} \right.
 \end{align*}
 
-For both cases, we can extend the evaluation to $s\in\mathcal{V}$ by adding $\cv$ to the reduced cost resource. For arcs indicent with $\ds$ or $\de$ we have ${\REF_{\ds,s}=\widetilde{\REF}_{s^-,s^+}}$ and ${\REF_{s,\de}=\widetilde{\REF}_{s^+,\de}}$.
+For both cases, we can extend the evaluation to $s\in\mathcal{V}$ by adding $\cv$ to the reduced cost resource. For arcs incident with $\ds$ or $\de$ we have ${\REF_{\ds,s}=\widetilde{\REF}_{s^-,s^+}}$ and ${\REF_{s,\de}=\widetilde{\REF}_{s^+,\de}}$.
 
 \paragraph{Task Graph} \parfill
 
@@ -560,7 +559,7 @@ For every arc $(s,t)\in\widehat{A}$ with $s\notin\mathcal{V}, t\in\mathcal{T}$ a
 \begin{align*}
 	\begin{array}{cl}
 		\left(\left( \begin{array}{c}
-			c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r, 1\right) - \fd_{r,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+			c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r, 1\right) - \fd_{r,t} - \ft_t \\ l + 1 \\ a^t(b)
 		\end{array} \right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0} \right) \cap I & \text{if } e\geq\fd_{s,r} \\
 		\\
 		\emptyset & \text{otherwise}
@@ -568,13 +567,14 @@ For every arc $(s,t)\in\widehat{A}$ with $s\notin\mathcal{V}, t\in\mathcal{T}$ a
 \end{align*}
 
 for $(c,e,l,b)\in I$. For $s\in\mathcal{V}$, we again add $\cv$ to the reduced cost resource. The resource extension function is then according to \Cref{def:contraction} given by
+
 \begin{align*}
 	& \widehat{\REF}_{s,t}(c,e,l,b) = \REF_{s,t}(c,e,l,b)\cup\bigcup_{r\in\Rst}\left(\REF_{r,t}\circ\REF_{s,r}\right)(c,e,l,b) \\
 	= & \left[\left(\left(\begin{array}{c}
-		c + \cd_{s,t} + \ct_t - \gamma_t \\ e - \fd_{s,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+		c + \cd_{s,t} + \ct_t - \gamma_t \\ e - \fd_{s,t} - \ft_t \\ l + 1 \\ a^t(b)
 	\end{array} \right) + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right)\cap I\right] \\
 	\cup & \left[\left(\left\{\left(\begin{array}{c}
-		c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r,1\right) - \fd_{r,t} - \ft_t \\ l - 1 \\ b - \mathbbm{1}_{\overline{M}(t)}
+		c + \cd_{s,r} + \cd_{r,t} + \ct_t - \gamma_t \\ \min\left(e-\fd_{s,r}-\ft_r,1\right) - \fd_{r,t} - \ft_t \\ l + 1 \\ a^t(b)
 	\end{array}\right) \mid r\in\Rst, e\geq\fd_{s,r}\right\} + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right)\cap I\right]
 \end{align*}
 
@@ -861,111 +861,111 @@ Using this branching decision requires adding a suitable inequality to the maste
 %#
 %########################################################################################################################################
 
-\section{Variants of the Problem Formulation}
-
-\subsection{Master Problem with Route Choice Restriction}
-
-Remember the formulation from before:
-
-\begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m \\
-	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
-	& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
-	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
-	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
-\end{align*}
-
-The constraints $\eqref{eq:MMILP:customer}$ depend only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
-
-\begin{align*}
-	\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
-\end{align*}
-
-We introduce variable $\hat{u}$ and the respective route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
-
-\begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}} \min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y_t^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
-	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
-	& \hat{u}\in\hat{X}
-\end{align*}
-
-\paragraph{Column Generation} \parfill
-
-For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\mathcal{T}\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{G}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
-
-\begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{IMMP} \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
-	& \lambda^v\in\{0,1\}^{\Iv} && \text{for all } v\in\mathcal{V} \\
-	& \hat{\lambda}\in\{0,1\}^{\Ihat}
-\end{align*}
-
-We regard the LP-relaxation by dropping the integrality constraints:
-
-\begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
-	& \lambda^v\in\mathbb{R}_{\geq 0}^{\Iv} && \text{for all } v\in\mathcal{V} \\
-	& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\Ihat}
-\end{align*}
-
-We reduce the size by considering only subsets $\Jv\subset\Iv$ and $\hat{\mathcal{J}}\subset\Ihat$ and formulate the relaxed restricted master problem:
-
-\begin{align*}
-	\min \quad & \sum_{v\in\mathcal{V}}G^v_{\Jv}\lambda^v + \hat{G}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
-	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\Jv}\lambda^v = \hat{Y}_{m,\hat{\mathcal{J}}}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	& \sum_{i\in\Jv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	& \sum_{i\in\hat{\mathcal{J}}}\hat{\lambda}_i= 1 \\
-	& \lambda^v\in\mathbb{R}_{\geq 0}^{\Jv} && \text{for all } v\in\mathcal{V} \\
-	& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\hat{\mathcal{J}}}
-\end{align*}
-
-For the dual relaxed restricted master problem, we introduce dual variables $\gamma\in\mathbb{R}^{\mathcal{T}}$, $\mu\in\mathbb{R}^{\mathcal{V}}$ and $\alpha\in\mathbb{R}$. The dual problem is:
-
-\begin{align*}
-	\max \quad & \sum_{v\in\mathcal{V}}\mu_v + \alpha \tag{DLRMMP} \label{eq:DLRMMP} \\
-	\text{s.t.} \quad & \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Jv \\
-	& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{G}_i && \text{for all } i\in\hat{\mathcal{J}} \\
-	& \gamma\in\mathbb{R}^{\mathcal{T}} \\
-	& \mu\in\mathbb{R}^{\mathcal{V}} \\
-	& \alpha\in\mathbb{R}
-\end{align*}
-
-\paragraph{Solving of the Relaxed Master Problem} \parfill
-
-Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\Jv\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
-
-We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
-
-\begin{align}
-	& \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma^* + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMMP:vehicle} \\
-	& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{G}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
-\end{align}
-
-In order to find an optimal solution of $\eqref{eq:LMMP}$ we have to find indices $i\in\Iv$ or $j\in\Ihat$ where the previous constraints are violated. This leads to the following subproblems:
-
-\begin{align*}
-	& \text{Find } i\in\Iv\backslash\Jv \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \\
-	& \text{Find } i\in\Ihat\backslash\hat{\mathcal{J}} \text{ s.t.} && \alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{G}_i
-\end{align*}
-
-The vehicle subproblem $\eqref{eq:SPv}$ was already considered before. For the route choice, an additional subproblem arises.
-
-\paragraph{Route Subproblem} \parfill
-
-The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ reads as follows:
-
-\begin{align*}
-	\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\croute_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
-	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)}u_m = 1 && \text{for all } c\in\mathcal{C} \\
-	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
-\end{align*}
-
-This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\croute_m + \sum_{t\in m}\gamma^*_t$. 
-
-Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{val}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.
+%\section{Variants of the Problem Formulation}
+%
+%\subsection{Master Problem with Route Choice Restriction}
+%
+%Remember the formulation from before:
+%
+%\begin{align*}
+	%\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m \\
+	%\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
+	%& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	%& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+%\end{align*}
+%
+%The constraints $\eqref{eq:MMILP:customer}$ depend only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
+%
+%\begin{align*}
+	%\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
+%\end{align*}
+%
+%We introduce variable $\hat{u}$ and the respective route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
+%
+%\begin{align*}
+	%\min \quad & \sum_{v\in\mathcal{V}} \min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
+	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y_t^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
+	%& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	%& \hat{u}\in\hat{X}
+%\end{align*}
+%
+%\paragraph{Column Generation} \parfill
+%
+%For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\mathcal{T}\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{G}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
+%
+%\begin{align*}
+	%\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{IMMP} \\
+	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	%& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	%& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
+	%& \lambda^v\in\{0,1\}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	%& \hat{\lambda}\in\{0,1\}^{\Ihat}
+%\end{align*}
+%
+%We regard the LP-relaxation by dropping the integrality constraints:
+%
+%\begin{align*}
+	%\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
+	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	%& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	%& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
+	%& \lambda^v\in\mathbb{R}_{\geq 0}^{\Iv} && \text{for all } v\in\mathcal{V} \\
+	%& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\Ihat}
+%\end{align*}
+%
+%We reduce the size by considering only subsets $\Jv\subset\Iv$ and $\hat{\mathcal{J}}\subset\Ihat$ and formulate the relaxed restricted master problem:
+%
+%\begin{align*}
+	%\min \quad & \sum_{v\in\mathcal{V}}G^v_{\Jv}\lambda^v + \hat{G}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
+	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\Jv}\lambda^v = \hat{Y}_{m,\hat{\mathcal{J}}}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
+	%& \sum_{i\in\Jv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
+	%& \sum_{i\in\hat{\mathcal{J}}}\hat{\lambda}_i= 1 \\
+	%& \lambda^v\in\mathbb{R}_{\geq 0}^{\Jv} && \text{for all } v\in\mathcal{V} \\
+	%& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\hat{\mathcal{J}}}
+%\end{align*}
+%
+%For the dual relaxed restricted master problem, we introduce dual variables $\gamma\in\mathbb{R}^{\mathcal{T}}$, $\mu\in\mathbb{R}^{\mathcal{V}}$ and $\alpha\in\mathbb{R}$. The dual problem is:
+%
+%\begin{align*}
+	%\max \quad & \sum_{v\in\mathcal{V}}\mu_v + \alpha \tag{DLRMMP} \label{eq:DLRMMP} \\
+	%\text{s.t.} \quad & \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Jv \\
+	%& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{G}_i && \text{for all } i\in\hat{\mathcal{J}} \\
+	%& \gamma\in\mathbb{R}^{\mathcal{T}} \\
+	%& \mu\in\mathbb{R}^{\mathcal{V}} \\
+	%& \alpha\in\mathbb{R}
+%\end{align*}
+%
+%\paragraph{Solving of the Relaxed Master Problem} \parfill
+%
+%Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\Jv\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
+%
+%We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
+%
+%\begin{align}
+	%& \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma^* + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMMP:vehicle} \\
+	%& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{G}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
+%\end{align}
+%
+%In order to find an optimal solution of $\eqref{eq:LMMP}$ we have to find indices $i\in\Iv$ or $j\in\Ihat$ where the previous constraints are violated. This leads to the following subproblems:
+%
+%\begin{align*}
+	%& \text{Find } i\in\Iv\backslash\Jv \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \\
+	%& \text{Find } i\in\Ihat\backslash\hat{\mathcal{J}} \text{ s.t.} && \alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{G}_i
+%\end{align*}
+%
+%The vehicle subproblem $\eqref{eq:SPv}$ was already considered before. For the route choice, an additional subproblem arises.
+%
+%\paragraph{Route Subproblem} \parfill
+%
+%The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ reads as follows:
+%
+%\begin{align*}
+	%\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\croute_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
+	%\text{s.t.} \quad & \sum_{m\in C^{-1}(c)}u_m = 1 && \text{for all } c\in\mathcal{C} \\
+	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
+%\end{align*}
+%
+%This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\croute_m + \sum_{t\in m}\gamma^*_t$. 
+%
+%Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{val}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.

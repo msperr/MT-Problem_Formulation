@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=117
-Cursor=4166
+TopLine=0
+Cursor=466
 
 [Frame1]
 Flags=0
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=1350
-Cursor=63414
+TopLine=1707
+Cursor=92607
 
 [Frame5]
 Flags=0
@@ -107,10 +107,28 @@ Class=LaTeXView
 Document=tex\Optimal_Approach.tex
 
 [Frame5_View0,0]
-TopLine=1269
-Cursor=63871
+TopLine=1275
+Cursor=83081
 
 [Frame6]
+Flags=0
+ShowCmd=1
+MinPos.x=-1
+MinPos.y=-1
+MaxPos.x=-1
+MaxPos.y=-1
+NormalPos.left=4
+NormalPos.top=32
+NormalPos.right=1574
+NormalPos.bottom=627
+Class=LaTeXView
+Document=tex\Instance_Creation.tex
+
+[Frame6_View0,0]
+TopLine=91
+Cursor=7835
+
+[Frame7]
 Flags=0
 ShowCmd=1
 MinPos.x=-1
@@ -124,11 +142,11 @@ NormalPos.bottom=627
 Class=BibTeXView
 Document=Literatur.bib
 
-[Frame6_View0,0]
-TopLine=0
-Cursor=458
+[Frame7_View0,0]
+TopLine=35
+Cursor=4377
 
 [SessionInfo]
-FrameCount=7
+FrameCount=8
 ActiveFrame=0
 

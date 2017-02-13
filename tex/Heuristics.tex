@@ -1020,7 +1020,7 @@ We have to consider these properties for creating the customer set~$B$. Further 
 \begin{enumerate}
 \setcounter{enumi}{4}
 	\item The time interval ${[\max_{c\in B}\zend_c, \min_{c\in B}\zstart_c]}$ is small. \\
-	In the subproblem, all duties stay fixed up to this time interval. A small time interval causes a small number of trips that are variable \wrt the duties. This kepps the size of the subproblem small.
+	In the subproblem, all duties stay fixed up to this time interval. A small time interval causes a small number of trips that are variable \wrt the duties. This keeps the size of the subproblem small.
 	\item The set ${(M\circ C)^{-1}(B)}$ is small. \\
 	This set contains all trips of one of the customers in~$B$. In the subproblem, all other trips are fixed to be fulfilled. Therefore a small number of trips that are variable \wrt the duties or can be neglected keeps the subproblem small.
 \end{enumerate}
@@ -1134,156 +1134,176 @@ These formulations provide the same solution as $S$ with minimal or maximal fuel
 
 \paragraph{Creating an Improved Solution} \parfill
 
-With solving $(\operatorname{HSP}_c)$, we receive a new partial solution denoted as $\hat{S}^c_2$. Let $S$ be the original entire solution. First, we transform $S$ into three partial solutions $\left\{S^c_1,S^c_2,S^c_3\right\}$ according to the splitting $\mathcal{T}=\left\{\mathcal{T}^c_1,\mathcal{T}^c_2,\mathcal{T}^c_3\right\}$ and $\mathcal{V}=\left\{\mathcal{V}^c_1,\mathcal{V}^c_2,\mathcal{V}^c_3\right\}$.\fxnote{This is done according to the procedure in ...} Then, we feasibly connect the partial solutions $\left\{S^c_1,\hat{S}^c_2,S^c_3\right\}$ to a new solution $\hat{S}$ according to the procedure described in \Cref{sec:general_setting}.
+After constructing the subproblem, we describe how we compose the old solution and the result of the subproblem to a new feasible solution. Let $S$ be the current solution, $B\subseteq\mathcal{C}$ be the set of critical customers and $\left\{\mathcal{T}^B_1,\mathcal{T}^B_2,\mathcal{T}^B_3\right\}$ be the respective splitting. We create the partial solutions $S_1$ and $S_3$. Partial solution~$S_1$ consists of the partial duties of~$S$ ending with a trip or vehicle representing a start point ${t\in\Vhat_2}$. Partial solution~$S_3$ consists of the partial duties of~$S$ starting with a trip representing an end point ${t\in\Phat_2}$. 
 
-The original partial solution $S^c_2$ is a feasible solution of $(\operatorname{HSP}_c)$. Therefore, with this method we cannot get a worse entire solution than before.
-
-After completing this step, we can apply this procedure to the customer with the second-highest ratio of $\frac{C_2(S,c)}{C_1(c)}$.
-
-\begin{remark}
-
-The customer extension $\LC$ is not bounded explicitly like $\eqref{eq:LCLS}$. But also here a small customer extension is beneficial due to the size of the $(\operatorname{HSP}_c)$.
-
-\end{remark}
-
-%----------------------------------------------------------------------------------------------------------------------------------------
-
-\subsection{Restricted Approach}
-\label{sec:restricted_approach}
-
-We regard the special case in which each customer has trips in at most two subsequent splittings. This can be ensured if the customer extension is bounded by the splitting length. We try to exploit this special structure. For each customer, we basically distinguish between two cases: There are more trips of this customer in the splitting whose partial instance is solved first (Case 1) or there are more trips in the splitting whose partial instance is solved later (Case 2). In Case 1, the cost estimation for the routes is easy since most of the structure is already contained in the first processed partial instance. In Case 2, there is not much structure in the first processed partial instance, so the cost prediction will be imprecise. In order to prevent an imprecise cost estimation as in Case 2, we inspect the possibility of reversing a previous route choice in the later solved partial instance, if we find a better alternative there. In this section, we inspect the potential of cost saving for a belated trip deletion and develop a more flexible formulation in order to receive a better solution.
+Let $\widehat{S}_2$ be a solution of $(\operatorname{HSP}_{B_j})$. Each of its partial duties certainly starts with a start point ${t\in\Vhat_2}$. It ends with a start point, a trip or an end point. For each partial duty ${d\in\widehat{S}_2}$, delete its start point and prepend the partial duty ${d'\in S_1}$ that ends with the trip representing the start point to it. If~$d$ ends with an end point, delete the end point and append the partial duty ${d'\in S_3}$ that starts with the trip representing the end point. All the so created duties are part of the new solution $\widehat{S}$.
 
 \begin{lemma}
+\label{lem:feasibility_hsp}
 
-For $n\geq 3$, consider the problem with customer set $\mathcal{C}$ and split points $c_i$ for ${i\in[n-1]}$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. Let
-\begin{align}
-	L_{\operatorname{C}}\leq L_{\operatorname{S}} \tag{\ref{eq:LCLS}}
-\end{align}
-
-For every customer $c\in\mathcal{C}$, there is $i\in[n-1]$ such that
-\begin{align}
-	t\in\left(\Ti\cupdot\mathcal{T}_{i+1}\right) && \text{for all } t\in (M\circ C)^{-1}(c)
-\end{align}
-
-this means, each customer is represented in at most two subsequent splittings.
+Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ and $B\subseteq\mathcal{C}$. Let $\widehat{S}$ be a solution that is computed as described previously. Then $\widehat{S}$ is also feasible and
+\begin{align*}
+	\operatorname{cost}\left(\widehat{S}\right) \leq \operatorname{cost}\left(S\right)
+\end{align*}
 
 \end{lemma}
 
 \begin{proof}
 
-For simplicity of notion, we state $c_0:=-\infty$ and $c_n:=+\infty$. Consider customer $c\in\mathcal{C}$ and $i\in[n]$ such that ${c_{i-1} \leq \zstart_c < c_i}$. For $i=n$ all trips of $c$ are in splitting $n$.	 For $i<n$ we have
-\begin{align*}
-	\zstart_c \leq \zstart_t \leq \zstart_c + L_{\operatorname{C}} < c_i + L_{\operatorname{C}} \leq c_i + L_{\operatorname{S}} \leq c_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
-\end{align*}
-
-Thus we have
-\begin{align*}
-	t\in\left(\mathcal{T}_i\cupdot\mathcal{T}_{i+1}\right) && \text{for all } t\in (M\circ C)^{-1}(c)
-\end{align*}
+Proof\fxnote{Proof}
 
 \end{proof}
 
-In the following considerations, we neglect the customer whose trip are in one splitting. These cover constraints are already ensured in the partial instance.
+\paragraph{Improvements} \parfill
 
-Consider partial instance $i\in[n]$, the customer set
-\begin{align*}
-	\CR_i := \left\{c\in\mathcal{C}\mid\gamma(c)\in\left\{i-1,i+1\right\}\land\left((M\circ C)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
-\end{align*}
-
-and the route set
-\begin{align*}
-	\mathcal{M}^{\operatorname{R}}_i := \left\{m\in\mathcal{M}\mid C(m)\in\CR_i\land m\subset\Ti\right\}
-\end{align*}
-
-$\CR_i$ are all customers represented in $\Ti$ but initially treated in another partial instance, $\MR_i$ are all routes of these customers where all trips are in $\Ti$.
-
-We regard the possibility to revise a previous route choice if we find a better alternative in partial instance~$i$. For this, we think about the cost saving for subsequent trip deletion. As in \Cref{sec:iterative_approach}, the cost function $C_1(m)$ is used for cost estimation.
-
-\paragraph{Costs for Trip Replacement} \parfill
-
-We want to regard the possibility of deleting an already chosen route in partial instance $I_i$. We therefore consider customer $c\in\CR_i$, \ie the customer has trips in an adjacent splitting and this partial instance is solved before. For this, we introduce the following notation.
-
-\begin{definition}
-
-Let $c\in\CR_i$ and let ${S_{\gamma(c)}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be the partial solution of the previously solved partial instance, where the route of $c$ has been chosen. Let $\bar{m}(c)\in C^{-1}(c)$ be the unique route with $\bar{u}_m = 1$
-
-Let ${s_1(t)\in\left(\left\{\ds_{\gamma(c)}\right\}\cupdot\hat{\mathcal{V}}_{\gamma(c)}\cupdot\mathcal{T}_{\gamma(c)}\right)}$, ${s_2(t)\in\left(\mathcal{T}_{\gamma(c)}\cupdot\hat{\mathcal{P}}_{\gamma(c)}\cupdot\left\{\de_{\gamma(c)}\right\}\right)}$ be the unique trips with $\bar{x}_{s_1,t}=\bar{x}_{t,s_2}=1$ for all $t\in\left(\bar{m}(c)\backslash\Ti\right)$.
-
-Here, ${\ds_{\gamma(c)},\de_{\gamma(c)}\in\overline{V}_{\gamma(c)}}$ are the respective source and sink node of the partial task graph $\overline{G}_{\gamma(c)}$.
-
-\end{definition}
-
-The route $\bar{m}(c)$ denotes the route that is chosen for customer $c\in\CR_i$ by the partial solution, $s_1(t)$ and $s_2(t)$ are the trips that are directly before and after this trip in its respective duty. 
-
-By assuming ${\cd_{\ds,t}=\cd_{t,\de}=:0}$ for all ${t\in\mathcal{T}_{\gamma(c)}}$, the cost saving for deleting a trip $t$ in partial instance $I_{\gamma(c)}$ is
-\begin{align*}
-	\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}
-\end{align*}
-
-\paragraph{Adaption of the Model} \parfill
-
-In the following, we adapt the formulation $(\operatorname{TMILP}_i)$ in order to allow a belated route replacement. The restriction $\eqref{eq:LCLS}$ is required for this formulation. It is also necessary that at least one adjacent partial instance is already solved. In this procedure, the partial instance is solved before, with the additional ability to replace already chosen routes under strong restrictions: If for customer $c\in\mathcal{C}$ a route has been chosen in a previously solved partial instance $I_{\gamma(c)}$ and there are routes whose trips are all in the partial trip set $\mathcal{T}_i$, then either one of these routes is chosen or the previous route decision is confirmed. The choice of another route is not possible since this would require an insertion of trips into an already existing partial solution. We call this formulation $\eqref{eq:RTMILPi}$. The underlying partial task graph $\overline{G}_i$ is not modified.
-
-We introduce new decision variables $u^c$ for $c\in\CR_i$. They indicate whether the route choice for customer $c$ is confirmed or not. If the route choice is not confirmed, adding of routes of the same customer is necessary. This is only possible, if all trips of this route are in $\mathcal{T}_i$. We therefore introduce decision variables $u_m$ for all $m\in\MR_i$.
-
-For every $c\in\CR_i$, either the previous choice must be confirmed or a new route is chosen. This is ensured by
-\begin{align}
-	u^c + \sum_{\substack{m\in\MR_i \\ C(m)=c}} u_m = 1 && \text{for all } c\in\CR_i \label{eq:RTMILP:customer_old}
-\end{align}
-
-We have $\overline{\mathcal{C}}_i = \CR_i$ since $\eqref{eq:LCLS}$. The constraint $\eqref{eq:TMILP:route_fix}$ ensures the route decisions of the previous partial instances. It is replaced by
-\begin{align}
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = u^c && \text{for all } c\in\CR_i, t\in\bar{m}(c)\cap\Ti \label{eq:RTMILP:route_confirmed} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } t\in M^{-1}\left(\MR_i\right) \label{eq:RTMILP:route_old} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 0 && \text{for all } c\in\CR_i, t\in M^{-1}\left(C^{-1}(c)\backslash\left(\MR_i\cup\left\{\bar{m}(c)\right\}\right)\right)\cap\Ti \label{eq:RTMILP:route_fix}
-\end{align}
-
-The constraint $\eqref{eq:RTMILP:route_confirmed}$ ensures the route satisfaction for the previously decided route, $\eqref{eq:RTMILP:route_old}$ for all route completely in $\Ti$ and $\eqref{eq:RTMILP:route_fix}$ for all other trips in $\Ti$. Note that $\mathcal{C}_i\cap\CR_i = \emptyset$. Hence, $\eqref{eq:TMILP:customer}$ and $\eqref{eq:TMILP:route}$ are not influenced by them. We contract $\eqref{eq:TMILP:route}$ and $\eqref{eq:RTMILP:route_old}$ to
-\begin{align}
-	\sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in\MR_i\cupdot C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:RTMILP:route}
-\end{align}
-
-Finally, we replace $\eqref{eq:TMILP:um}$ by
-\begin{align}
-	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right)\cupdot\MR_i \label{eq:RTMILP:um} \\
-	& u^c \in\{0,1\} && \text{for all } c\in\CR_i \label{eq:RTMILP:uc}
-\end{align}
-
-\paragraph{Cost Function} \parfill
-
-We have to consider additional contributions to the cost function. If the route choice is not confirmed, the trips of $\bar{m}(c)$ are deleted and the route cost and the saved cost are subtracted from the cost function. We define these cost as
-\begin{align*}
-	\hat{c}_c := \croute_{\bar{m}(c)} + \sum_{t\in\left(\bar{m}(c)\backslash\Ti\right)} \left(\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}\right) && \text{for } c\in\CR_i
-\end{align*}
-
-Note, that the costs $\ct$ and $\cd$ belong to the partial instance $I_{\gamma(i)}$ and are not part of the considered partial task graph $\overline{G}_i$. The term $\hat{c}_c$ describes the cost saving for not confirming the route choice of $c$ and is completely given in advance.
-
-In order to determine the route costs for all $c\in\CR_i$, we add the following term to the objective function.
-\begin{align*}
-	\sum_{m\in\MR_i} u_m \croute_m - \sum_{c\in\CR_i} \left(1-u^c\right)\hat{c}_c
-\end{align*}
-
-In summary, the formulation $\eqref{eq:RTMILPi}$ is given by $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:RTMILP:customer_old}$, $\eqref{eq:RTMILP:route_confirmed}$, $\eqref{eq:RTMILP:route_fix}$, $\eqref{eq:RTMILP:route}$, $\eqref{eq:RTMILP:um}$ and $\eqref{eq:RTMILP:uc}$ and the objective function
-\begin{align}
-	&\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m + \sum_{m\in\MR_i} u_m \croute_m + \sum_{c\in\CR_i} \left(u^c - 1\right)\hat{c}_c \nonumber \\
-	+ & \sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right] \tag{$\operatorname{RTMILP}_i$} \label{eq:RTMILPi}
-\end{align}
+There are several ways to further improve the heuristics. We have not worked them out in detail and have not implemented them. We further cannot estimate how the additional computation time is in proportion to the additional cost saving. But we provide the main ideas in order to improve the heuristical solutions.
+\begin{itemize}
+	\item
+We can put additional effort in the choice of the time points. We aim to have only few customers that are represented in more than one partial trip set. Preferably, the customers are represented in only few partial instances in summary. Nevertheless, the time points should be distributed evenly over time such that the partial instances have more or less the same size. We can create a supplementary subproblem for choosing the time points in a desirable way.
+	\item
+In partial instance~$I_i$, it is not beneficial to choose a route with ${m\cap\Ti=\emptyset}$. If such a route is the most suitable one, the route choice can be left open. In the next partial instance, the route is chosen among all routes with ${m\cap\Ti=\emptyset}$. In this case it is not necessary to fix the route choice in~$I_i$ because there are no trips to cover in this partial instance. In the next partial instance, there is more additional information available in order to choose a better route.
+\end{itemize}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{Improvements}
-
-This is listing of comments regarding this section. It includes some small changes that can be made in the formulations in order to improve the performance, some new considerations and some small mistakes, where the developed methods work inaccurately but there is not an easy handling.
-
-\begin{enumerate}
-	\item{$\eqref{eq:LCLS}$ does not hold in general}:
-It is possible that each customer is represented in at most two splittings although $\eqref{eq:LCLS}$ does not hold. If this is not the case, one can possibly deviate some split points by a small value \st the condition holds. If only a small number of customers exceeds the splitting length, their exclusion from the formulations $(\operatorname{HSP}_c)$ or $\eqref{eq:RTMILPi}$ still promises good results.
-	\item{Create Preprocessing}:
-One can create the split points via an own problem. The goal of this preprocessing is minimizing the customers represented in several splittings, constraints are a minimal and a maximal splitting length. If there are only few customers in more than one splitting, the solution behavior is improved.
-	\item{Strategy for route choice in \Cref{sec:iterative_approach}}:
-In $I_i$, it is not beneficial to choose a route with $m\cap\Ti=\emptyset$. If such a route is the most suitable one, one can leave the choice open and choose in the next partial instance among all routes with $m\cap\Ti=\emptyset$. In $I_i$ is is not necessary to choose the route because there are no trips to cover, thus it is not beneficial fix the route choice already there.
-	\item{Strategy for route choice in \Cref{sec:restricted_approach}}:
-In $I_{\gamma(c)}$, it is beneficial to choose a route with $m\cap\mathcal{T}_{\gamma(c)}\neq\emptyset$, even is another choice, \ie $m'\in\MR_i$ is more beneficial there. If $m$ is a bad choice at the end, it will be reversed in $I_i$. If $m$ is a good choice against expectation, it will be confirmed in $I_i$.
-	\item{Deleting subsequent trips}:
-If in $\eqref{eq:RTMILPi}$ two subsequent trips of the same duty are deleted, the value for cost saving is wrong. For four subsequent trips $t_1, t_2, t_3, t_4$ where $t_2, t_3$ are deleted, the difference between the real cost saving and the computed cost saving is ${\cd_{t_1,t_4}+\cd_{t_2,t_3}-\cd_{t_1,t_3}-\cd_{t_2,t_4}}$. If there a subsequent trips of the same route in the same duty, the term can be adapted. An exact solution would be the introduction of a decision variable for each combination of route deletions.
-\end{enumerate}
+%\subsection{Restricted Approach}
+%\label{sec:restricted_approach}
+%
+%We regard the special case in which each customer has trips in at most two subsequent splittings. This can be ensured if the customer extension is bounded by the splitting length. We try to exploit this special structure. For each customer, we basically distinguish two cases: There are more trips of this customer in the later partial trip set (Case 1) or in the earlier partial trip set (Case 2). Remember that the later partial instance is solved earlier. In Case 1, the cost estimation for the routes is easy since most of the structure is already contained in this partial instance. In Case 2, there is not much structure in the first processed partial instance, thus the cost prediction will be imprecise. In order to prevent an imprecise cost estimation as in Case 2, we inspect the possibility of reversing a previous route choice in the later solved partial instance, if we find a better alternative there. In this section we inspect the potential of cost saving for a belated trip deletion and develop a more flexible formulation in order to receive a better solution.
+%
+%\begin{lemma}
+%
+%Let $\mathcal{C}$ be a customer set and let $c_i$ be time points for ${i\in[n-1]}$ with ${c_i<c_{i+1}}$ for all ${i\in[n-2]}$. Let
+%\begin{align}
+	%L_{\operatorname{C}}\leq L_{\operatorname{S}} \tag{\ref{eq:LCLS}}
+%\end{align}
+%
+%For each customer $c\in\mathcal{C}$, there is some $i\in[n-1]$ such that
+%\begin{align}
+	%t\in\Ti\cupdot\mathcal{T}_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
+%\end{align}
+%
+%this means, each customer is represented in at most two subsequent splittings.
+%
+%\end{lemma}
+%
+%\begin{proof}
+%
+%For simplicity of notion, we state $c_0:=-\infty$ and $c_n:=+\infty$. Consider customer $c\in\mathcal{C}$ and $i\in[n]$ such that ${c_{i-1} \leq \zstart_c < c_i}$. For $i=n$ we have ${t\in\mathcal{T}_n}$ for all ${t\in\left(M\circ C\right)^{-1}(c)}$. For $i<n$ we have
+%\begin{align*}
+	%\zstart_c \leq \zstart_t \leq \zstart_c + L_{\operatorname{C}} < c_i + L_{\operatorname{C}} \leq c_i + L_{\operatorname{S}} \leq c_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
+%\end{align*}
+%
+%Thus we have
+%\begin{align*}
+	%t\in\mathcal{T}_i\cupdot\mathcal{T}_{i+1} && \text{for all } t\in (M\circ C)^{-1}(c)
+%\end{align*}
+%
+%\end{proof}
+%
+%In the following considerations, we neglect all customers whose trips are contained in only one splitting. Their cover constraints are already ensured in the partial instance.
+%
+%Consider partial instance $i\in[n-1]$, the customer set
+%\begin{align*}
+	%\CR_i := \left\{c\in\mathcal{C}\mid\gamma(c)=i+1\land\left((M\circ C)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
+%\end{align*}
+%
+%and the route set
+%\begin{align*}
+	%\mathcal{M}^{\operatorname{R}}_i := \left\{m\in\mathcal{M}\mid C(m)\in\CR_i\land m\subset\Ti\right\}
+%\end{align*}
+%
+%$\CR_i$ are all customers represented in $\Ti$ but initially treated in another partial instance, $\MR_i$ are all routes of these customers where all its trips are in $\Ti$.
+%
+%For each customers ${c\in\CR_i}$, the respective route choice is already done in partial instance~$I_{i+1}$. We regard the possibility to revise the previous route choice if we find a better alternative in partial instance~$I_i$. For this, we examine the cost saving for a belated trip deletion. As in \Cref{sec:iterative_approach}, the cost function $C_1(m)$ is used for cost estimation.
+%
+%\paragraph{Costs for Trip Replacement} \parfill
+%
+%We regard the possibility of deleting an already chosen route in partial instance~$I_i$. For this, we introduce the following notation.
+%
+%\begin{definition}
+%
+%Let $c\in\CR_i$ and let ${S_{i+1}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be the partial solution of the previously solved partial instance, where the route of $c$ has been chosen. Let $\bar{m}(c)\in C^{-1}(c)$ be the unique route with $\bar{u}_m = 1$
+%
+%Let ${s_1(t)\in\left\{\ds_{i+1}\right\}\cupdot\mathcal{T}_{i+1}}$ and ${s_2(t)\in\mathcal{T}_{i+1}\cupdot\hat{\mathcal{P}}_{i+1}\cupdot\left\{\de_{i+1}\right\}}$ be the unique trips with $\bar{x}_{s_1,t}=\bar{x}_{t,s_2}=1$ for all $t\in\left(\bar{m}(c)\backslash\Ti\right)$ and let ${r(t)\in\mathcal{R}_{s_1(t),t}}$ if ${\bar{z}_{s_1(t),r,t}=1}$.
+%
+%Here, ${\ds_{i+1},\de_{i+1}\in\overline{V}_{i+1}}$ are the respective source and sink node of~$\overline{G}_{i+1}$.
+%
+%\end{definition}
+%
+%The route $\bar{m}(c)$ denotes the route that is chosen for customer $c\in\CR_i$ by the partial solution, $s_1(t)$ and $s_2(t)$ are the trips that are directly before and after this trip in its respective duty. 
+%
+%We assume ${\cd_{\ds,t}=\cd_{t,\de}=:0}$ for all ${t\in\mathcal{T}_{i+1}}$. If we delete 
+%
+%By assuming ${\cd_{\ds,t}=\cd_{t,\de}=:0}$ for all ${t\in\mathcal{T}_{\gamma(c)}}$, the cost saving for deleting a trip $t$ in partial instance $I_{\gamma(c)}$ is
+%\begin{align*}
+	%\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}
+%\end{align*}
+%
+%\paragraph{Adaption of the Model} \parfill
+%
+%In the following, we adapt the formulation $(\operatorname{TMILP}_i)$ in order to allow a belated route replacement. The restriction $\eqref{eq:LCLS}$ is required for this formulation. It is also necessary that at least one adjacent partial instance is already solved. In this procedure, the partial instance is solved before, with the additional ability to replace already chosen routes under strong restrictions: If for customer $c\in\mathcal{C}$ a route has been chosen in a previously solved partial instance $I_{\gamma(c)}$ and there are routes whose trips are all in the partial trip set $\mathcal{T}_i$, then either one of these routes is chosen or the previous route decision is confirmed. The choice of another route is not possible since this would require an insertion of trips into an already existing partial solution. We call this formulation $\eqref{eq:RTMILPi}$. The underlying partial task graph $\overline{G}_i$ is not modified.
+%
+%We introduce new decision variables $u^c$ for $c\in\CR_i$. They indicate whether the route choice for customer $c$ is confirmed or not. If the route choice is not confirmed, adding of routes of the same customer is necessary. This is only possible, if all trips of this route are in $\mathcal{T}_i$. We therefore introduce decision variables $u_m$ for all $m\in\MR_i$.
+%
+%For every $c\in\CR_i$, either the previous choice must be confirmed or a new route is chosen. This is ensured by
+%\begin{align}
+	%u^c + \sum_{\substack{m\in\MR_i \\ C(m)=c}} u_m = 1 && \text{for all } c\in\CR_i \label{eq:RTMILP:customer_old}
+%\end{align}
+%
+%We have $\overline{\mathcal{C}}_i = \CR_i$ since $\eqref{eq:LCLS}$. The constraint $\eqref{eq:TMILP:route_fix}$ ensures the route decisions of the previous partial instances. It is replaced by
+%\begin{align}
+	%& \sum_{s\in\Ninoi(t)} x_{s,t} = u^c && \text{for all } c\in\CR_i, t\in\bar{m}(c)\cap\Ti \label{eq:RTMILP:route_confirmed} \\
+	%& \sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } t\in M^{-1}\left(\MR_i\right) \label{eq:RTMILP:route_old} \\
+	%& \sum_{s\in\Ninoi(t)} x_{s,t} = 0 && \text{for all } c\in\CR_i, t\in M^{-1}\left(C^{-1}(c)\backslash\left(\MR_i\cup\left\{\bar{m}(c)\right\}\right)\right)\cap\Ti \label{eq:RTMILP:route_fix}
+%\end{align}
+%
+%The constraint $\eqref{eq:RTMILP:route_confirmed}$ ensures the route satisfaction for the previously decided route, $\eqref{eq:RTMILP:route_old}$ for all route completely in $\Ti$ and $\eqref{eq:RTMILP:route_fix}$ for all other trips in $\Ti$. Note that $\mathcal{C}_i\cap\CR_i = \emptyset$. Hence, $\eqref{eq:TMILP:customer}$ and $\eqref{eq:TMILP:route}$ are not influenced by them. We contract $\eqref{eq:TMILP:route}$ and $\eqref{eq:RTMILP:route_old}$ to
+%\begin{align}
+	%\sum_{s\in\Ninoi(t)} x_{s,t} = u_m && \text{for all } m\in\MR_i\cupdot C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:RTMILP:route}
+%\end{align}
+%
+%Finally, we replace $\eqref{eq:TMILP:um}$ by
+%\begin{align}
+	%& u_m\in\{0,1\} && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right)\cupdot\MR_i \label{eq:RTMILP:um} \\
+	%& u^c \in\{0,1\} && \text{for all } c\in\CR_i \label{eq:RTMILP:uc}
+%\end{align}
+%
+%\paragraph{Cost Function} \parfill
+%
+%We have to consider additional contributions to the cost function. If the route choice is not confirmed, the trips of $\bar{m}(c)$ are deleted and the route cost and the saved cost are subtracted from the cost function. We define these cost as
+%\begin{align*}
+	%\hat{c}_c := \croute_{\bar{m}(c)} + \sum_{t\in\left(\bar{m}(c)\backslash\Ti\right)} \left(\cd_{s_1(t),t}+\ct_t+\cd_{t,s_2(t)}-\cd_{s_1(t),s_2(t)}\right) && \text{for } c\in\CR_i
+%\end{align*}
+%
+%Note, that the costs $\ct$ and $\cd$ belong to the partial instance $I_{\gamma(i)}$ and are not part of the considered partial task graph $\overline{G}_i$. The term $\hat{c}_c$ describes the cost saving for not confirming the route choice of $c$ and is completely given in advance.
+%
+%In order to determine the route costs for all $c\in\CR_i$, we add the following term to the objective function.
+%\begin{align*}
+	%\sum_{m\in\MR_i} u_m \croute_m - \sum_{c\in\CR_i} \left(1-u^c\right)\hat{c}_c
+%\end{align*}
+%
+%In summary, the formulation $\eqref{eq:RTMILPi}$ is given by $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:RTMILP:customer_old}$, $\eqref{eq:RTMILP:route_confirmed}$, $\eqref{eq:RTMILP:route_fix}$, $\eqref{eq:RTMILP:route}$, $\eqref{eq:RTMILP:um}$ and $\eqref{eq:RTMILP:uc}$ and the objective function
+%\begin{align}
+	%&\left(\sum_{s\in\Ti\cup\Phat_i} x_{\ds,s} - \sum_{s\in\Phat_i} x_{s,\de}\right)\cv + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m + \sum_{m\in\MR_i} u_m \croute_m + \sum_{c\in\CR_i} \left(u^c - 1\right)\hat{c}_c \nonumber \\
+	%+ & \sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right] \tag{$\operatorname{RTMILP}_i$} \label{eq:RTMILPi}
+%\end{align}
+%
+%%----------------------------------------------------------------------------------------------------------------------------------------
+%
+%\subsection{Improvements}
+%
+%This is listing of comments regarding this section. It includes some small changes that can be made in the formulations in order to improve the performance, some new considerations and some small mistakes, where the developed methods work inaccurately but there is not an easy handling.
+%
+%\begin{enumerate}
+	%\item{$\eqref{eq:LCLS}$ does not hold in general}:
+%It is possible that each customer is represented in at most two splittings although $\eqref{eq:LCLS}$ does not hold. If this is not the case, one can possibly deviate some split points by a small value \st the condition holds. If only a small number of customers exceeds the splitting length, their exclusion from the formulations $(\operatorname{HSP}_c)$ or $\eqref{eq:RTMILPi}$ still promises good results.
+	%\item{Create Preprocessing}:
+%One can create the split points via an own problem. The goal of this preprocessing is minimizing the customers represented in several splittings, constraints are a minimal and a maximal splitting length. If there are only few customers in more than one splitting, the solution behavior is improved.
+	%\item{Strategy for route choice in \Cref{sec:iterative_approach}}:
+%In $I_i$, it is not beneficial to choose a route with $m\cap\Ti=\emptyset$. If such a route is the most suitable one, one can leave the choice open and choose in the next partial instance among all routes with $m\cap\Ti=\emptyset$. In $I_i$ is is not necessary to choose the route because there are no trips to cover, thus it is not beneficial fix the route choice already there.
+	%\item{Strategy for route choice in \Cref{sec:restricted_approach}}:
+%In $I_{\gamma(c)}$, it is beneficial to choose a route with $m\cap\mathcal{T}_{\gamma(c)}\neq\emptyset$, even is another choice, \ie $m'\in\MR_i$ is more beneficial there. If $m$ is a bad choice at the end, it will be reversed in $I_i$. If $m$ is a good choice against expectation, it will be confirmed in $I_i$.
+	%\item{Deleting subsequent trips}:
+%If in $\eqref{eq:RTMILPi}$ two subsequent trips of the same duty are deleted, the value for cost saving is wrong. For four subsequent trips $t_1, t_2, t_3, t_4$ where $t_2, t_3$ are deleted, the difference between the real cost saving and the computed cost saving is ${\cd_{t_1,t_4}+\cd_{t_2,t_3}-\cd_{t_1,t_3}-\cd_{t_2,t_4}}$. If there a subsequent trips of the same route in the same duty, the term can be adapted. An exact solution would be the introduction of a decision variable for each combination of route deletions.
+%\end{enumerate}
