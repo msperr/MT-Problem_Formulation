@@ -275,30 +275,31 @@ As mentioned before, it requires some additional work to include the cover const
 
 \paragraph{Cost Function} \parfill
 
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=1cm, auto,]
+		\node[circ] (de) {$d^{\operatorname{e}}$};
+		\node[dummy, above=of de] (dummy1) {};
+		\node[dummy, below=of de] (dummy2) {};
+		\node[rect, left= 1.5cm of dummy2] (endpoints) {$\widehat{\mathcal{P}}_i$};
+		\node[rect, left= 3cm of dummy1] (trips) {$\mathcal{T}_i$};
+		\node[dummy, left= 1.5cm of trips] (dummy3) {};
+		\node[circ, below=of dummy3] (ds) {$d^{\operatorname{s}}$};
+		\draw[arrow] (ds) to node[auto] {$0$} (trips.west);
+		\draw[arrow] (ds) to node[auto] {$0$} (endpoints.west);
+		\draw[arrow] (trips) to node[auto] {$0$} (endpoints);
+		\draw[arrow] (trips.east) to node[auto] {$c^{\operatorname{v}}$} (de);
+		\draw[arrow] (endpoints.east) to node[auto] {$0$} (de);
+	\end{tikzpicture}
+	\caption{Vehicle cost for $(\operatorname{SMILP}_i)$}
+	\label{fig:graph_instance}
+\end{figure}
+
 The cost function is also modified. The deadhead cost between trips ${s,t\in\Ti}$ are the same as in the $\eqref{eq:SMILP}$. Between trips ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$, there is an end point ${t'\in\Phat_i}$ with $t$ representing $t'$ if $t$ starts another partial duty in $S_j$. The deadhead cost $\cd_{s,t}$ is treated in $I_i$ as $\cd_{s,t'}$ and the trip cost $\ct_t$ is treated in $I_j$. Therefore the trip cost for the trip starting a duty arises additionally.
 
-The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost.
+The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost. \Cref{fig:graph_instance} demonstrates the vehicle cost.
 
-Besides the cover constraints also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
-
-\begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t}$} \nonumber \\
-	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
-	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
-	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
-	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
-	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
-	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
-	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
-	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
-	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
-	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
-	& \sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \tag{\ref{eq:CMILP:strengthening}} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
-	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
-	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
-\end{align}
+Besides the cover constraints, also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
@@ -326,6 +327,27 @@ With introducing the vehicles we have to ensure that each vehicle is considered 
 
 to $(\operatorname{SMILP}_1)$.
 
+\begin{align}
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t}$} \nonumber \\
+	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
+	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
+	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
+	& \sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \tag{\ref{eq:CMILP:strengthening}} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
+	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
+\end{align}
+
+\newpage
+
 The objective function is also modified. Each vehicle with a non-empty duty causes vehicle cost~$\cv$. Further, for all duties that end with an end point, the vehicle cost is already paid in a later partial instance and is therefore subtracted for these duties. Thus, the term of the objective function
 \begin{align*}
 	\sum_{s\in\Ti} x_{s,\de}\cv
@@ -333,9 +355,34 @@ The objective function is also modified. Each vehicle with a non-empty duty caus
 
 is replaced in $(\operatorname{SMILP}_1)$ by
 \begin{align*}
-	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv
+	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv.
 \end{align*}
 
+\Cref{fig:graph_instance_1} shows the vehicle cost for partial instance~$I_1$.
+
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=1cm, auto,]
+		\node[circ] (de) {$d^{\operatorname{e}}$};
+		\node[dummy, above=of de] (dummy1) {};
+		\node[dummy, below=of de] (dummy2) {};
+		\node[rect, left= 1.5cm of dummy2] (endpoints) {$\widehat{\mathcal{P}}_1$};
+		\node[rect, left= 3cm of dummy1] (trips) {$\mathcal{T}_1$};
+		\node[dummy, left= 1.5cm of trips] (dummy3) {};
+		\node[rect, below=of dummy3] (vehicles) {$\mathcal{V}$};
+		\node[circ, left=of vehicles] (ds) {$d^{\operatorname{s}}$};
+		\draw[arrow] (ds) to node[auto] {$0$} (vehicles);
+		\draw[arrow, bend left=90] (vehicles.north) to node[auto] {$0$} (de.north);
+		\draw[arrow] (vehicles) to node[auto] {$c^{\operatorname{v}}$} (trips.west);
+		\draw[arrow] (vehicles) to node[auto] {$c^{\operatorname{v}}$} (endpoints.west);
+		\draw[arrow] (trips) to node[auto] {$0$} (endpoints);
+		\draw[arrow] (trips.east) to node[auto] {$0$} (de);
+		\draw[arrow] (endpoints.east) to node[auto] {$-c^{\operatorname{v}}$} (de);
+	\end{tikzpicture}
+	\caption{Vehicle cost for $(\operatorname{SMILP}_1)$}
+	\label{fig:graph_instance_1}
+\end{figure}
+	
 \begin{theorem}[Feasibility of the connection]
 \label{thm:equivalence_heuristic_SMILP}
 
@@ -365,6 +412,8 @@ Thus, the solution $S'$ is feasible in $\eqref{eq:SMILP}$ except for $\eqref{eq:
 \label{sec:customer_dependent_splitting}
 
 In this section, we introduce the customer-dependent splitting. In contrast to the splitting performed by \cite{Knoll}, the trips are not split according to their start times but according to their customers' start times. Therefore all trips of a route and all routes of a customer are in the same partial trip set. The advantage is that the cover constraints can be applied easily in the respective subproblems. The problem is that this formulation is not equivalent to the original problem, \ie duties that are feasible in $\eqref{eq:MMILP}$ can be cut off in this formulation. We show restrictions, in which the application of this splitting is sensible, though. 
+
+\subsection{Basic Idea}
 
 \paragraph{Splitting} \parfill
 
@@ -455,9 +504,11 @@ If we now set a time point ${c_1 := \text{8:15}}$, then the partial trip sets ar
 
 \end{example}
 
-\paragraph{Quality of the Heuristical Solution} \parfill
+\subsection{Quality of the Heuristic}
 
 Although the optimal solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. Based on an arbitrary feasible solution we inspect where this solution becomes infeasible in the heuristic and if we can construct a new solution which is feasible there. Depending on the initial solution, we aim to receive upper bounds for the total cost of the new solution. 
+
+\paragraph{Quality of Feasible Solutions} \parfill
 
 The only reason that makes a duty~$d$ infeasible in the customer-dependent heuristic is when an earlier trip $s$ is located in a later partial trip set than $t$ and therefore the connection between $s$ and $t$ is deleted. Under certain conditions it is possible to create new duties $d_1$ and $d_2$ covering all trips of~$d$ where $d_1$ and $d_2$ are feasible in the heuristic. To realize these duties, we also need an additional vehicle that covers duty~$d_2$. Having these additional vehicles, we construct a new solution whose total cost is bounded by twice the original cost.
 
@@ -759,6 +810,7 @@ It is important to keep in mind that \Cref{thm:doubleduties} does not provide an
 Finally, we show that the developed heuristic is not a constant-factor approximation. We provide an example where the ratio between the objective values of the heuristic solution and the optimal solution is arbitrarily large.
 
 \begin{example}
+\label{ex:approximation_factor}
 
 Let $M\leq 0$ arbitrary. Let ${\mathcal{V} = \left\{v\right\}}$ and ${\mathcal{T} = \left\{t_1,t_2,t_3\right\}}$ with the properties of \Cref{tab:approximation_example}. 
 
@@ -1064,8 +1116,6 @@ It is not possible to meet the requirements for~$B$ and simultaneously cover all
 	\item{$n_{\max}$:} The maximal number of iterations
 \end{itemize}
 
-No guarantee. $B_1=\mathcal{C}$ guarantees optimality but too big. $B=\mathcal{C}$ does not ensure optimality. There can be route choices that are bad in $S^*$ but optimal in current $S$. Not necessarily all properties apply. $C_2$ is only estimated. Subproblem cannot fix all other bad heuristical decisions.
-
 \paragraph{Subproblem} \parfill
 
 Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the $\eqref{eq:MMILP}$ and $B\subseteq\mathcal{C}$ a set of candidates for a bad route choice. We define the following subproblem $(\operatorname{HSP}_B)$: Assume the schedule according to~$S$ for the entire time without the trips of $B$ and all route choices for customers except~$B$ as fix. Determine an optimal schedule within these restrictions.
@@ -1078,9 +1128,9 @@ Let ${B\subseteq\mathcal{C}}$. We set
 	\zstart_B := \min_{c\in B}\zstart_c && \zend_B := \max_{c\in B}\zend_c
 \end{align*}
 
-and define a splitting ${\mathcal{T}=\Cupdot_{i=1}^3\Ti^B}$ by
+and define a splitting $\left\{\mathcal{T}_1,\mathcal{T}_2,\mathcal{T}_3\right\}$ by
 \begin{align*}
-	\mathcal{T}^B_i := \begin{cases}
+	\mathcal{T}_i := \begin{cases}
 		\left\{t\in\mathcal{T}\mid \zstart_t<\zstart_B\right\} & \text{if } i=1 \\
 		\left\{t\in\mathcal{T}\mid \zstart_B\leq\zstart_t\leq\zend_B\right\} & \text{if } i=2 \\
 		\left\{t\in\mathcal{T}\mid \zend_B<\zstart_t\right\} & \text{if } i=3
@@ -1089,35 +1139,69 @@ and define a splitting ${\mathcal{T}=\Cupdot_{i=1}^3\Ti^B}$ by
 
 \end{definition}
 
-The $(\operatorname{HSP}_B)$ is a part of the Successive Heuristic with a splitting according to \Cref{def:splitting_HSP}. We assume that the partial instances $I_1$ and $I_3$ are already solved and these partial solutions coincide with the respective parts of~$S$. We only solve the partial instance~$I_2$. For each duty of~$S$, we identify the transitions from $\mathcal{T}^B_1$ to $\mathcal{T}^B_2$ and from $\mathcal{T}^B_2$ to $\mathcal{T}^B_3$. These transitions are start points and end points for the partial instance~$I_2$. We need to introduce these start points since the partial instances are not solved from the end to the beginning here.\fxnote{Eqivalent to I1}
+The $(\operatorname{HSP}_B)$ is a partial instance of the Successive Heuristic with a splitting according to \Cref{def:splitting_HSP}. We split the duties of $S$ into three partial solutions $\left\{S_1,S_2,S_3\right\}$, each having trips only in $\Ti$. For this, we identify the transitions from $\mathcal{T}_1$ to $\mathcal{T}_2$ and from $\mathcal{T}_2$ to $\mathcal{T}_3$. These transitions form a start point set $\Vhat$ and an end point set $\Phat$. We solve the subproblem with a modified formulation of $(\operatorname{SMILP}_1)$. The vehicle set is replaced by $\Vhat$ and the end point set is $\Phat$. 
 
-We set the start point set~$\Vhat_2$ and the end point set~$\Phat_2$ as
+The start point set comprises the respective last trips of all partial duties of $S_1$ and all vehicles that have no duty in this partial solution. The end point set comprises the respective first trips in $S_3$. We set $\Vhat$ and $\Phat$ as
 \begin{align*}
-	\Vhat_2 & := \left\{s\in\mathcal{V}\cupdot\mathcal{T}^B_1\mid\bar{x}_{s,t}=1\text{ for some } t\in\mathcal{T}^B_2\cupdot\mathcal{T}^B_3\cupdot\left\{\de\right\}\right\} \\
-	\Phat_2 & := \left\{t\in\mathcal{T}^B_3\mid\bar{x}_{s,t}=1\text{ for some } s\in\mathcal{V}\cupdot\mathcal{T}^B_2\cupdot\mathcal{T}^B_3\right\}
+	\Vhat & := \left\{s\in\mathcal{V}\cupdot\mathcal{T}_1\mid\bar{x}_{s,t}=1\text{ for some } t\in\mathcal{T}_2\cupdot\mathcal{T}_3\cupdot\left\{\de\right\}\right\} \\
+	\Phat & := \left\{t\in\mathcal{T}_3\mid\bar{x}_{s,t}=1\text{ for some } s\in\mathcal{V}\cupdot\mathcal{T}_2\cupdot\mathcal{T}_3\right\}
 \end{align*}
 
-Strictly speaking, $\Vhat_2$ and $\Phat_2$ consists of start or end points that are created from the respective trips. For each start or end point~$t$ that is created from a trip or vehicle $s$ hold the following properties:
+Strictly speaking, $\Vhat$ and $\Phat$ consist of start or end points that are created from the respective trips. For each start or end point~$t$ that is created from a trip or vehicle $s$ hold the following properties:
 \begin{align*}
-	\pstart_t = \pend_t := \pend_s && \zstart_t = \zend_t := \zend_s && \text{for all } t\in\Vhat_2 \\
-	\pstart_t = \pend_t := \pstart_s && \zstart_t = \zend_t := \zstart_s && \text{for all } t\in\Phat_2
+	\pstart_t = \pend_t := \pend_s && \zstart_t = \zend_t := \zend_s && \text{for all } t\in\Vhat \\
+	\pstart_t = \pend_t := \pstart_s && \zstart_t = \zend_t := \zstart_s && \text{for all } t\in\Phat
 \end{align*}
 
-How the initial fuel states $f^0_t$ for ${t\in\Vhat_2\cupdot\Phat_2}$ are created, is explained afterwards.
+How the initial fuel states $f^0_t$ for ${t\in\Vhat\cupdot\Phat}$ are created, is explained afterwards.
 
-Using these definitions, we adapt the formulation $(\operatorname{SMILP}_1)$ to $(\operatorname{HSP}_B)$. The vehicle set~$\mathcal{V}$ is replaced by the start point set~$\Vhat_2$. We add the cover constraints
+Using these definitions, we adapt the formulation $(\operatorname{SMILP}_1)$ to $(\operatorname{HSP}_B)$. The vehicle set~$\mathcal{V}$ is replaced by the start point set~$\Vhat$. We add the cover constraints
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in B \label{eq:HSP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_1}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}(B),t\in m \label{eq:HSP:route} \\
-	& \sum_{s\in\operatorname{N}_{\overline{G}_1}^-(t)} x_{s,t} = \bar{u}_{M(t)} && \text{for all } t\in\mathcal{T}^B_2\backslash(M\circ C)^{-1}(B) \label{eq:HSP:route_fix} \\
+	& \sum_{s\in\operatorname{N}_{\overline{G}_1}^-(t)} x_{s,t} = \bar{u}_{M(t)} && \text{for all } t\in\mathcal{T}_2\backslash(M\circ C)^{-1}(B) \label{eq:HSP:route_fix} \\
 	& u_m\in\{0,1\} && \text{for all } m\in C^{-1}(B) \label{eq:HSP:um}
 \end{align}
 
-The constraints $\eqref{eq:HSP:customer}$, $\eqref{eq:HSP:route}$ and $\eqref{eq:HSP:um}$ ensure the cover constraints for all trips ${t\in(M\circ C)^{-1}(B)}$, \ie all trips of the reviewed customers. $\eqref{eq:HSP:route_fix}$ ensures that the fixed route decisions for all other customers are maintained. 
+where $\bar{u}_m$ are the fixed route decisions of $S$ for ${m\in\mathcal{M}\backslash C^{-1}(B)}$. The constraints $\eqref{eq:HSP:customer}$, $\eqref{eq:HSP:route}$ and $\eqref{eq:HSP:um}$ ensure the cover constraints for all trips ${t\in(M\circ C)^{-1}(B)}$, \ie all trips of the reviewed customers. $\eqref{eq:HSP:route_fix}$ ensures that the fixed route decisions for all other customers are maintained. 
 
-We decide only the routes of customers ${c\in B}$. Thus we use the objective function of $(\operatorname{SMILP}_1)$ and add the following term:
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=1cm, auto,]
+		\node[circ] (de) {$d^{\operatorname{e}}$};
+		\node[dummy, above=of de] (dummy1) {};
+		\node[dummy, below=of de] (dummy2) {};
+		\node[rect, left= 1.5cm of dummy2] (endpoints) {$\widehat{\mathcal{P}}$};
+		\node[rect, left= 3cm of dummy1] (trips) {$\mathcal{T}_2$};
+		\node[dummy, left= 2cm of trips] (dummy3) {};
+		\node[dummy, below=of dummy3] (dummy4) {};
+		\node[rect, above=0cm of dummy4] (startpoints) {$\mathcal{T}\cap\widehat{\mathcal{V}}$};
+		\node[rect, below=0cm of dummy4] (vehicles) {$\mathcal{V}\cap\widehat{\mathcal{V}}$};
+		\node[circ, left=of dummy4] (ds) {$d^{\operatorname{s}}$};
+		\draw[arrow] (ds) to node[auto] {$0$} (startpoints.west);
+		\draw[arrow] (ds) to node[auto, swap] {$0$} (vehicles.west);
+		\draw[arrow] (startpoints.east) to node[auto] {$0$} (trips.west);
+		\draw[arrow] (startpoints.east) to node[auto] {$0$} (endpoints.west);
+		\draw[arrow, bend left=90] (startpoints.north) to node[auto] {$0$} (de.north);
+		\draw[arrow] (vehicles.east) to node[auto, swap] {$c^{\operatorname{v}}$} (trips.west);
+		\draw[arrow] (vehicles.east) to node[auto, swap] {$c^{\operatorname{v}}$} (endpoints.west);
+		\draw[arrow, bend right=90] (vehicles.south) to node[auto, swap] {$0$} (de.south);
+		\draw[arrow] (trips) to node[auto] {$0$} (endpoints);
+		\draw[arrow] (trips.east) to node[auto] {$0$} (de);
+		\draw[arrow] (endpoints.east) to node[auto] {$-c^{\operatorname{v}}$} (de);
+	\end{tikzpicture}
+	\caption{Vehicle cost in $(\operatorname{HSP}_B)$}
+	\label{fig:graph_hsp}
+\end{figure}
+
+In $(\operatorname{HSP}_B)$, we decide the route of customers ${c\in B}$. Thus we add their route cost to the objective function. The vehicle cost is only caused by the vehicles, but not by the other start points. A partial duty that ends with an end point does not cause any vehicle cost since this cost is already considered in $S_3$. A duty that starts with a trip ${s\in\mathcal{T}\cap\Vhat}$ and ends with a trip ${t\in\Phat}$ has negative vehicle cost since it has been charged in $S_1$ and $S_3$. \Cref{fig:graph_hsp} illustrates the associated task graph and the vehicle cost for the subproblem. We replace the term
 \begin{align*}
-	\sum_{m\in C^{-1}(B)} u_m \croute_m
+	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right) \cv
+\end{align*}
+
+in $(\operatorname{SMILP}_1)$ by
+\begin{align*}
+	\left(\sum_{s\in\mathcal{V}\cap\Vhat} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat} x_{s,\de}\right) \cv + \sum_{m\in C^{-1}(B)} u_m \croute_m.
 \end{align*}
 
 \paragraph{Determination of the Initial Fuel States} \parfill
@@ -1125,6 +1209,7 @@ We decide only the routes of customers ${c\in B}$. Thus we use the objective fun
 We now examine the determination of the initial fuel states $f^0_t$ for ${t\in\Vhat_2\cupdot\Phat_2}$. These fuel states should guarantee as feasible continuation of the existing duties. Besides this, we aim to have as much scope as possible for feasible solutions. Therefore the initial fuel state should be large for a start point and small for an end point. In order to determine the optimal initial fuel states, we draw up another linear program where all results are fixed by the existing solution and only the fuel states stay variable. Then we optimize the respective fuel values.
 
 Given a solution ${S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ that is feasible in the $\eqref{eq:MMILP}$. We state the problems $\eqref{eq:FMILP_min}$ and $\eqref{eq:FMILP_max}$ as follows:
+
 \begin{align}
 	\min \quad & \sum_{s\in\mathcal{V}\cupdot\mathcal{T}} e_s \hphantom{\sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + u_m} \tag{$\operatorname{FMILP}^{\min}_S$} \label{eq:FMILP_min} \\
 	\max \quad & \sum_{s\in\mathcal{V}\cupdot\mathcal{T}} e_s \tag{$\operatorname{FMILP}^{\max}_S$} \label{eq:FMILP_max} \\
@@ -1143,14 +1228,21 @@ These formulations provide the same solution as $S$ with minimal or maximal fuel
 
 \paragraph{Creating an Improved Solution} \parfill
 
-After constructing the subproblem, we describe how we compose the old solution and the result of the subproblem to a new feasible solution. Let $S$ be the current solution, $B\subseteq\mathcal{C}$ be the set of critical customers and $\left\{\mathcal{T}^B_1,\mathcal{T}^B_2,\mathcal{T}^B_3\right\}$ be the respective splitting. We create the partial solutions $S_1$ and $S_3$. Partial solution~$S_1$ consists of the partial duties of~$S$ ending with a trip or vehicle representing a start point ${t\in\Vhat_2}$. Partial solution~$S_3$ consists of the partial duties of~$S$ starting with a trip representing an end point ${t\in\Phat_2}$. 
+After constructing the subproblem, we describe how we compose the old solution and the result of the subproblem to a new feasible solution. Let $S$ be the current solution, $B\subseteq\mathcal{C}$ the set of critical customers and $\left\{\mathcal{T}_1,\mathcal{T}_2,\mathcal{T}_3\right\}$ the respective splitting. We create the partial solutions $S_1$ and $S_3$. Partial solution~$S_1$ consists of the partial duties of~$S$ ending with a trip or vehicle representing a start point ${t\in\Vhat_2}$. Partial solution~$S_3$ consists of the partial duties of~$S$ starting with a trip representing an end point ${t\in\Phat_2}$. 
 
-Let $\widehat{S}_2$ be a solution of $(\operatorname{HSP}_{B_j})$. Each of its partial duties certainly starts with a start point ${t\in\Vhat_2}$. It ends with a start point, a trip or an end point. For each partial duty ${d\in\widehat{S}_2}$, delete its start point and prepend the partial duty ${d'\in S_1}$ that ends with the trip representing the start point to it. If~$d$ ends with an end point, delete the end point and append the partial duty ${d'\in S_3}$ that starts with the trip representing the end point. All the so created duties are part of the new solution $\widehat{S}$.
+Let $\widehat{S}_2$ be a solution of $(\operatorname{HSP}_B)$. Each of its partial duties certainly starts with a start point ${t\in\Vhat}$. It ends with a start point, a trip or an end point. For each partial duty ${d\in\widehat{S}_2}$, delete its start point and prepend the partial duty ${d'\in S_1}$ that ends with the trip representing the start point to it. If~$d$ ends with an end point, delete the end point and append the partial duty ${d'\in S_3}$ that starts with the trip representing the end point. All the so created duties are part of the new solution $\widehat{S}$. 
+
+The cost of the new solution is
+\begin{align*}
+	\operatorname{cost}\left(\widehat{S}\right) = \operatorname{cost}\left(S_1\right) + \operatorname{cost}\left(\widehat{S}_2\right) + \operatorname{cost}\left(S_3\right) + \sum_{c\in\mathcal{C}\backslash B} \croute_{m(c)}
+\end{align*}
+
+where ${c\mapsto m(c)}$ describes the route decision for the previous solution $S$. We show that $\widehat{S}$ is again feasible and the cost does not increase.
 
 \begin{lemma}
 \label{lem:feasibility_hsp}
 
-Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ and $B\subseteq\mathcal{C}$. Let $\widehat{S}$ be a solution that is computed as described previously. Then $\widehat{S}$ is also feasible and
+Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ and $B\subseteq\mathcal{C}$. Let $\widehat{S}$ be a solution that is computed as described in \Cref{sec:iterative_approach}. Then $\widehat{S}$ is also feasible and
 \begin{align*}
 	\operatorname{cost}\left(\widehat{S}\right) \leq \operatorname{cost}\left(S\right)
 \end{align*}
@@ -1159,11 +1251,25 @@ Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$ and $B\subseteq\mathcal
 
 \begin{proof}
 
-Proof\fxnote{Proof}
+The partial solutions $S_1$, $\widehat{S}_2$ and $S_3$ are connected in such a way that $\widehat{S}$ is feasible \wrt time. The initial fuel states in $\Vhat$ and $\Phat$ are computed appropriately in order to maintain fuel feasibility. For ${c\in B}$, the cover constraints are ensured by $\eqref{eq:HSP:customer}$, $\eqref{eq:HSP:route}$ and $\eqref{eq:HSP:um}$. By construction, $\widehat{S}$ fulfills exactly the same trips as $S$ for ${c\in\mathcal{C}\backslash B}$.
+
+The deadhead and trip cost are determined as before. From the construction of the objective function of $(\operatorname{HSP}_B)$ follows that the vehicle cost arise exactly once for each non-empty duty in $\widehat{S}$. The vehicle cost is charged for each duty starting with a vehicle and not with a trip. It is subtracted for each duty ending with an end point. For ${c\in B}$, the route cost occurs in $\operatorname{cost}\left(\widehat{S}_2\right)$ and for ${c\in\mathcal{C}\backslash B}$ in the additional term.
+
+The original solution $S_2$ is a feasible solution of the $(\operatorname{HSP}_B)$ by construction. Therefore the total cost of $\widehat{S}$ is not greater than the total cost of $S$.
 
 \end{proof}
 
-\paragraph{Improvements} \parfill
+Finally, we describe the complete Iterative Approach to create a solution. First we solve the problem with the time-dependent Successive Heuristic according to \Cref{alg:successive_heuristic}. We call this initial solution~$S^0$. Based on this solution, we determine the customer sets $\left\{B_1,\dots,B_k\right\}$ with \Cref{alg:critical_customers}. For each ${i\in[k]}$ we create a new solution $S^i$ by the formulation $(\operatorname{HSP}_{B_i})$ based on the previous solution $S^{i-1}$. Due to \Cref{lem:feasibility_hsp}, the total cost does not increase during this process. Finally, we receive an improved solution $S^k$.
+
+\paragraph{Remarks} \parfill
+
+We provide several remarks concerning the developed heuristics and the results that can be expected or not.
+
+Analogously to the customer-dependent heuristic, the time-dependent heuristic is not a constant-factor approximation. \Cref{ex:approximation_factor} directly applies to $(\operatorname{TMILP})$, too. With the same choice of the time point~$c_1$, the splitting $\left\{\mathcal{T}_1,\mathcal{T}_2\right\}$ is equal if it is performed according to \Cref{def:time_dependent_splitting}. Thus the heuristic solution can be arbitrarily bad compared to the optimal solution, even if all subproblems are solved to optimality.
+
+In the iterative approach, there is not guarantee that an optimal solution is achieved. If we choose $B_1=\mathcal{C}$, \ie all customers are reviewed during one iteration, then we will receive an optimal solution. But the formulation $(\operatorname{HSP}_{\mathcal{C}})$ is equal to $\eqref{eq:MMILP}$ and it is expected that this formulation is too big to solve it in reasonable time for realistic problem sizes. Even if ${\Cupdot_{i=1}^k B_i = \mathcal{C}}$, \ie every customer is reviewed during the process, we cannot expect an optimal solution.
+
+The previously discussed criteria, whether the route choice of a customer was bad, are only indications. It is not sure that a customer that fulfills all of them actually has a bad route choice. Further, changing the route for a customer does not necessarily improve the cost of the current solution, even if the new route is also chosen in an optimal solution. The subproblem does not certainly fix other bad heuristical decisions besides the route choice, \eg the assignment of trips to duties or the visitation of refuel points.
 
 There are several ways to further improve the heuristics. We have not worked them out in detail and have not implemented them. We further cannot estimate how the additional computation time is in proportion to the additional cost saving. But we provide the main ideas in order to improve the heuristical solutions.
 \begin{itemize}
