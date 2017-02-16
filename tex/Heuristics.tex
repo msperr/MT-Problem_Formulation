@@ -129,9 +129,11 @@ Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 
 \paragraph{Model Equivalence} \parfill
 
+We show that $\eqref{eq:SMILP}$ is also feasible in $\eqref{eq:MMILP}$. Inversely, not every solution of the original formulation is also feasible in the split formulation.
+
 \begin{theorem}
 
-Let $S$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ is also a feasible solution of the $\eqref{eq:MMILP}$ and the objective values coincide.
+Let $S$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ can be converted into a solution $S'$ which is feasible in the $\eqref{eq:MMILP}$ and the objective values of $S$ and $S'$ coincide.
 
 \end{theorem}
 
@@ -185,7 +187,7 @@ In the partial instances has to be ensured that each end point ${t\in\Phat_i}$ i
 
 \begin{algorithm}[htb]
 	\SetAlgoLined
-	\KwIn{splitting $\mathcal{T}=\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$, vehicle set $\mathcal{V}$}
+	\KwIn{splitting $\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$, vehicle set $\mathcal{V}$}
 	\KwOut{overall solution $S$ with duty set $D$}
 	\lForEach{$i\in[n]$}{$\Phat_i\gets\emptyset$}
 	\ForEach{$i=n,\dots,2$}{
@@ -280,7 +282,7 @@ The fixed vehicle costs require a different treatment. If a duty ends with an en
 Besides the cover constraints also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_c}$} \nonumber \\
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t}$} \nonumber \\
 	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
 	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
 	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
@@ -337,13 +339,19 @@ is replaced in $(\operatorname{SMILP}_1)$ by
 \begin{theorem}[Feasibility of the connection]
 \label{thm:equivalence_heuristic_SMILP}
 
-Let $S$ be a solution that is created with the procedure of \Cref{sec:general_setting} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ is feasible in $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$.
+Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ can be converted into a solution $S'$ which is feasible in the $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. The objective values of $S$ and $S'$ coincide without respecting the route costs.
 
 \end{theorem}
 
 \begin{proof}
 
-Proof\fxnote{Proof}
+In $\eqref{eq:SMILP}$, the partial instances are only connected via the split points~$\mathcal{P}$. We show how we identify the end points of~$S$ with the split points of~$S'$. Let ${s\in\Phat_i}$ be arbitrary with ${t\in\mathcal{T}}$ representing it. Then we identify $s$ with $\operatorname{SP}_i(t)$. This directly yields a solution of the $\eqref{eq:SMILP}$. Only the route variables $u_m$ for ${m\in\mathcal{M}}$ is not considered. We have ${\operatorname{cost}(S) = \sum_{i=1}^n\operatorname{cost}\left(S_i\right)}$.
+
+In both formulations, exactly the same connections $(s,t)$ are feasible. Therefore $S$ is time feasible. The fuel constraints are directly applied to the partial instances. Constraint~$\eqref{eq:CMILP:final_fuel}$ ensures that the fuel state suffices when two partial duties are strung together. This guarantees fuel feasibility.
+
+All connections between trips $s$ and $t$ and all refuel point visitations between $s$ and $t$ are the same in $S$ and $S'$. No partial duty is neglected in $S$ because of $\eqref{eq:CMILP:start_end_points}$. Therefore the trip cost and deadhead cost coincide. In partial instance~$I_i$ for ${i\in[n]\backslash\{1\}}$, the vehicle cost occurs when a new duty is created, \ie a partial duty does not end with an end point. In~$I_1$, the vehicle cost arises for all non-empty partial duties that do not end with an end point. Therefore the vehicle costs arise equally often in $S$ and $S'$.
+
+Thus, the solution $S'$ is feasible in $\eqref{eq:SMILP}$ except for $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ and ${\operatorname{cost}(S) = \operatorname{cost}\left(S'\right)}$ without the route cost.
 
 \end{proof}
 
@@ -381,8 +389,6 @@ Based on the customer splitting, we define the splitting of $\mathcal{T}$ as
 
 \end{definition}
 
-We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:customer_dependent_splitting} as (CMILP).
-
 \paragraph{Solving the Partial Instances} \parfill
 
 The formulation of the partial instances is built on the basic structure $\eqref{eq:SMILPi}$. The cover constraints have not been considered there. We therefore introduce the decision variable $u_m\in\{0,1\}$ for $m\in C^{-1}\left(\mathcal{C}_i\right)$. Since a customer $c\in\mathcal{C}_i$ has all his trips in~$\Ti$, only the cover constraints concerning these customers are included in partial instance~$I_i$. We therefore add the following constraints:
@@ -397,7 +403,7 @@ Further the route costs are not considered in $\eqref{eq:SMILPi}$ so far. We aga
 	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \croute_m
 \end{align*}
 
-We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$.
+We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$. Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then we call $S$ a feasible solution of the $(\operatorname{CMILP})$.
 
 \paragraph{Model Equivalence} \parfill
 
@@ -406,7 +412,10 @@ In the following, we examine whether the formulations $\eqref{eq:MMILP}$ and $(\
 \begin{theorem}
 \label{thm:equivalence_CMILP_MMILP}
 
-Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then~$S$ is feasible in $\eqref{eq:MMILP}$.
+Let $S$ be a feasible solution of the $(\operatorname{CMILP})$. Then $S$ is feasible in the $\eqref{eq:MMILP}$ and
+\begin{align*}
+	\operatorname{cost}\left(S\right) = \sum_{i=1}^n\operatorname{cost}\left(S_i\right)
+\end{align*}
 
 \end{theorem}
 
@@ -416,7 +425,7 @@ Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and t
 
 According to \Cref{thm:equivalence_heuristic_SMILP}, solution~$S$ is feasible in $\eqref{eq:MMILP}$ except for the cover constraints. Let $c\in\mathcal{C}$ arbitrary. Then there is a unique $i\in[n]$ with ${c\in\mathcal{C}_i}$. In $(\operatorname{CMILP}_i)$ exist decision variables $u_m$ for all ${m\in C^{-1}(c)}$ and then $\eqref{eq:MMILP:customer}$ follows directly from $\eqref{eq:CMILP:customer}$. Let ${m\in\mathcal{M}}$ arbitrary. There is a unique ${i\in[n]}$ with ${m\in C^{-1}(\mathcal{C}_i)}$ and all trips ${t\in m}$ are in $(\operatorname{CMILP}_i)$. Then $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:um}$ follow directly from $\eqref{eq:CMILP:route}$ and $\eqref{eq:CMILP:um}$. 
 
-Therefore $S$ is a feasible solution of the $\eqref{eq:MMILP}$.
+In the $(\operatorname{CMILP}_i)$, the route cost is added to the objective function. For each route, the route cost arises in exactly one partial instance. Therefore $S$ is a feasible solution of the $\eqref{eq:MMILP}$ and ${\operatorname{cost}(S) = \sum_{i=1}^n\operatorname{cost}\left(S_i\right)}$.
 
 \end{proof}
 
