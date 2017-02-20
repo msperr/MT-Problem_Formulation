@@ -133,13 +133,34 @@ We show that $\eqref{eq:SMILP}$ is also feasible in $\eqref{eq:MMILP}$. Inversel
 
 \begin{theorem}
 
-Let $S$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ can be converted into a solution $S'$ which is feasible in the $\eqref{eq:MMILP}$ and the objective values of $S$ and $S'$ coincide.
+Let ${S=(x,z,e,u)}$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ can be converted into a solution ${\bar{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ which is feasible in the $\eqref{eq:MMILP}$ and the objective values $\operatorname{val}(S)$ and $\operatorname{val}(\bar{S})$ coincide.
 
 \end{theorem}
 
-Previously in this subsection, the task graph and the constraints are modified in such a way that the feasibility in $\eqref{eq:MMILP}$ is not destroyed. Connections between ${s\in\mathcal{V}\cupdot\mathcal{T}}$ and ${t\in\mathcal{T}}$ via a split point ${t'\in\mathcal{P}}$, \ie ${(s,t'),(t',t)\in\overline{A}}$, are only feasible if ${s\prec t}$, \ie ${(s,t)\in A}$. Therefore these connections are feasible in $\eqref{eq:MMILP}$. Visiting a refuel point during $\left(s,t'\right)$ in $\overline{A}$ means visiting a refuel point during $(s,t)$ in $A$, visiting a refuel point during $\left(t',t\right)$ is not feasible in $\eqref{eq:SMILP}$. The fuel states and the fuel constraints are adapted feasibly and the cover constraints are not affected by the transformation.
+\begin{proof}
 
-The objective function is adapted such that the trip and deadhead costs arise for the same trips, the vehicle and route costs are not affected by the transformation.
+Let ${S=(x,z,e,u)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We define ${\bar{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ as follows: Let ${s\in\mathcal{V}}$, ${t\in\mathcal{T}}$ with ${s\prec t}$ and ${r\in\Rst}$. We set
+\begin{align*}
+	\bar{x}_{s,t} := \begin{cases} x_{s,t} & \text{if } t\in\mathcal{T}_1 \\ x_{s,\operatorname{SP}_1(t)} & \text{otherwise} \end{cases} &&
+	\bar{z}_{s,r,t} := \begin{cases} z_{s,r,t} & \text{if } t\in\mathcal{T}_1 \\ z_{s,r,\operatorname{SP}_1(t)} & \text{otherwise} \end{cases}
+\end{align*}
+
+For ${i\in[n]}, {s\in\Ti}$, ${t\in\mathcal{T}}$ with ${s\prec t}$ and ${r\in\Rst}$, we set
+\begin{align*}
+	\bar{x}_{s,t} := \begin{cases} x_{s,t} & \text{if } t\in\Ti \\ x_{s,\operatorname{SP}_i(t)} & \text{if } t\in\Cupdot_{j=i+1}^n \mathcal{T}_j \\ 0 & \text{otherwise} \end{cases} &&
+	\bar{z}_{s,r,t} := \begin{cases} z_{s,r,t} & \text{if } t\in\Ti \\ z_{s,r,\operatorname{SP}_i(t)} & \text{if } t\in\Cupdot_{j=i+1}^n \mathcal{T}_j \\ 0 & \text{otherwise} \end{cases}
+\end{align*}
+
+Additionally, we set ${\bar{e}_s := e_s}$ for all ${s\in\mathcal{V}\cupdot\mathcal{T}}$ and ${\bar{u}_m := u_m}$ for all ${m\in\mathcal{M}}$. From the flow conservation $\eqref{eq:SMILP:flow}$ and ${\Nouto\left(\operatorname{SP}_i(t)\right)=\{t\}}$ follows:
+\begin{align*}
+	x_{s,\operatorname{SP}_i(t)}=1 \Rightarrow x_{\operatorname{SP}_i(t),t}=1 && \text{for } i\in[n], s\in\Ti, t\in\Cupdot_{j=i+1}^n \mathcal{T}_j \text{ with } s\prec t
+\end{align*}
+
+The time feasibility of $\bar{S}$ follows directly from the definition of ${s\prec\operatorname{SP}_i(t)}$. Visiting a refuel point between $s$ and $\operatorname{SP}_i(t)$ in the $\eqref{eq:SMILP}$ is equivalent to visiting a refuel point between $s$ and $t$ in the $\eqref{eq:MMILP}$. Visiting a refuel point between $\operatorname{SP}_i(t)$ and $t$ is not feasible in the $\eqref{eq:SMILP}$. The fuel constraints are equivalent by construction and therefore $\bar{S}$ is feasible \wrt fuel. The cover constraints are equivalent in both formulations. Therefore $\bar{S}$ is a feasible solution of the $\eqref{eq:MMILP}$.
+
+The objective function of $\eqref{eq:SMILP}$ is adapted such that the trip and deadhead costs arise for exactly the same trips, the vehicle and route costs are not affected by the transformation. Thus ${\operatorname{val}(S)=\operatorname{val}(\bar{S})}$.
+
+\end{proof}
 
 \begin{remark}
 
@@ -291,19 +312,42 @@ As mentioned before, it requires some additional work to include the cover const
 		\draw[arrow] (trips.east) to node[auto] {$c^{\operatorname{v}}$} (de);
 		\draw[arrow] (endpoints.east) to node[auto] {$0$} (de);
 	\end{tikzpicture}
-	\caption{Vehicle cost for $(\operatorname{SMILP}_i)$}
+	\caption{Graph $\overline{G}_i$ and vehicle cost for $i\in[n]\backslash\{1\}$}
 	\label{fig:graph_instance}
 \end{figure}
 
 The cost function is also modified. The deadhead cost between trips ${s,t\in\Ti}$ are the same as in the $\eqref{eq:SMILP}$. Between trips ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$, there is an end point ${t'\in\Phat_i}$ with $t$ representing $t'$ if $t$ starts another partial duty in $S_j$. The deadhead cost $\cd_{s,t}$ is treated in $I_i$ as $\cd_{s,t'}$ and the trip cost $\ct_t$ is treated in $I_j$. Therefore the trip cost for the trip starting a duty arises additionally.
 
-The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost. \Cref{fig:graph_instance} demonstrates the vehicle cost.
+The fixed vehicle costs require a different treatment. If a duty ends with an end point, the vehicle cost of this duty arises already in the partial instance where the end point is created. Therefore, we use the vehicle cost only for duties that end with a trip. Thus, the arcs ${\Ti\times\de}$ have vehicle cost $\cv$. All other arcs that are incident with $\ds$ or $\de$ have no vehicle cost. \Cref{fig:graph_instance} shows a simplified visualization of the partial task graph and the vehicle cost.
 
 Besides the cover constraints, also the route costs are not treated here. They are specified in the heuristic. The formulation of the partial instance is called $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
 
 \paragraph{Solving Partial Instance $\boldsymbol{I_1}$} \parfill
 
 As mentioned before, the partial instance~$I_1$ plays a special role since the vehicles are introduced there. The vehicle set $\mathcal{V}$ is added to the partial task graph and all duties start with a vehicle. We show how the formulation $(\operatorname{SMILP}_1)$ differs from $\eqref{eq:SMILPi}$ for ${i\in[n]\backslash\{1\}}$.
+
+\newpage
+
+\begin{align}
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t}$} \nonumber \\
+	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
+	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
+	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
+	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
+	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
+	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
+	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
+	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
+	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
+	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
+	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
+	& \sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \tag{\ref{eq:CMILP:strengthening}} \\
+	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
+	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
+	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
+\end{align}
+
+\newpage
 
 \begin{definition}[Partial Transformed Task Graph]
 
@@ -327,39 +371,6 @@ With introducing the vehicles we have to ensure that each vehicle is considered 
 
 to $(\operatorname{SMILP}_1)$.
 
-\begin{align}
-	\min \quad & \omit\rlap{$\displaystyle{\sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t}$} \nonumber \\
-	& \omit\rlap{$\displaystyle{\sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{SMILP}_i$} \label{eq:SMILPi} \\
-	\text{s.t.} \quad & \sum_{t\in\Ninoi(s)} x_{t,s} = \sum_{t\in\Noutoi(s)} x_{s,t} & & \text{for all } s\in \overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:flow} \\
-	& \sum_{s\in\Ninoi(t)} x_{s,t} = 1 && \text{for all } t\in\Phat_i \tag{\ref{eq:CMILP:start_end_points}} \\	
-	& \sum_{r\in\Rst} z_{s,r,t} \leq x_{s,t} && \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:refuel} \\
-	& f^0_s \leq e_s && \text{for all } s\in\Phat_i \tag{\ref{eq:CMILP:final_fuel}} \\
-	& 0 \leq e_s - \sum_{r\in\Rst} z_{s,r,t}\fd_{s,r} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:min_fuel} \\
-	& e_t \leq 1 - \ft_t - \sum_{r\in\Rst} z_{s,r,t}\fd_{r,t} & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t)\backslash\left\{\ds\right\} \label{eq:CMILP:max_fuel} \\
-	& \omit\rlap{$\displaystyle{e_t \leq e_s - x_{s,t}\left(f_{s,t}^{\operatorname{d}}+f_t^{\operatorname{t}}\right) - \sum_{r\in\Rst} z_{s,r,t}\left(\fd_{s,r}+\ft_r+\fd_{r,t}-\fd_{s,t}\right) + \left(1-x_{s,t}\right)}$} \nonumber \\
-	& & & \text{for all } t\in\Ti\cup\Phat_i, s\in\Ninoi(t) \label{eq:CMILP:fuel_consumption} \\
-	& \omit\rlap{$\displaystyle{e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right)} \qquad \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmax}}$} \\
-	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \tag{\ref{eq:CMILP:fmin}} \\
-	& \sum_{t\in\Ti\cup\Phat_i} x_{\ds,t} \leq \vert\mathcal{V}\vert \tag{\ref{eq:CMILP:strengthening}} \\
-	& x_{s,t}\in\{0,1\} & & \text{for all } (s,t)\in\overline{A}_i \label{eq:CMILP:xst} \\
-	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
-	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
-\end{align}
-
-\newpage
-
-The objective function is also modified. Each vehicle with a non-empty duty causes vehicle cost~$\cv$. Further, for all duties that end with an end point, the vehicle cost is already paid in a later partial instance and is therefore subtracted for these duties. Thus, the term of the objective function
-\begin{align*}
-	\sum_{s\in\Ti} x_{s,\de}\cv
-\end{align*}
-
-is replaced in $(\operatorname{SMILP}_1)$ by
-\begin{align*}
-	\left(\sum_{s\in\mathcal{V}} \sum_{t\in\operatorname{N}^+_{\overline{G}_1}(s)\backslash\left\{\de\right\}} x_{s,t} - \sum_{s\in\Phat_1} x_{s,\de}\right)\cv.
-\end{align*}
-
-\Cref{fig:graph_instance_1} shows the vehicle cost for partial instance~$I_1$.
-
 \begin{figure}[htb]
 	\centering
 	\begin{tikzpicture}[node distance=1cm, auto,]
@@ -373,32 +384,102 @@ is replaced in $(\operatorname{SMILP}_1)$ by
 		\node[circ, left=of vehicles] (ds) {$d^{\operatorname{s}}$};
 		\draw[arrow] (ds) to node[auto] {$0$} (vehicles);
 		\draw[arrow, bend left=90] (vehicles.north) to node[auto] {$0$} (de.north);
-		\draw[arrow] (vehicles) to node[auto] {$c^{\operatorname{v}}$} (trips.west);
-		\draw[arrow] (vehicles) to node[auto] {$c^{\operatorname{v}}$} (endpoints.west);
+		\draw[arrow] (vehicles) to node[auto] {$0$} (trips.west);
+		\draw[arrow] (vehicles) to node[auto] {$0$} (endpoints.west);
 		\draw[arrow] (trips) to node[auto] {$0$} (endpoints);
-		\draw[arrow] (trips.east) to node[auto] {$0$} (de);
-		\draw[arrow] (endpoints.east) to node[auto] {$-c^{\operatorname{v}}$} (de);
+		\draw[arrow] (trips.east) to node[auto] {$c^{\operatorname{v}}$} (de);
+		\draw[arrow] (endpoints.east) to node[auto] {$0$} (de);
 	\end{tikzpicture}
-	\caption{Vehicle cost for $(\operatorname{SMILP}_1)$}
+	\caption{Graph $\overline{G}_1$ and vehicle cost for $(\operatorname{SMILP}_1)$}
 	\label{fig:graph_instance_1}
 \end{figure}
-	
-\begin{theorem}[Feasibility of the connection]
+
+The objective function is not modified. The vehicle cost is charged for each non-empty duty that does not end with an end point. The deadhead cost $\cd_{s,t}$ or $\cd_{s,r} + \cd_{r,t}$ for ${s\in\mathcal{V}}$ is respected in the objective function. \Cref{fig:graph_instance_1} shows a simplified visualization of the partial task graph $\overline{G}_1$ and the vehicle cost.
+
+\paragraph{Model Equivalence} \parfill
+
+\begin{theorem}
 \label{thm:equivalence_heuristic_SMILP}
 
-Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions $S_i$ are feasible in $(\operatorname{SMILP}_i)$ for ${i\in[n]}$. Then $S$ can be converted into a solution $S'$ which is feasible in the $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. The objective values of $S$ and $S'$ coincide without respecting the route costs.
+Let ${\left\{S_1,\dots,S_n\right\}}$ be partial solutions where $S_i$ is feasible in the $\eqref{eq:SMILPi}$ and the end point set $\Phat_i$ is created according to \Cref{alg:successive_heuristic} for ${i\in[n]}$. They can be transformed into a solution $\overline{S}$ that is feasible in the $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. The values ${\sum_{i=1}^n \operatorname{val}\left(S_i\right)}$ and ${\operatorname{val}(\overline{S})}$ coincide.
 
 \end{theorem}
 
 \begin{proof}
 
-In $\eqref{eq:SMILP}$, the partial instances are only connected via the split points~$\mathcal{P}$. We show how we identify the end points of~$S$ with the split points of~$S'$. Let ${s\in\Phat_i}$ be arbitrary with ${t\in\mathcal{T}}$ representing it. Then we identify $s$ with $\operatorname{SP}_i(t)$. This directly yields a solution of the $\eqref{eq:SMILP}$. Only the route variables $u_m$ for ${m\in\mathcal{M}}$ is not considered. We have ${\operatorname{cost}(S) = \sum_{i=1}^n\operatorname{cost}\left(S_i\right)}$.
+For ${i\in[n]}$, let ${S_i=\left(x^i,z^i,e^i\right)}$ be the partial solution of $I_i$. We construct a solution ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$. For this, we identify each end point set $\Phat_i$ with the partial split point set $\mathcal{P}_i$. An end point ${t\in\Phat_i}$ that represents a trip ${s\in\Cupdot_{j=i+1}^n \mathcal{T}_j}$ is identified with the split point $\operatorname{SP}_i(s)$. Each split point with which no end point is identified is not used in $\overline{S}$.
 
-In both formulations, exactly the same connections $(s,t)$ are feasible. Therefore $S$ is time feasible. The fuel constraints are directly applied to the partial instances. Constraint~$\eqref{eq:CMILP:final_fuel}$ ensures that the fuel state suffices when two partial duties are strung together. This guarantees fuel feasibility.
+Let ${i\in[n]}$ be arbitrary. For ${i=1}$, let ${s\in\mathcal{V}\cupdot\mathcal{T}_1}$ and ${t\in\mathcal{T}_1\cupdot\mathcal{P}_1}$. For ${i>1}$, let ${s\in\Ti}$ and ${t\in\Ti\cupdot\mathcal{P}_i}$. We state
+\begin{align*}
+	\bar{x}_{s,t} := \begin{cases} x^i_{s,t} & \text{if } t\in\Ti\cupdot\Phat_i \\ 0 & \text{if } t\in\mathcal{P}_i\backslash\Phat_i \end{cases} &&
+	\bar{z}_{s,r,t} := \begin{cases} z^i_{s,r,t} & \text{if } t\in\Ti\cupdot\Phat_i \\ 0 & \text{if } t\in\mathcal{P}_i\backslash\Phat_i \end{cases} &&
+	\text{for } r\in\Rst.
+\end{align*}
 
-All connections between trips $s$ and $t$ and all refuel point visitations between $s$ and $t$ are the same in $S$ and $S'$. No partial duty is neglected in $S$ because of $\eqref{eq:CMILP:start_end_points}$. Therefore the trip cost and deadhead cost coincide. In partial instance~$I_i$ for ${i\in[n]\backslash\{1\}}$, the vehicle cost occurs when a new duty is created, \ie a partial duty does not end with an end point. In~$I_1$, the vehicle cost arises for all non-empty partial duties that do not end with an end point. Therefore the vehicle costs arise equally often in $S$ and $S'$.
+The term ${t\in\mathcal{P}_i\backslash\Phat_i}$ means that \Cref{alg:successive_heuristic} has not created the respective end point and therefore the split point is not used in this solution.
 
-Thus, the solution $S'$ is feasible in $\eqref{eq:SMILP}$ except for $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ and ${\operatorname{cost}(S) = \operatorname{cost}\left(S'\right)}$ without the route cost.
+Let ${t\in\Ti}$ and ${s=\operatorname{SP}_j(t)}$ with ${j<i}$. Then we state
+\begin{align*}
+	\bar{x}_{s,t} := \begin{cases} 1 & \text{if } s\in\Phat_j \text{ and } x^j_{\ds,s} = 0 \\ 0 & \text{otherwise} \end{cases}
+\end{align*}
+
+Consider ${s\in\Phat_j}$ and ${x^j_{\ds,s}=1}$. Then the end point is not appended to a partial duty. In this case, \Cref{alg:successive_heuristic} creates a new end point in $\Phat_{j-1}$. If ${x^j_{\ds,s}=0}$, then we have ${x^j_{t',s}=1}$ for some ${t\in\mathcal{T}_j}$ and therefore $s$ is appended to a duty and no further end point is created.
+
+Finally, we state
+\begin{align*}
+	\bar{x}_{\ds,v} & := 1 && \text{for } v\in\mathcal{V} & \bar{x}_{s,\de} & := x^i_{s,\de} && \text{for } s\in\Ti \\
+	\bar{e}_s & := e^i_s && \text{for } s\in\Ti\cupdot\Phat_i & \bar{e}_v & := e^1_v && \text{for } v\in\mathcal{V} \\
+	\bar{e}_s & := 0 && \text{for } s\in\mathcal{P}\backslash\Cupdot_{i=1}^n \Phat_i & \bar{u}_m & := 0 && m\in\mathcal{M} \\
+\end{align*}
+
+We show that $\overline{S}$ is a feasible solution of the $\eqref{eq:SMILP}$. The flow conservation $\eqref{eq:SMILP:flow}$ is obviously fulfilled for ${t\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{P}\backslash\Cupdot_{i=1}^n \Phat_i}$. Let ${t\in\Phat_i}$ with ${t=\operatorname{SP}_i\left(t'\right)}$ for some ${t'\in\Cupdot_{j=i+1}^n \mathcal{T}_j}$. We have ${\sum_{s\in\Ninoi(t)} x^i_{s,t} = 1}$ due to $\eqref{eq:CMILP:start_end_points}$ and $\Nouto(t) = \left\{t'\right\}$. Thus
+\begin{align*}
+	x^j_{\ds,t} + \sum_{s\in\Nino(t)} x_{s,t} = 1 && \text{and} && x^j_{\ds,t} + x_{t,t'} = 1 && \Rightarrow && \sum_{s\in\Nino(t)} x_{s,t} = \sum_{s\in\Nouto(t)} x_{t,s}
+\end{align*}
+
+The fuel constraints hold in each partial solution individually, the initial fuel states $f^0_t$ for ${t\in\Cupdot_{i=1}^n \Ti}$ maintain feasible fuel states at the transitions between the partial instances. Therefore, $\overline{S}$ is feasible in the $\eqref{eq:SMILP}$ without the cover constraints $\eqref{eq:MMILP}$ and $\eqref{eq:MMILP}$.
+
+In each partial instance, we distinguish the non-empty duties concerning the vehicle cost. For each partial duty that ends with a trip, the vehicle cost is charged. If it ends with an end point, no vehicle cost is charged, since the partial duty is prepended to an already existing duty. Therefore the vehicle costs are charged exactly once for each duty of $\overline{S}$. Each trip cost $\ct_t$ and deadhead cost $\cd_{s,t}$ or ${\cd_{s,r}+\cd_{r,t}}$ occurs in exactly one partial instance. Because of ${\bar{u}_m=0}$, the route cost is not considered. Therefore
+\begin{align*}
+	\sum_{i=1}^n\operatorname{val}\left(S_i\right) = \operatorname{val}\left(\overline{S}\right)
+\end{align*}
+
+\end{proof}
+
+\begin{theorem}
+\label{thm:equivalence_SMILP_heuristic}
+
+Let ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We can transform $\overline{S}$ into partial solutions $\left\{S_1,\dots,S_n\right\}$ where $S_i$ is feasible in $\eqref{eq:SMILPi}$ for ${i\in[n]}$. The values $\operatorname{val}(\overline{S})$ and ${\sum_{i=1}^n S_i}$ coincide without respecting the route cost.
+
+\end{theorem}
+
+\begin{proof}
+
+Let ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We construct solutions ${S_i=\left(x^i,z^i,e^i\right)}$ for ${i\in[n]}$. Similarly to the proof of \Cref{thm:equivalence_heuristic_SMILP}, we create an end point for each used split point. Let ${t\in\Ti}$ with ${\bar{x}_{\operatorname{SP}_{i'}(t),t}=1}$ for some ${i',i\in[n]}$. Then, for each ${j\in\left\{i',\dots,i-1\right\}}$ we create an end point $\operatorname{SP}_j(t)$ in $\Phat_j$. We identify each end point with the split point from which it is created.
+
+Let ${i\in[n]}$ be arbitrary. For ${i=1}$, let ${s\in\mathcal{V}\cupdot\mathcal{T}_1}$ and ${t\in\mathcal{T}_1\cupdot\Phat_1}$. For ${i>1}$, let ${s\in\Ti}$ and ${t\in\Ti\cupdot\Phat_i}$. We state
+\begin{align*}
+	x^i_{s,t} := \bar{x}_{s,t} && z^i_{s,r,t} := \bar{z}_{s,r,t} && \text{for } r\in\Rst.
+\end{align*}
+
+Let ${s\in\Ti}$. Then we state
+\begin{align*}
+	x^i_{\ds,s} := \max_{j\in[i-1]} \left(\bar{x}_{\operatorname{SP}_j(s),s}\right) && x^i_{s,\de} := \bar{x}_{s,\de}
+\end{align*}
+
+For ${s\in\Phat_i}$ with ${s=\operatorname{SP}_i(t)}$ for some ${t\in\Cupdot_{j=i+1}^n\mathcal{T}_j}$, we state
+\begin{align*}
+	x^i_{\ds,s} := \max_{j\in[i-1]} \left(\bar{x}_{\operatorname{SP}_j(t),t}\right) && x^i_{s,\de} := 1
+\end{align*}
+
+We have ${x^i_{\ds,s}=1}$, iff $s$ is the start of a partial duty. This means for ${s\in\Ti}$ that $s$ is connected to one of its split points, \ie ${\bar{x}_{\operatorname{SP}_j(s),s}=1}$ for some ${j\in[i-1]}$. For ${s\in\Phat_i}$, \Cref{alg:successive_heuristic} creates a new end point out of $s$ and one of these split points is connected to the original trip. We have ${x^i_{s,\de}=1}$, iff $s$ is the end of a partial duty. If $s$ is a trip then $s$ is the end of the whole duty, while each end point is the end of a partial duty.
+
+We further state
+\begin{align*}
+	x^1_{\ds,v} := 1 && x^1_{v,\de} := \bar{x}_{v,\de} && e^1_v := \bar{e}_v && \text{for } v\in\mathcal{V} && e^i_s & := \bar{e}_s && \text{for } s\in\Ti\cupdot\Phat_i
+\end{align*}
+
+Each $S_i$ is a feasible solution of the $\eqref{eq:SMILPi}$ and the objective values $\operatorname{val}(\overline{S})$ and ${\sum_{i=1}^n\operatorname{val}\left(S_i\right)}$ coincide up to the route cost. The proof works analogously to the proof of \Cref{thm:equivalence_heuristic_SMILP}. The route cost is not considered in the objective function of $\eqref{eq:SMILPi}$.
 
 \end{proof}
 
@@ -883,7 +964,7 @@ This is a remarkable result. In the original version of the Successive Heuristic
 \section{Time-dependent Splitting}
 \label{sec:time_dependent_splitting}
 
-The developed formulation (CMILP) based on a customer-dependent splitting is not equivalent to the original formulation $\eqref{eq:MMILP}$. The goal now is to develop a splitting that is equivalent and create a heuristic based on this splitting. Therefore, it is necessary that trips of the same customer may be in different splittings. This leads to the following problem: When the partial instances are solved successively, we need a possibility to still guarantee the customer satisfaction for the entire problem. This has to be applied already in the first partial instance where a certain customer is concerned, although we do not have any knowledge about the trips of the same customer in the later solved partial instances.
+The developed formulation (CMILP) based on a customer-dependent splitting is not equivalent to the original formulation $\eqref{eq:MMILP}$. The goal now is to develop a splitting that is equivalent and create a heuristic based on this splitting. Therefore, it is necessary that trips of the same customer may be in different splittings. This leads to the following problem: If the partial instances are solved successively, we need a possibility to still guarantee the customer satisfaction for the entire problem. This has to be applied already in the first partial instance where a certain customer is concerned, although we do not have any knowledge about the trips of the same customer in the later solved partial instances.
 
 \subsection{Basic Idea}
 \label{sec:basic_idea}
@@ -897,7 +978,7 @@ We split the trip set~$\mathcal{T}$ according to the start times of the trips.
 \begin{definition}[Time-dependent Splitting]
 \label{def:time_dependent_splitting}
 
-Given time point $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We define the splitting of $\mathcal{T}$ as
+Given time points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We define the splitting of $\mathcal{T}$ as
 \begin{align*}
 	\Ti := \begin{cases}
 		\left\{t\in\mathcal{T}\mid \zstart_t\leq c_1\right\} & \text{for } i=1 \\
@@ -924,7 +1005,7 @@ Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we d
 
 Consider an arbitrary customer $c\in\mathcal{C}$. In the partial instance~$I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be chosen in advance and all trips ${t\in(M\circ C)^{-1}(c)\backslash m}$ are fixed to be neglected.
 
-In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even multimodal routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. Therefore, we try to estimate the total cost of the routes in advance. Solving the partial instances is again based on $\eqref{eq:SMILPi}$.
+In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even multimodal routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. For this, we try to estimate the total cost of the routes in advance. Solving the partial instances is again based on $\eqref{eq:SMILPi}$.
 
 We now consider partial instance~$I_i$. For the cover constraints, we introduce the decision variable ${u_m\in\{0,1\}}$ for ${m\in C^{-1}\left(\mathcal{C}_i\right)}$.  Notice that the definition of $\mathcal{C}_i$ is different from \Cref{def:customer_dependent_splitting}. In the customer constraints, only the customers in $\mathcal{C}_i$ are considered. The route constraints are restricted to the trips in $\Ti$. The cover constraints read as follows:
 \begin{align}
@@ -937,12 +1018,12 @@ For the constraint $\eqref{eq:TMILP:customer}$ it is irrelevant, if the consider
 
 After solving the partial instance, all determined $u_m$ are fixed for the later solved partial instances. The fixed route decisions from the previous partial instances have an impact on this instance, too. 
 
-Let $\bar{u}_m\in[0,1]$ be the fixed route choices from the previous instances. Define
+Let $\bar{u}_m\in\{0,1\}$ be the fixed route choices from the previous instances. Define
 \begin{align*}
 	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)>i\right\}
 \end{align*}
 
-as the set of customers that are treated before $I_i$. Then, we introduce the constraint
+as the set of customers that have been treated before $I_i$. This means, in partial instance $I_i$, we have chosen the routes for all ${c\in\overline{C}_i}$. We have ${\bar{u}_m=1}$ if the route $m$ has been chosen for the respective customer, \ie ${u_m=1}$ in the partial solution $S_{\gamma(C(m))}$. We are given $\bar{u}_m$ for all ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$. Thus, we introduce the constraint
 \begin{align}
 	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
 \end{align}
