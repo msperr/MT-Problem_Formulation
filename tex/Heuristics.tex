@@ -132,6 +132,7 @@ Putting all together, we have the formulation $\eqref{eq:SMILP}$.
 We show that $\eqref{eq:SMILP}$ is also feasible in $\eqref{eq:MMILP}$. Inversely, not every solution of the original formulation is also feasible in the split formulation.
 
 \begin{theorem}
+\label{thm:equivalence_SMILP_MMILP}
 
 Let ${S=(x,z,e,u)}$ be a feasible solution of the $\eqref{eq:SMILP}$. Then $S$ can be converted into a solution ${\bar{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ which is feasible in the $\eqref{eq:MMILP}$ and the objective values $\operatorname{val}(S)$ and $\operatorname{val}(\bar{S})$ coincide.
 
@@ -449,7 +450,7 @@ In each partial instance, we distinguish the non-empty duties concerning the veh
 \begin{theorem}
 \label{thm:equivalence_SMILP_heuristic}
 
-Let ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We can transform $\overline{S}$ into partial solutions $\left\{S_1,\dots,S_n\right\}$ where $S_i$ is feasible in $\eqref{eq:SMILPi}$ for ${i\in[n]}$. The values $\operatorname{val}(\overline{S})$ and ${\sum_{i=1}^n S_i}$ coincide without respecting the route cost.
+Let ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We can transform $\overline{S}$ into partial solutions $\left\{S_1,\dots,S_n\right\}$ where $S_i$ is feasible in $\eqref{eq:SMILPi}$ for ${i\in[n]}$. The values $\operatorname{val}(\overline{S})$ and ${\sum_{i=1}^n \operatorname{val}\left(S_i\right)}$ coincide without respecting the route cost.
 
 \end{theorem}
 
@@ -993,21 +994,21 @@ We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref
 
 \paragraph{Solving the Partial Instances} \parfill
 
-Since the trips of the same customer may be in different splittings, we cannot easily guarantee the customer satisfaction in just one partial instance. We have to put great effort in this issue. The partial instances are solved from the end to the beginning. Thus the earliest partial instance in which a trip of a customer arises, is defined as follows:
+Since the trips of the same customer may be in different partial trip sets, we cannot easily guarantee the customer satisfaction in just one partial instance. For each customer, we choose a route in the earliest solved partial instance where a trip of this customer arises. The partial instances are solved from the end to the beginning. Thus the earliest solved partial instance for a customer is defined as follows:
 \begin{align*}
 	\gamma: \mathcal{C}\to[n] && \gamma(c) := \max\left\{i\in[n]\mid\left(\left(M\circ C\right)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
 \end{align*}
 
 Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we define a partition ${\mathcal{C}=\Cupdot_{i=1}^n \mathcal{C}_i}$ as
 \begin{align*}
-	\mathcal{C}_i := \left\{c\in\mathcal{C}\mid \gamma(c)=i\right\} && \text{for } i\in[n]
+	\mathcal{C}_i := \left\{c\in\mathcal{C}\mid \gamma(c)=i\right\} && \text{for } i\in[n].
 \end{align*}
 
-Consider an arbitrary customer $c\in\mathcal{C}$. In the partial instance~$I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be chosen in advance and all trips ${t\in(M\circ C)^{-1}(c)\backslash m}$ are fixed to be neglected.
+Consider an arbitrary customer $c\in\mathcal{C}$. In the partial instance~$I_{\gamma(c)}$, a multimodal route $m\in C^{-1}(c)$ is chosen and this choice is definite. This means, in all subsequently solved partial instances, all trips ${t\in m}$ are fixed to be fulfilled in advance and all trips ${t\in(M\circ C)^{-1}(c)\backslash m}$ are fixed to be neglected.
 
-In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even multimodal routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. For this, we try to estimate the total cost of the routes in advance. Solving the partial instances is again based on $\eqref{eq:SMILPi}$.
+In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. For this, we try to estimate the total cost of the routes in advance. Solving the partial instances is based on the $\eqref{eq:SMILPi}$.
 
-We now consider partial instance~$I_i$. For the cover constraints, we introduce the decision variable ${u_m\in\{0,1\}}$ for ${m\in C^{-1}\left(\mathcal{C}_i\right)}$.  Notice that the definition of $\mathcal{C}_i$ is different from \Cref{def:customer_dependent_splitting}. In the customer constraints, only the customers in $\mathcal{C}_i$ are considered. The route constraints are restricted to the trips in $\Ti$. The cover constraints read as follows:
+We consider a partial instance~$I_i$. For the cover constraints, we introduce the decision variable ${u_m\in\{0,1\}}$ for ${m\in C^{-1}\left(\mathcal{C}_i\right)}$. In the customer constraints, only the customers in $\mathcal{C}_i$ are considered. The route constraints are restricted to the trips in $\Ti$. The cover constraints read as follows:
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:TMILP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:TMILP:route} \\
@@ -1016,72 +1017,143 @@ We now consider partial instance~$I_i$. For the cover constraints, we introduce 
 
 For the constraint $\eqref{eq:TMILP:customer}$ it is irrelevant, if the considered route has a trip in~$\Ti$.
 
-After solving the partial instance, all determined $u_m$ are fixed for the later solved partial instances. The fixed route decisions from the previous partial instances have an impact on this instance, too. 
+After solving the partial instance, all determined $u_m$ are fixed for the later solved partial instances. The fixed route decisions from the previously solved partial instances have an impact on this instance, too. 
 
-Let $\bar{u}_m\in\{0,1\}$ be the fixed route choices from the previous instances. Define
+We define terms with which we ensure the fixed route choices:
+
+\begin{definition}
+\label{def:route_fix}
+
+Let ${i\in[n]}$. We define
 \begin{align*}
 	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)>i\right\}
 \end{align*}
 
-as the set of customers that have been treated before $I_i$. This means, in partial instance $I_i$, we have chosen the routes for all ${c\in\overline{C}_i}$. We have ${\bar{u}_m=1}$ if the route $m$ has been chosen for the respective customer, \ie ${u_m=1}$ in the partial solution $S_{\gamma(C(m))}$. We are given $\bar{u}_m$ for all ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$. Thus, we introduce the constraint
+as the set of customers that have been treated before $I_i$.
+
+Let ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$ and let $\left\{S_{i+1},\dots,S_n\right\}$ be the already determined partial solutions with ${S_j=\left(x^j,z^j,e^j,u^j\right)}$. We define
+\begin{align*}
+	\hat{u}^i_m := u^j_m && \text{for } j=\gamma(C(m))
+\end{align*}
+
+\end{definition}
+
+In the partial instance $I_i$, we choose a route for each customer $c\in\mathcal{C}_i$. This is indicated by the decision variables $u^i_m$ for ${m\in C^{-1}(c)}$. We save this decision for all partial instances that are solved later in the value $\hat{u}^j_m$ for ${j\in[i-1]}$. Thus, we are given a ${\hat{u}^i_m\in\{0,1\}}$ for each ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$. We introduce the constraint
 \begin{align}
-	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \bar{u}_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
+	&\sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = \hat{u}^i_m && \text{for all } m\in C^{-1}\left(\overline{\mathcal{C}}_i\right), t\in m\cap\Ti \label{eq:TMILP:route_fix}
 \end{align}
 
 which ensures that the previous route choices are considered.
 
 \paragraph{Cost Estimation} \parfill
 
-We have to select one route of customer~$c$ in the partial instance~$I_{\gamma(c)}$. For this we have to estimate the costs for all routes of~$c$ in advance. But these costs partly arise in the later solved instances. The entire cost for the problem consists of vehicle costs $\cv$, trip costs $\ct$, deadhead costs $\cd$ and route costs $\croute$. While the trip cost and route cost can be determined easily for a route, the vehicle cost and deadhead cost strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route costs and define the estimated route cost as follows:
+We have to select one route of customer ${c\in\mathcal{C}}$ in the partial instance~$I_{\gamma(c)}$. For this we have to estimate the costs for all routes $m\in C^{-1}(c)$ in advance. But these costs partly arise in the later solved instances. The entire cost $\operatorname{cost}(S)$ consists of the vehicle cost $\cv$, trip cost $\ct$, deadhead cost $\cd$ and route cost $\croute$. While the trip cost and route cost can be determined easily for a route, the vehicle cost and deadhead cost strongly depend on the environment of the route and cannot be determined. We therefore focus on the trip and route cost and define the estimated route cost as follows:
 \begin{align*}
 	C_1(m) := \croute_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
 
-We use these costs in order to define the modified route cost
+We use this cost in order to define the modified route cost
 \begin{align*}
-	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } m\in\mathcal{M}
+	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } i\in[n], m\in C^{-1}\left(\mathcal{C}_i\right)
 \end{align*}
 
-and add the following term to the objective function:
-\begin{align*}
-	\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m
-\end{align*}
+We use this to state the objective function as follows: Let ${m\in C^{-1}\left(\mathcal{C}_i\right)}$. Its trips in the considered partial trip set ${t\in m\cap\Ti}$ are not respected in $\hat{c}^{\operatorname{r}}_m$ since their trip costs are already part of the objective function. The other trips ${t\in m\backslash\Ti}$ are added to $\hat{c}^{\operatorname{r}}_m$ such that they have an impact on the choice of the routes.
 
-\begin{remark}
+Let ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$. Its trips in the considered partial trip set ${t\in m\cap\Ti}$ are respected in $\hat{c}^{\operatorname{r}}_m$ in the partial instance $I_{\gamma(C(m))}$ and as trip costs $\ct$ in $I_i$. Therefore we subtract these trip costs from the objective function in $I_i$. This term is only a constant and does not influence the solution. We subtract it nevertheless, such that the sum of the objective values of the partial instances provides the correct solution cost.
 
-The trips in the considered partial trip set $t\in m\cap\Ti$ are not considered in~$\hat{c}^{\operatorname{r}}_m$ since their trip costs are already part of the objective function. The other trips ${t\in m\backslash\Ti}$ are added to~$\hat{c}^{\operatorname{r}}_m$ such that they have an impact on the choice of the routes.
-
-Consider a trip $t$  that is decided before this partial instance, \ie ${t\in(M\circ C)\left(\overline{\mathcal{C}}_i\right)}$. Its trip cost $\ct_t$ arises twice in the objective functions. Once in the partial instance $I_{\gamma\left((M\circ C)(t)\right)}$ as part of $\hat{c}^{\operatorname{r}}_{M(t)}$ and once in partial instance $I_i$ as $\ct_t$. But since in partial instance $I_i$ the trip is fulfilled anyway, this cost is only an additional constant that does not influence the solution. 
-
-\end{remark}
-
-We denote the formulation $\eqref{eq:SMILPi}$ with the constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:um}$ and $\eqref{eq:TMILP:route_fix}$ and the new objective function including modified route costs as $(\operatorname{TMILP}_i)$ for $i\in[n]$.
+In summary, the objective function reads as:
+\begin{align}
+	& \sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m - \sum_{m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)} \hat{u}^i_m \left(\sum_{t\in m\cap\Ti} \ct_t\right)\nonumber \\
+	& \sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right] \tag{$\operatorname{TMILP}_i$} \label{eq:TMILPi}
+\end{align}
 
 \paragraph{Model Equivalence} \parfill
 
-\begin{theorem}
-\label{thm:equivalence_TMILP_MMILP}
+Finally, we show that the original model and the time-dependent heuristic are equivalent to each other. We can transform each heuristical solution into a feasible solution of the $\eqref{eq:MMILP}$ as shown in \Cref{thm:equivalence_SMILP_MMILP} and \Cref{thm:equivalence_TMILP_SMILP}. In contrast to the customer-dependent, we additionally can transform each solution of the $\eqref{eq:MMILP}$ into a solution that is feasible in the heuristic as shown in \Cref{lem:equivalence_MMILP_SMILP} and \Cref{thm:equivalence_SMILP_TMILP}.
 
-Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{TMILP}_i)$ for ${i\in[n]}$. Then~$S$ is feasible in the $\eqref{eq:MMILP}$.
+\begin{theorem}
+\label{thm:equivalence_TMILP_SMILP}
+
+Let $\left\{S_1,\dots,S_n\right\}$ be partial solutions where $S_i$ is feasible in the $\eqref{eq:TMILPi}$ and the end point set $\Phat_i$ is created according to \Cref{alg:successive_heuristic} for ${i\in[n]}$. They can be transformed into a solution $\overline{S}$ that is feasible in the $\eqref{eq:SMILP}$ and the values ${\sum_{i=1}^n \operatorname{val}\left(S_i\right)}$ and ${\operatorname{val}(\overline{S})}$ coincide.
 
 \end{theorem}
 
 \begin{proof}
 
-Proof\fxnote{Proof}
+For ${i\in[n]}$, let ${S_i=\left(x^i,z^i,e^i,u^i\right)}$ be the partial solutions of $I_i$ and $\hat{u}^i_m$ as in \Cref{def:route_fix}. The formulation $\eqref{eq:TMILPi}$ is built on the $\eqref{eq:SMILPi}$ with additional constraints and thus $S_i$ is feasible in $\eqref{eq:SMILPi}$. According to \Cref{thm:equivalence_heuristic_SMILP}, we can construct a solution ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ which is feasible in the $\eqref{eq:SMILP}$ without the cover constraints. We apply this construction and only modify the variables $\bar{u}_m$.
+
+Let ${i\in[n]}$ be arbitrary. We define
+\begin{align*}
+	\bar{u}_m := u^i_m && \text{for } m\in C^{-1}\left(\mathcal{C}_i\right)
+\end{align*}
+
+The variables $\bar{u}_m$ only affect the cover constraints. For each ${c\in\mathcal{C}}$, there is a unique ${i\in[n]}$ such that ${c\in\mathcal{C}_i}$. The constraint $\eqref{eq:TMILP:customer}$ holds in every partial instance, from this follows $\eqref{eq:MMILP:customer}$. Let ${m\in C^{-1}\left(\mathcal{C}_i\right)}$. The constraint $\eqref{eq:MMILP:route}$ follows from $\eqref{eq:TMILP:route}$ for ${t\in m\cap\Ti}$ and from $\eqref{eq:TMILP:route_fix}$ for ${t\in m\cap\Cupdot_{j=1}^{i-1}\mathcal{T}_j}$. Therefore $\overline{S}$ is a feasible solution of the $\eqref{eq:SMILP}$.
+
+According to \Cref{thm:equivalence_heuristic_SMILP}, the objective values coincide. We have modified the objective function of the $\eqref{eq:TMILPi}$ and $\bar{u}_m$. We see that
+\begin{align*}
+	\sum_{m\in\mathcal{M}} \bar{u}_m \croute_m & = \sum_{i=1}^n \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u^i_m \croute_m \\
+	& = \sum_{i=1}^n \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u^i_m\left(\croute_m + \sum_{t\in m\backslash\Ti} \ct_t\right) - \sum_{i=1}^n \sum_{m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)} \hat{u}^i_m\left(\sum_{t\in m\cap\Ti} \ct_t\right) \\
+	& = \sum_{i=1}^n \left[\sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u^i_m \hat{c}^{\operatorname{r}}_m - \sum_{m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)} \hat{u}^i_m \left(\sum_{t\in m\cap\Ti} \ct_t\right)\right]
+\end{align*}
+
+and therefore
+\begin{align*}
+	\operatorname{val}\left(\overline{S}\right) = \sum_{i=1}^n \operatorname{val}\left(S_i\right)
+\end{align*}
+
+\end{proof}
+
+\begin{lemma}
+\label{lem:equivalence_MMILP_SMILP}
+
+Let $S$ be a solution of the $\eqref{eq:MMILP}$. We can transform $S$ into a solution $\overline{S}$ which is feasible in the $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:time_dependent_splitting}. The objective values $\operatorname{val}(S)$ and $\operatorname{val}(\overline{S})$ coincide.
+
+\end{lemma}
+
+\begin{proof}
+
+Let ${S=\left(x,z,e,u\right)}$ be a feasible solution of the $\eqref{eq:MMILP}$. We construct a solution ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ that is feasible in the $\eqref{eq:SMILP}$ with a time-dependent splitting. Let $i\in[n]$ and ${s\in\Ti}$. For each ${t\in\mathcal{T}}$ with ${s\prec t}$ holds ${t\in\Cupdot_{j=i}^n\mathcal{T}_j}$ due to the construction of the splitting.
+
+For ${s,t\in\Ti}$ (if $i=1$ then $s\in\mathcal{V}\cupdot\mathcal{T}_1$) with ${s\prec t}$ and ${r\in\Rst}$, we set
+\begin{align*}
+	\bar{x}_{s,t} := x_{s,t} && \bar{z}_{s,r,t} := z_{s,r,t}
+\end{align*}
+
+For ${s\in\Ti}$ (if $i=1$ then $s\in\mathcal{V}\cupdot\mathcal{T}_1$), ${t'=\operatorname{SP}_i(t)}$ for some ${t\in\Cupdot_{j=i+1}^n\mathcal{T}_j}$ with ${s\prec t}$ and ${r\in\Rst}$, we set
+\begin{align*}
+	\bar{x}_{s,t'} := x_{s,t} && \bar{x}_{t',t} := x_{s,t} && \bar{z}_{s,r,t'} := z_{s,r,t}
+\end{align*}
+
+Further, we set
+\begin{align*}
+	\bar{u}_m & := u_m && \text{for } m\in\mathcal{M} && \bar{x}_{\ds,s} := x_{\ds,s} && \bar{x}_{s,\de} := x_{s,\de} && \text{for } s\in\mathcal{V}\cupdot\mathcal{T} \\
+	\bar{e}_s & := e_s && \text{for } s\in\mathcal{V}\cupdot\mathcal{T} && \bar{e}_s := e_t + \ft_t && \omit\rlap{for $t\in\mathcal{T}, s=\operatorname{SP}_i(t)$}
+\end{align*}
+
+The proof that $\overline{S}$ is a feasible solution of the $\eqref{eq:SMILP}$ and the objective values coincide works analogously to the proof of \Cref{thm:equivalence_SMILP_MMILP}.
 
 \end{proof}
 
 \begin{theorem}
-\label{thm:equivalence_MMILP_TMILP}
+\label{thm:equivalence_SMILP_TMILP}
 
-Let $S$ be a feasible solution of the $\eqref{eq:MMILP}$. Then $S$ is feasible in the $(\operatorname{TMILP})$.
+Let $\overline{S}$ be a feasible solution of the $\eqref{eq:SMILP}$. We can transform $\overline{S}$ into partial solutions $\left\{S_1,\dots,S_n\right\}$ where $S_i$ is feasible in $\eqref{eq:TMILPi}$ for ${i\in[n]}$. The values ${val}(\overline{S})$ and ${\sum_{i=1}^n \operatorname{val}\left(S_i\right)}$ coincide.
 
 \end{theorem}
 
 \begin{proof}
 
-Proof\fxnote{Proof}
+Let ${\overline{S}=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ be a feasible solution of the $\eqref{eq:SMILP}$. We construct solutions ${S_i=\left(x^i,z^i,e^i,u^i\right)}$ for ${i\in[n]}$. We define $x^i$, $z^i$ and $e^i$ as in the proof of \Cref{thm:equivalence_SMILP_heuristic}. For ${m\in C^{-1}\left(\mathcal{C}_i\right)}$, we define
+\begin{align*}
+	u^i_m := \bar{u}_m && \hat{u}^j_m := \bar{u}_m && \text{for } j\in[i-1]
+\end{align*}
+
+$\left(x^i,z^i,e^i\right)$ is feasible in the $\eqref{eq:SMILP}$ according to \Cref{thm:equivalence_SMILP_heuristic} and the cover constraints $\eqref{eq:TMILP:customer}$, $\eqref{eq:TMILP:route}$, $\eqref{eq:TMILP:um}$ and $\eqref{eq:TMILP:route_fix}$ follow directly from $\eqref{eq:MMILP:customer}$, $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:um}$. Therefore, each $S_i$ is a feasible solution of $\eqref{eq:TMILPi}$. The proof of
+\begin{align*}
+	\sum_{i=1}^n\operatorname{val}\left(S_i\right) = \operatorname{val}\left(\overline{S}\right)
+\end{align*}
+
+works analogously to the proof of \Cref{thm:equivalence_TMILP_SMILP}.
 
 \end{proof}
 
