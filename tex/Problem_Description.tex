@@ -43,6 +43,7 @@ In summary, we try to model additional customer costs and customer inconvenience
 We first define the car trips, the multimodal routes, the customers and the connections between them. 
 
 \begin{definition}[Trips, routes and customers]
+\label{def:trips_routes_customers}
 
 \begin{enumerate}
 	\item
@@ -67,7 +68,7 @@ Each trips belongs to exactly one route and each route belongs to exactly one cu
 	\item
 For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, but the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$
 \begin{align*}
-	\zstart_c := \min_{m\in C^{-1}(c)}\zstart_m & & \zend_c := \max_{m\in C^{-1}(c)}\zend_m .
+	\zstart_c := \min_{t\in (C\circ M)^{-1}(c)}\zstart_t & & \zend_c := \max_{t\in (C\circ M)^{-1}(c)}\zstart_t .
 \end{align*}
 \end{enumerate}
 

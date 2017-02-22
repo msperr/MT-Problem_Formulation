@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=128
-Cursor=4546
+TopLine=0
+Cursor=492
 
 [Frame1]
 Flags=0
@@ -53,8 +53,8 @@ Class=LaTeXView
 Document=tex\Problem_Description.tex
 
 [Frame2_View0,0]
-TopLine=283
-Cursor=8362
+TopLine=87
+Cursor=8112
 
 [Frame3]
 Flags=0
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame4_View0,0]
-TopLine=1426
-Cursor=86301
+TopLine=862
+Cursor=53352
 
 [Frame5]
 Flags=0
@@ -143,7 +143,7 @@ Class=BibTeXView
 Document=Literatur.bib
 
 [Frame7_View0,0]
-TopLine=25
+TopLine=35
 Cursor=4377
 
 [SessionInfo]

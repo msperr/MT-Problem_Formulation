@@ -28,13 +28,15 @@
  colorlinks=true,
 }
 
-\usetikzlibrary{arrows,positioning} 
+\usetikzlibrary{arrows,positioning, fit} 
 \tikzset{
 	>=stealth',
-	rect/.style={rectangle, rounded corners, draw=black, text width=1cm, text height=0.35cm, text centered},
-	circ/.style={circle, draw=black, text centered},
+	rect/.style={rectangle, rounded corners, draw=black, text width=1cm, minimum height=0.7cm, text centered},
+	circ/.style={circle, draw=black, text centered, minimum height=0.8cm},
 	arrow/.style={->, shorten <=1pt, shorten >=1pt,},
-	dummy/.style={rectangle, draw=white, text width=1cm, text height=0.35cm}
+	dummy/.style={rectangle, text centered, text width=1cm, minimum height=0.7cm},
+	dummycirc/.style={circle, minimum height=0.8cm},
+	box/.style={draw=black, inner sep=0.3cm, rectangle},
 }
 
 \setlength{\parindent}{0pt}
@@ -147,6 +149,10 @@
 
 \bibliography{Literatur}
 \bibliographystyle{alpha}
+
+\listoffigures
+
+\listoftables
 
 \listoffixmes
 

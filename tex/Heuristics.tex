@@ -3,9 +3,9 @@
 
 In this chapter, successive heuristics are introduced in order to solve our problem. As seen in \Cref{sec:complexity}, the problem is ${\mathcal{NP}\text{-hard}}$ even if we apply one of the restrictions, the cover constraints or the fuel constraints, individually. Our goal is to develop a heuristic that can cope with both multi-leg cover constraints and fuel constraints. We build our heuristic on a heuristic for a simpler version of the problem, developed in the underlying theses. \cite{Knoll} present heuristical solution methods for the problem only with fuel constraints. The problem setting assumes that there is a set of trips where each of these trips shall be fulfilled. They already claim, that solving a complete instance of 24 hours to optimality is not possible with their respective computing capacity. Therefore it is a plausible assumption that an optimal solution for our problem cannot be expected in reasonable time. 
 
-Their solution methods are based on the idea of splitting the complete instance according to several time intervals. For each interval, only the trips starting in the respective interval are considered. From this formulation emerge several separate partial instances that are still loosely connected to each other. Each of these partial instances is solved separately and then the partial solutions are connected to a complete feasible solution. Two different approaches are presented in order to solve the problem: The constraints connecting the partial instances are relaxed by using Lagrange Relaxation. With suitable computation of Lagrange multipliers, the partial instances are solved in parallel. In the other one, the partial instances are solved successively, where the respective connecting constraints are fixed beginning at the end.
+Their solution methods are based on the idea of splitting the complete instance into several time intervals. For each interval, only the trips starting in the respective interval are considered. The connection between two trips from different intervals is redirected through a split point. From this formulation emerge several separate partial instances that are only loosely connected to each other via the split points. Each of these partial instances is solved separately and then the partial solutions are connected to a complete feasible solution. Two different approaches are presented in order to solve the problem: The constraints connecting the partial instances are relaxed by using Lagrange Relaxation. With suitable computation of Lagrange multipliers, the partial instances are solved in parallel. In the other approach, the partial instances are solved successively, where the respective connecting constraints are fixed beginning at the end.
 
-An adaption of the cover constraints to the heuristic using Lagrange Relaxation seems not practicable. This heuristics heavily exploits the loosely connection of the partial instances. The cover constraints strongly influence the complete instance by selecting the fulfilled trips, the multi-leg cover constraints even require an additional set of variables, belonging to none of the partial instances. Therefore, an additional relaxing of these cover constraints is not a promising approach. Instead, we focus on the second approach of Successive Heuristics.
+An adaption of the cover constraints to the heuristic using Lagrange Relaxation seems not practicable. This heuristic heavily exploits the loose connection of the partial instances. The cover constraints strongly influence the complete instance by selecting the fulfilled trips, the multi-leg cover constraints even require an additional set of variables, belonging to none of the partial instances. Therefore, an additional relaxing of these cover constraints is not a promising approach. Instead, we focus on the second approach of Successive Heuristics.
 
 The crucial difficulty for this procedure is to ensure the customer satisfaction. In particular, if trips of a customer are wide apart in terms of time, these trips will lie in different splittings. This makes it hard to keep control over the trip selection in separately solved partial instances.
 
@@ -169,6 +169,76 @@ Note that a feasible solution in $\eqref{eq:MMILP}$ is not necessarily feasible 
 
 \end{remark}
 
+\paragraph{Example} \parfill
+
+In the following, we show an example how the transformed task graph is created for a given splitting. We do not enlarge upon the kind of the splitting, as this is treated in \Cref{sec:customer_dependent_splitting} and \Cref{sec:time_dependent_splitting}. \Cref{fig:transformed_taskgraph} shows a simplified model of the transformed task graph $\overline{G}$ with $n=3$. The boxes $\left\{I_1,I_2,I_3\right\}$ indicate how the complete instance is split up in partial instances. This is needed later in order to define the heuristics.
+
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=0.6cm, auto,]
+		\node[circ] (ds) {$d^{\operatorname{s}}$};
+		\node[rect, right=of ds] (vehicles) {$\mathcal{V}$};
+		\node[rect, right=of vehicles] (t1) {$\mathcal{T}_1$};
+		\node[dummy, right=of t1] (dummy1) {};
+		\node[rect, above=of dummy1] (p12) {$\mathcal{P}_{1,2}$};
+		\node[rect, below=of dummy1] (p13) {$\mathcal{P}_{1,3}$};
+		\node[rect, right=of p12] (t2) {$\mathcal{T}_2$};
+		\node[dummy, below=of t2] (dummy2) {};
+		\node[rect, right=of dummy2] (p23) {$\mathcal{P}_{2,3}$};
+		\node[dummy, below=of p23] (dummy3) {};
+		\node[rect, right=of p23] (t3) {$\mathcal{T}_3$};
+		\node[dummy, above=of t3] (dummy4) {};
+		\node[dummy, below=of t3] (dummy5) {};
+		\node[circ, right=of t3] (de) {$d^{\operatorname{e}}$};
+	
+		\draw[arrow] (ds) to (vehicles);
+		\draw[arrow] (vehicles.east) to (t1.west);
+		\draw[arrow] (vehicles) to (p12);
+		\draw[arrow] (vehicles) to (p13);
+		\draw[arrow] (t1) to (p12);
+		\draw[arrow] (t1) to (p13);
+		\draw[arrow] (p12) to (t2);
+		\draw[arrow, bend right=15] (p13) to (t3);
+		\draw[arrow] (t2) to (p23);
+		\draw[arrow] (p23) to (t3);
+		\draw[arrow, bend right=60] (vehicles.south) to (de);
+		\draw[arrow, bend right=60] (t1.south) to (de);
+		\draw[arrow, bend left=15] (t2.east) to (de);
+		\draw[arrow] (t3) to (de);
+	
+		\node (box1) [box, fit = (vehicles) (p12) (p13)] {};
+		\node (box2) [box, fit = (t2) (p23) (dummy3)] {};
+		\node (box3) [box, fit = (dummy4) (dummy5)] {};
+		\node (i1) [dummy, above=0cm of box1] {$I_1$};
+		\node (i2) [dummy, above=0cm of box2] {$I_2$};
+		\node (i3) [dummy, above=0cm of box3] {$I_3$};
+	\end{tikzpicture}
+	\vspace{-1cm}
+	\caption{Simplified representation of $\overline{G}$ for $n=3$}
+	\label{fig:transformed_taskgraph}
+\end{figure}
+
+We show an exemplary instance, with which we explain the creation of the split points.
+
+\begin{example}
+\label{ex:splitting_1}
+
+Let ${\mathcal{V}=\left\{v_1,v_2,v_3\right\}}$ and ${\mathcal{T}=\left\{t_1,\dots,t_6\right\}}$. We assume that each trip belongs to a different customer, therefore the cover constraints are equivalent to fulfilling each trip. We consider a splitting
+\begin{align*}
+	\mathcal{T}_1=\left\{t_1\right\} && \mathcal{T}_2=\left\{t_2,t_3\right\} && \mathcal{T}_3=\left\{t_4,t_5,t_6\right\}
+\end{align*}
+
+We assume that ${s\prec t}$ for ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${i<j}$. The partial split point sets are the following:
+\begin{gather*}
+	\mathcal{P}_{1,2} = \left\{\operatorname{SP}_1\left(t_2\right), \operatorname{SP}_1\left(t_3\right)\right\}
+	\qquad \mathcal{P}_{1,3} = \left\{\operatorname{SP}_1\left(t_4\right),\operatorname{SP}_1\left(t_5\right),\operatorname{SP}_1\left(t_6\right)\right\} \\
+	\mathcal{P}_{2,3} = \left\{\operatorname{SP}_2\left(t_4\right),\operatorname{SP}_2\left(t_5\right),\operatorname{SP}_2\left(t_6\right)\right\}
+\end{gather*}
+
+For all ${s\in\Ti}$, ${t\in\mathcal{T}_j}$ with ${i<j}$, the arc $(s,t)$ is replaced by the arc $\left(s,\operatorname{SP}_i(t)\right)$ and the arc $\left(\operatorname{SP}_{j'}(t),t\right)$ is inserted for each ${j'<j}$.
+
+\end{example}
+
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{General Setting}
@@ -180,16 +250,16 @@ This heuristic is directly applied from \cite[Sec.~10.4]{Knoll}. As presented th
 
 \paragraph{Determination of the Endpoints} \parfill
 
-The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. For ${i\in[n-1]}$ assume that we have solved $I_{i+1}$ right now. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
+The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. For ${i\in[n-1]}$ assume that we have solved $I_{i+1}$ right before. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
 
 Each duty of $S_{i+1}$ consists of a sequence of trips out of $\mathcal{T}_{i+1}$ and refuel points and possibly ends with an end point out of $\Phat_{i+1}$. It is possible that a duty only consists of an end point. For each duty we create an end point in $\Phat_i$. If the duty starts with a trip or end point $s$, we create the end point $t$ with the following properties
 \begin{align*}
 	\pstart_t = \pend_t := \pstart_s && \zstart_t = \zend_t := \zstart_s && f_t^0 := e_s + \ft_s
 \end{align*}
 
-where $e_s$ is the respective value of decision variable $e$ in the $S_{i+1}$. We add $t$ to the end point set $\Phat_i$.
+where $e_s$ is the respective value of decision variable $e$ in $S_{i+1}$. We add $t$ to the end point set $\Phat_i$.
 
-For each end point $t$, we call the respective trip $s$ from where it is created, the trip representing $t$. If an end point $t$ is created from an end point $s$, the trip representing $t$ is the trip representing $s$. Note that each end point ${t\in\bigcup_{i=1}^n\Phat_i}$ has a trip ${s\in\mathcal{T}}$ representing it.
+For each end point $t\in\Phat_i$, we call the respective trip $s\in\mathcal{T}_{i+1}$ from where it is created, the trip representing $t$. If an end point $t\in\Phat_i$ is created from an end point $s\in\Phat:{i+1}$, the trip representing $t$ is the trip representing $s$. Note that each end point $t\in\Phat_i$ has a trip ${s\in\Cupdot_{j=i+1}^n\mathcal{T}_j}$ representing it.
 
 The partial instance~$I_1$ has a special role. This instance additionally contains the vehicle set. Each duty of the partial solution $S_1$ starts with a vehicle $v\in\mathcal{V}$, consists of trips out of $\mathcal{T}_1$ and refuel points and possibly ends with an endpoint out of $\Phat_1$. It is possible that a duty only consists of a vehicle.
 
@@ -205,7 +275,7 @@ For each duty in $S_1$, we check whether it ends with an end point $t\in\bigcup_
 		If it does not, the start duty is finished and we continue with the next duty in $S_1$.
 \end{itemize}
 
-In the partial instances has to be ensured that each end point ${t\in\Phat_i}$ is covered by some duty in $S_i$. This guarantees that all duties of the partial solutions are finally part of the overall solution. \Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
+In a partial instance $I_i$, each end point ${t\in\Phat_i}$ is covered by some duty in $S_i$. This guarantees that all duties of the partial solutions are finally part of the overall solution. \Cref{alg:successive_heuristic} describes the procedure of the Successive Heuristics.
 
 \begin{algorithm}[htb]
 	\SetAlgoLined
@@ -234,6 +304,36 @@ In the partial instances has to be ensured that each end point ${t\in\Phat_i}$ i
 	\caption{Successive Heuristic (general setting) \label{alg:successive_heuristic}}
 \end{algorithm}
 
+\paragraph{Example} \parfill
+
+In the following, we show an example how the end points are created and the partial solutions are connected. This example proceeds \Cref{ex:splitting_1}.
+
+\begin{example}
+
+Let ${\mathcal{V}=\left\{v_1,v_2,v_3\right\}}$ and ${\mathcal{T}=\left\{t_1,\dots,t_6\right\}}$ with the splitting $\left\{\left\{t_1\right\},\left\{t_2,t_3\right\},\left\{t_4,t_5,t_6\right\}\right\}$. We first solve the partial instance $I_3$ with end point set $\Phat_2$ and partial solution $S_3$:
+\begin{align*}
+	\Phat_3 = \emptyset && S_3 = \left\{\left(t_4, t_5\right), \left(t_6\right)\right\}
+\end{align*}
+
+We create an end point $t'_4$ out of $t_4$ and $t'_6$ out of $t_6$. We solve the partial instance $I_2$ with end point set $\Phat_2$ and partial solution $S_2$:
+\begin{align*}
+	\Phat_2 = \left\{t'_4,t'_6\right\} && S_2 = \left\{\left(t'_4\right), \left(t_2,t_3,t'_6\right)\right\}
+\end{align*}
+
+We create an end point $t''_4$ out of $t'_4$ and $t'_2$ out of $t_2$. Note that $t_4$ represents $t''_4$. We solve the partial instance $I_1$ with end point set $\Phat_1$ and partial solution $S_1$:
+\begin{align*}
+	\Phat_1\left\{t'_2,t''_4\right\} && S_1 = \left\{\left(v_1,t_1,t''_4\right), \left(v_2,t'_2\right), \left(v_3\right)\right\}
+\end{align*}
+
+Then we connect the partial solutions to 
+\begin{align*}
+	d\left(v_1\right) = \left(t_1,t_4,t_5\right) && d\left(v_2\right) = \left(t_2,t_3,t_6\right) && d\left(v_3\right) = \emptyset
+\end{align*}
+
+This is a feasible solution according to \Cref{def:feasible_schedule}.
+
+\end{example}
+
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Solving the Subproblems}
@@ -242,7 +342,7 @@ We describe how the partial instances ${I_1,\dots,I_n}$ are solved. We create a 
 
 \begin{remark}
 
-The formulation developed here is only a basic structure for solving the partial instances. The realization of the cover constraints depends on the splitting method. Since there are several approaches to split the trip set, we refer to \Cref{sec:customer_dependent_splitting} and \Cref{sec:time_dependent_splitting} for the actual description of the cover constraints. The route costs heavily depend on the cover constraints and are thus also neglected here. The in \Cref{sec:successive_heuristics} developed approach solely is not appropriate to gain meaningful results. Since the cover constraints are completely left out here, the empty solution is feasible and is obviously the cost-minimal solution.
+The formulation developed here is only a basic structure for solving the partial instances. The realization of the cover constraints depends on the splitting method. Since there are several approaches to split the trip set, we refer to \Cref{sec:customer_dependent_splitting} and \Cref{sec:time_dependent_splitting} for the actual description of the cover constraints. The route costs heavily depend on the cover constraints and are thus also neglected here. The approach as developed in \Cref{sec:successive_heuristics} is not appropriate to gain meaningful results. Since the cover constraints are completely left out here, the empty solution is feasible and is obviously the cost-minimal solution.
 
 \end{remark}
 
@@ -504,7 +604,7 @@ The customer-dependent splitting is defined as follows:
 \begin{definition}[Customer-dependent splitting]
 \label{def:customer_dependent_splitting}
 
-Given points in time $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We first define a splitting of the customers $\mathcal{C}=\Cupdot_{i=1}^n\mathcal{C}_i$ as
+Given points in time $c_i$, $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We first define a splitting of the customers $\mathcal{C}=\Cupdot_{i=1}^n\mathcal{C}_i$ as
 \begin{align*}
 	\mathcal{C}_i := \begin{cases}
 		\left\{c\in\mathcal{C}\mid \zstart_c\leq c_1\right\} & \text{for } i=1 \\
@@ -538,7 +638,7 @@ We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$. Let $S$ be a 
 
 \paragraph{Model Equivalence} \parfill
 
-In the following, we examine whether the formulations $\eqref{eq:MMILP}$ and $(\operatorname{CMILP})$ are equivalent. We show that each solution that is computed with the heuristic is actually a feasible solution of the original problem. On the other hand, we provide a counterexample, in which the optimal solution is not a feasible outcome of the heuristic.
+In the following, we examine whether the formulations $\eqref{eq:MMILP}$ and $(\operatorname{CMILP})$ are equivalent. We show that each solution that is computed with the heuristic is actually a feasible solution of the original problem. On the other hand, we provide a counterexample, in which the optimal solution of the $\eqref{eq:MMILP}$ is not a feasible outcome of the heuristic.
 
 \begin{theorem}
 \label{thm:equivalence_CMILP_MMILP}
@@ -560,7 +660,7 @@ In the $(\operatorname{CMILP}_i)$, the route cost is added to the objective func
 
 \end{proof}
 
-\Cref{thm:equivalence_CMILP_MMILP} shows that each heuristical solution is a feasible solution. Now we show that a feasible solution is not necessarily feasible in the heuristic using a customer-dependent splitting.
+\Cref{thm:equivalence_CMILP_MMILP} shows that each heuristical solution is a feasible solution of the $\eqref{eq:MMILP}$. Now we show that a feasible solution of the $\eqref{eq:MMILP}$ is not necessarily feasible in the heuristic using a customer-dependent splitting.
 
 \begin{example}
 \label{ex:equivalence_MMILP_CMILP}
@@ -576,7 +676,7 @@ Let ${\mathcal{T}=\left\{t_1, t_2, t_3\right\}}$ with ${t_1\prec t_2\prec t_3}$ 
 		$t_2$ & 8:30 & 8:45 & $m_2$ & $b_2$ \\
 		$t_3$ & 9:00 & 9:15 & $m_1$ & $b_1$ \\
 	\end{tabular}
-	\caption{Trips}
+	\caption{Trips corresponding to \Cref{ex:equivalence_MMILP_CMILP}}
 	\label{tab:customer_heuristic_example}
 \end{table}
 
@@ -586,44 +686,36 @@ If we now set a time point ${c_1 := \text{8:15}}$, then the partial trip sets ar
 
 \end{example}
 
+%----------------------------------------------------------------------------------------------------------------------------------------
+
 \subsection{Quality of the Heuristic}
 
-Although the optimal solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. Based on an arbitrary feasible solution we inspect where this solution becomes infeasible in the heuristic and if we can construct a new solution which is feasible there. Depending on the initial solution, we aim to receive upper bounds for the total cost of the new solution. 
+Although the optimal solution is possibly not feasible in the heuristic, we examine the quality of feasible heuristical solutions. Based on an arbitrary feasible solution of the $\eqref{eq:MMILP}$, we inspect at which points this solution becomes infeasible in the heuristic and if we can construct a new solution which is feasible there. Depending on the initial solution, we aim to receive upper bounds for the total cost of the new solution. 
 
 \paragraph{Quality of Feasible Solutions} \parfill
 
-The only reason that makes a duty~$d$ infeasible in the customer-dependent heuristic is when an earlier trip $s$ is located in a later partial trip set than $t$ and therefore the connection between $s$ and $t$ is deleted. Under certain conditions it is possible to create new duties $d_1$ and $d_2$ covering all trips of~$d$ where $d_1$ and $d_2$ are feasible in the heuristic. To realize these duties, we also need an additional vehicle that covers duty~$d_2$. Having these additional vehicles, we construct a new solution whose total cost is bounded by twice the original cost.
+Let $d(v)$ be a duty of a feasible schedule according to \Cref{def:feasible_schedule}. The only reason that makes $d(v)$ infeasible in the customer-dependent heuristic is the following: A trip ${s\in\mathcal{T}}$ is positioned earlier in time than ${t\in\mathcal{T}}$, but is located in a later partial trip set, \ie ${s\prec t}$ and ${s\in\Ti}, {t\in\mathcal{T}_j}$ with ${j<i}$. This may occur if
+\begin{align*}
+	\zstart_s < \zstart_t && \text{and} && \zstart_{(C\circ M)(s)} > \zstart_{(C\circ M)(t)}.
+\end{align*}
+
+Then the feasible connection between $s$ and $t$ is infeasible in the heuristic. Under certain conditions it is possible to create new duties $d_1$ and $d_2$ covering all trips of the duty $d(v)$ where $d_1$ and $d_2$ are both feasible in the heuristic. To realize these duties, we also need an additional vehicle that covers duty~$d_2$. Having these additional vehicles, we construct a new solution whose total cost is bounded by twice the original cost.
 
 \begin{definition}[Customer extension and splitting length]
 
-Consider a customer set $\mathcal{C}$ and time points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
+Consider a customer set $\mathcal{C}$ and time points $c_i$, $i\in[n-1]$ with $c_i<c_{i+1}$ for all $i\in[n-2]$. We define the following values:
 \begin{itemize}
-	\item{Customer Extension for $c\in\mathcal{C}$: $\displaystyle{L_{\operatorname{C}}(c) := \max_{t\in(M\circ C)^{-1}(c)}\zstart_t - \min_{t\in(M\circ C)^{-1}(c)}\zstart_t}$}
-	\item{Customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} L_{\operatorname{C}}(c)}$}
-	\item{Splitting Length: $\displaystyle{L_{\operatorname{S}} := \min_{i\in[n-1]} c_{i+1}-c_i}$}
+	\item{Customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} \left(\zend_c - \zstart_c\right)}$}
+	\item{Splitting Length: $\displaystyle{L_{\operatorname{S}} := \min_{i\in[n-1]} \left(c_{i+1}-c_i\right)}$}
 \end{itemize}
 
 \end{definition}
 
-The customer extension and the splitting length are important values for investigating the behavior of the heuristic. If the customer extension is small, the possibility of customer overlapping is restricted. If additionally the splitting length is large, the number of partial trip set affected by a single customer is small. Since only the overlapping of customers causes the infeasibilities, these are  desirable issues.
+According to \Cref{def:trips_routes_customers}, $\zstart_c$ is the earliest and $\zend_c$ the latest start time of a trip corresponding to customer ${c\in\mathcal{C}}$. The value $L_{\operatorname{C}}$ describes the greatest time range between the earliest and the latest trip of any customer. The value $L_{\operatorname{S}}$ indicates the smallest time range between two splitting points. 
 
-We make the next definitions in order to specify the cost of a solution and its duties.
+If the customer extension is bounded by the splitting length, \ie ${L_{\operatorname{C}}\leq L_{\operatorname{S}}}$, the following advantage occurs: Let ${t\in\Ti}$ and ${s\in\mathcal{T}}$ with ${s\prec t}$. Then $s$ is located not more than one partial instance later than $\Ti$, \ie ${s\in\Cupdot_{j=1}^{i+1}\mathcal{T}_j}$. With this condition, we restrict the number of possible connections that are destroyed by the heuristic.
 
-\begin{definition}[Duty cost]
-\label{def:dutycost}
-
-Let ${d=\left(v,t_1,\dots,t_k\right)}$ be a non-empty duty of a solution with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}\cupdot\mathcal{R}}$. We define the cost of duty~$d$ as
-\begin{align*}
-	\operatorname{cost}(d) := \cv + \cd_{v,t_1} + \sum_{i=1}^{k-1} \left(\ct_{t_i} + \cd_{t_i, t_{i+1}}\right) + \ct_{t_k}
-\end{align*}
-
-where $\ct_r := 0$ for $r\in\mathcal{R}$.
-
-\end{definition}
-
-Only the route costs~$\croute$ have been neglected in \Cref{def:dutycost}. Note that the total cost of a solution consists of the costs of all of its duties and the route costs of all the selected routes. We refer to the total cost of a solution as $\operatorname{cost}\left(S\right)$ and to the number of non-empty duties as $\operatorname{duties}\left(S\right)$. 
-
-In the following lemma, we construct two heuristic-feasible duties $d_1$ and $d_2$ from each duty $d$. This construction requires the customer extension to be bounded by the splitting length. It further requires an additional vehicle that can be prepended to the additional duty. Only in this lemma, we denote the vehicle duties as lists of trips and assume the respective refuel points to be given as additional information. We write ${s\prec t}$ if $(s,t)$ is feasible in the $\eqref{eq:MMILP}$, \ie ${(s,t)\in A}$.  We write ${s\to t}$ if the connection $(s,t)$ is feasible in $(\operatorname{CMILP})$, \ie ${(s,t)\in\overline{A}}$ or there is a ${t'\in\mathcal{P}}$ with ${(s,t'),(t',t)\in\overline{A}}$.
+In the following lemma, we construct two heuristic-feasible duties $d_1$ and $d_2$ out of each duty $d$. This construction requires the customer extension to be bounded by the splitting length. It further requires an additional vehicle ${v'\in\mathcal{V}}$ that is assigned to the additional duty. Only in this lemma, we denote the vehicle duties as lists of trips and assume the respective refuel points to be given as additional information. We write ${s\prec t}$ if $(s,t)$ is feasible in the $\eqref{eq:MMILP}$, \ie ${(s,t)\in A}$.  We write ${s\to t}$ if the connection $(s,t)$ is feasible in $(\operatorname{CMILP})$, \ie ${(s,t)\in\overline{A}}$ or there is a split point ${t'\in\mathcal{P}}$ with ${(s,t'),(t',t)\in\overline{A}}$.
 
 \begin{lemma}
 \label{lem:doubleduties}
@@ -652,14 +744,16 @@ Let additionally
 
 Then the cost of the duties $d_1,d_2$ is at most twice the original cost, \ie
 \begin{align*}
-	\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right)
+	\operatorname{cost}\left(d_1\right) + \operatorname{cost}\left(d_2\right) \leq 2\cdot\operatorname{cost}\left(d\right).
 \end{align*}
 
 \end{lemma}
 
+We can imagine the underlying conditions as follows: The additional vehicle $v'\in\mathcal{V}$ starts its duty with the trip $t_{a+1}$. Condition $\eqref{eq:doubleduties:time}$ ensures that $v'$ is at $\pstart_{t_{a+1}}$ at the desired time and $\eqref{eq:doubleduties:fuel}$ ensures that $v'$ has a sufficient fuel level to fulfill the duty. $\eqref{eq:doubleduties:cost}$ ensures that the deadhead cost $\cd_{v',t_{a+1}}$ is smaller than the cost for driving from $v$ to $t_{a+1}$ in the original duty $d(v)$.
+
 \begin{proof}
 
-If $d$ is feasible in $\operatorname{CMILP}$, the result is obvious. Therefore we consider a vehicle duty ${d=\left(v,t_1,\dots,t_k\right)}$ that is not feasible in $\operatorname{CMILP}$ and $a$ as the smallest index with ${t_a\not\to t_{a+1}}$.
+If ${d(v)=\left(t_1,\dots,t_k\right)}$ is feasible in $\operatorname{CMILP}$, the result is obvious. Else, there exist subsequent trips whose connection is not feasible in the heuristic. Let $a$ be the smallest index with ${t_a\not\to t_{a+1}}$.
 
 Consider ${s\prec t}$ with ${s\not\to t}$ and customers ${b_s:=\left(M\circ C\right)(s)}$ and ${b_t:=\left(M\circ C\right)(t)}$. If $s$ and $t$ is in the same partial trip set, then ${s\to t}$. If $s$ is in an earlier partial trip set, $s$ and $t$ are connected via a split point. Thus $s$ is in a later partial trip set. Using ${c_{0}:=-\infty}, {c_n:=+\infty}$, there are split points $c_{l-1},c_l,c_{l+1}$ for $l\in[n-1]$ with
 \begin{align*}
@@ -699,6 +793,72 @@ In each step, choose ${l_1,l_2\in[n]}$ as the indices such that for the current 
 	\item{Induction Step:}
 		Choose ${l\in[n]}$ such that ${t_i\in\mathcal{T}_l}$. Since $t_j\prec t_i$ for all ${j\in[i-1]}$ holds ${l+1\geq l_1}$ and since ${l_1>l_2}$ holds ${l\geq l_2}$. Thus $t_i$ can be appended to $d_1$ or $d_2$. If ${l<l_1}$ then $t_i$ is appended to $d_2$ and ${l_2 := l<l_1}$. Else $t_i$ is appended to $d_1$ and ${l_1 := l>l_2}$. Therefore still holds ${l_1>l_2}$.
 \end{itemize}
+
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=1cm, auto,]
+		\node[circ] (v) {$v$};
+		\node[circ, right=of v] (t1) {$t_1$};
+		\node[circ, right=of t1] (t2) {$t_2$};
+		\node[circ, right=of t2] (t3) {$t_3$};
+		\node[circ, below=of t2] (t4) {$t_4$};
+		\node[circ, right=of t4] (t5) {$t_5$};
+		\node[circ, right=of t5] (t6) {$t_6$};
+		\node[circ, below=of t4] (t7) {$t_7$};
+		\node[dummycirc, right=of t7] (dummy1) {};
+		\node[dummycirc, right=of dummy1] (dummy2) {};
+		\node[circ, right=of dummy2] (t8) {$t_8$};
+		\node[dummycirc, right=of t3] (dummy3) {};
+		\node[dummycirc, right=of dummy3] (dummy4) {};
+	
+		\draw[arrow] (v) to (t1);
+		\draw[arrow] (t1) to (t2);
+		\draw[arrow] (t2) to (t3);
+		\draw[arrow] (t3) to (t4);
+		\draw[arrow] (t4) to (t5);
+		\draw[arrow] (t5) to (t6);
+		\draw[arrow] (t6) to (t7);
+		\draw[arrow] (t7) to (t8);
+	
+		\node[box, inner sep=0.5cm, fit = (t1) (t7)] (box1) {};
+		\node[box, inner sep=0.5cm, fit = (t3) (dummy2)] (box2) {};
+		\node[box, inner sep=0.5cm, fit = (t8) (dummy4)] (box3) {};
+		\node (i1) [dummy, above=0cm of box1] {$\mathcal{T}_1$};
+		\node (i2) [dummy, above=0cm of box2] {$\mathcal{T}_2$};
+		\node (i3) [dummy, above=0cm of box3] {$\mathcal{T}_3$};
+	\end{tikzpicture}
+	\caption{Original duty $d(v)$}
+	\label{fig:doubleduties:duty}
+\end{figure}
+	
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=1cm, auto,]
+		\node[circ] (v1) {$v$};
+		\node[circ, right=of v1] (t1) {$t_1$};
+		\node[circ, right=of t1] (t2) {$t_2$};
+		\node[circ, right=of t2] (t3) {$t_3$};
+		\node[circ, right=of t3] (t5) {$t_5$};
+		\node[circ, right=of t5] (t6) {$t_6$};
+		\node[circ, right=of t6] (t8) {$t_8$};
+		\node[circ, below=of v1] (v2) {$v'$};
+		\node[circ, right=of v2] (t4) {$t_4$};
+		\node[circ, right=of t4] (t7) {$t_7$};
+
+		\draw[arrow] (v1) to (t1);
+		\draw[arrow] (t1) to (t2);
+		\draw[arrow] (t2) to (t3);
+		\draw[arrow] (t3) to (t5);
+		\draw[arrow] (t5) to (t6);
+		\draw[arrow] (t6) to (t8);
+		\draw[arrow] (v2) to (t4);
+		\draw[arrow] (t4) to (t7);
+	\end{tikzpicture}
+	\caption{Constructed duties $d_1\left(v\right)$ and $d_2\left(v'\right)$}
+	\label{fig:doubleduties:d1d2}
+\end{figure}
+
+\Cref{fig:doubleduties:duty} provides an example for a duty $d(v)$. The boxes indicate in which partial trip set the trips are located. \Cref{fig:doubleduties:d1d2} shows how the duties $d_1(v)$ and $s_2\left(v'\right)$ are constructed. In this example, it is crucial that $t_5$ is appended to $t_3$ although a connection to $t_4$ would also be feasible. If $t_5$ were appended to $t_4$ then there is no available duty for $t_7$.
 
 In summary, we have proven that each trip ${t\in d}$ can be feasibly appended either to $d_1$ or to $d_2$ and the vehicles $v$ and $v'$ are feasibly assigned to the duties $d_1$ and $d_2$, respectively.
 
@@ -894,7 +1054,7 @@ Finally, we show that the developed heuristic is not a constant-factor approxima
 \begin{example}
 \label{ex:approximation_factor}
 
-Let $M\leq 0$ arbitrary. Let ${\mathcal{V} = \left\{v\right\}}$ and ${\mathcal{T} = \left\{t_1,t_2,t_3\right\}}$ with the properties of \Cref{tab:approximation_example}. 
+Let $K\leq 0$ arbitrary. Let ${\mathcal{V} = \left\{v\right\}}$ and ${\mathcal{T} = \left\{t_1,t_2,t_3\right\}}$ with the properties of \Cref{tab:approximation_example}. 
 
 \begin{table}[htp]
 	\centering
@@ -920,13 +1080,13 @@ Let $M\leq 0$ arbitrary. Let ${\mathcal{V} = \left\{v\right\}}$ and ${\mathcal{T
 		\end{tabular}
 		\caption{Time between trips}
 	\end{subtable}
-	\caption{Example}
+	\caption{Trip Data for \Cref{ex:approximation_factor}}
 	\label{tab:approximation_example}
 \end{table}
 
-We set all deadhead cost equal to the time, \ie ${\cd_{s,t}=t_{s,t}}$. Then we increase all deadhead cost leading to $t_3$ by the parameter~$M$. Therefore
+We set all deadhead cost equal to the time, \ie ${\cd_{s,t}=t_{s,t}}$. Then we increase all deadhead cost leading to $t_3$ by the parameter~$K$. Therefore
 \begin{align*}
-	\cd_{v,t_3} = M+2 && \cd_{t_1,t_3} = M
+	\cd_{v,t_3} = K+2 && \cd_{t_1,t_3} = K
 \end{align*}
 
 For sake of completeness, we define the additional values:
@@ -942,12 +1102,32 @@ The fuel constraints are chosen such that all solutions are feasible \wrt fuel. 
 
 We solve this problem via \Cref{alg:successive_heuristic} with $n=2$ and $c_1=2$. Then the partial trip sets are ${\mathcal{T}_1=\left\{t_1\right\}}$ and ${\mathcal{T}_2=\left\{t_2,t_3\right\}}$. We first solve partial instance~$I_2$ where we chose the cheaper trip $t_3$ and receive ${\operatorname{cost}\left(S_2\right)=1}$. Therefore the heuristic solution~$S$ consists of duty $d$ with
 \begin{align*}
-	d = \left(v, t_1, t_3\right) && \operatorname{cost}\left(S\right) = M+3
+	d = \left(v, t_1, t_3\right) && \operatorname{cost}\left(S\right) = K+3
 \end{align*}
 
-For a heuristic solution $S$ and an optimal solution $S^*$, we have
+\Cref{fig:approximation_factor} illustrates this example. The solid line indicates the heuristical solution, the dashed line stands for the optimal solution.
+
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[node distance=2cm, auto,]
+		\node[circ] (v) {$v$};
+		\node[rect, text width=1.5cm, right=of v] (t3) {$c^{\operatorname{t}}_{t_3}=1$};
+		\node[dummy, text width=1.5cm, above=of t3] (dummy) {};
+		\node[rect, text width=2.5cm, right=of t3] (t2) {$c^{\operatorname{t}}_{t_2}=2$};
+		\node[rect, text width=1.5cm, right=of dummy] (t1) {$c^{\operatorname{t}}_{t_1}=1$};
+	
+		\draw[arrow, bend left=30] (v.east) to node[auto] {$c^{\operatorname{d}}=1$} (t3.west);
+		\draw[arrow, bend right=30, dashed] (v.east) to (t3.west);
+		\draw[arrow] (t3.east) to node[auto] {$c^{\operatorname{d}}=K$} (t1.west);
+		\draw[arrow, dashed] (t3.east) to node[auto, swap] {$c^{\operatorname{d}}=1$} (t2.west);
+	\end{tikzpicture}
+	\caption{Illustration of \Cref{ex:approximation_factor}}
+	\label{fig:approximation_factor}
+\end{figure}
+
+In summary, we have for a heuristic solution $S$ and an optimal solution $S^*$
 \begin{align*}
-	\frac{\operatorname{cost}\left(S\right)}{\operatorname{cost}\left(S^*\right)}\in\Theta(M)
+	\frac{\operatorname{cost}\left(S\right)}{\operatorname{cost}\left(S^*\right)}\in\Theta(K)
 \end{align*}
 
 in this example.
