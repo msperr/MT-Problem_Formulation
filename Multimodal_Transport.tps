@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=132
-Cursor=4661
+TopLine=92
+Cursor=4811
 
 [Frame1]
 Flags=0
@@ -35,7 +35,7 @@ Class=LaTeXView
 Document=tex\Introduction.tex
 
 [Frame1_View0,0]
-TopLine=0
+TopLine=9
 Cursor=324
 
 [Frame2]
@@ -53,7 +53,7 @@ Class=LaTeXView
 Document=tex\Problem_Description.tex
 
 [Frame2_View0,0]
-TopLine=128
+TopLine=147
 Cursor=8112
 
 [Frame3]
@@ -71,7 +71,7 @@ Class=LaTeXView
 Document=tex\Mathematical_Models.tex
 
 [Frame3_View0,0]
-TopLine=252
+TopLine=45
 Cursor=16576
 
 [Frame4]
@@ -107,8 +107,8 @@ Class=LaTeXView
 Document=tex\Optimal_Approach.tex
 
 [Frame5_View0,0]
-TopLine=0
-Cursor=55
+TopLine=962
+Cursor=64160
 
 [Frame6]
 Flags=0
@@ -143,7 +143,7 @@ Class=BibTeXView
 Document=Literatur.bib
 
 [Frame7_View0,0]
-TopLine=23
+TopLine=28
 Cursor=4377
 
 [SessionInfo]
