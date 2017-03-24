@@ -1,0 +1,142 @@
+\chapter{Implementation and Results}
+\label{ch:implementation_results}
+
+In this chapter, we describe the implementation of the algorithms that we have developed in \Cref{ch:heuristics} and \Cref{ch:optimal_approach}. All heuristical solution methods, based on the customer-dependent splitting and the time-dependent splitting and the iterative approach have been implemented and tested. Further, the optimal approach has been implemented and tested. The underlying test instances have been created as described in \Cref{ch:instance_creation}. Additionally, we provide computational results for all these algorithms and compare them with respect to computation time and results. Finally, we contextualize the results in the problem description as stated in \Cref{ch:problem_description}.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Implementation}
+\label{sec:implementation}
+
+Similar to the mathematical models, we adapt great parts of the implementation from the underlying these \cite{Kaiser} and \cite{Knoll}. Concerning the heuristics, on the one hand we limit ourselves to only one approach of the heuristics developed by \cite{Knoll}. On the other hand, we extend heavily extend this approach into two different splitting methods and the iterative approach. In order to provide these methods and to keep the code clearly arranged, we modify the majority of the existing code for the heuristics. In contrast, the optimal approach developed by \cite{Kaiser} is quite similar. Thus, we reuse most of the code for the optimal approach and adjust it on a few positions. 
+
+\paragraph{Implementation Details} \parfill
+
+Before describing the implementation, we going into some details in the models and the algorithms that we have not yet stated in detail or that we slightly modify in the implementation.
+
+We need to determine the number of partial instances $n$ and the time points $c_i$, ${i\in[n-1]}$. An approach is to choose the time points, \enquote{such that a partial instance, that is as large as possible but still solvable to optimality in reasonable time, arises} (\cite[p.~131]{Knoll}). We do not examine, how large the partial instances may be. Instead, we determine all time points in advance such that the number of vehicles and trips in each partial instance is the same. 
+
+As opposed to \Cref{ch:heuristics}, we do not consider all refuel points $r\in\Rst$ for some arc $(s,t)\in A$. Instead, we only consider one refuel point $r\in\Rst$ with ${\cd_{s,r} + \cd_{r,t}}$ is minimal, provided that ${\Rst\neq\emptyset}$. This involves a strong simplification in implementing the heuristic as the task graph contains only one arc with additional information. Further it reduces the computation time due to much less possibilities. In the optimal approach, we use a set of Pareto-optimal refuel points \wrt a suitable function. This approach is examined by \cite[Sec.~3.2.2]{Kaiser} and \cite[Sec.~3.2.2]{Knoll} and guarantees an optimal solution.
+
+During the complete thesis, we model the cover constraints by using auxiliary variables $u_m$ for ${m\in\mathcal{M}}$.
+\begin{align*}
+	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
+	& \sum_{v\in\mathcal{V}} y^v_t = u_{M(t)} && \text{for all } t\in\mathcal{T} \tag{\ref{eq:MMILP:linking_y}}
+\end{align*}
+
+However, we can find an equivalent formulation without these auxiliary variables. For this, we define a function ${T:\mathcal{M}\to\mathcal{T}}$ with ${\left(T\circ M\right)(m)=m}$. This means, $T$ maps a route to a fixed trip of the route, \eg to its first trip. Then, we have ${u_m=1}$ if and only if trip $T(m)$ is fulfilled and an equivalent formulation of the cover constraints reads as
+\begin{align*}
+	& \sum_{m\in C^{-1}(c)} \sum_{v\in\mathcal{V}} y^v_{T(m)} = 1 && \text{for all } c\in\mathcal{C} \\
+	& \sum_{v\in\mathcal{V}} y^v_t = \sum_{v\in\mathcal{V}} y^v_{(M\circ T)(t)} && \text{for all } t\in\mathcal{T}\backslash\Cupdot_{m\in\mathcal{M}} T(m)
+\end{align*}
+
+Further, we use the auxiliary variables for stating the route cost in the objective function. We delete the term $\sum_{m\in\mathcal{M}} u_m\croute_m$ and modify the trip cost for the $T(m)$ instead. For an equivalent formulation, we use modified trip costs $\hat{c}^{\operatorname{t}}$ that are defined as
+\begin{align*}
+	\hat{c}^{\operatorname{t}}_t = \begin{cases} \ct_t + \croute_{M(t)} & \text{if } t = \left(M\circ T\right)(t) \\ \ct_t & \text{otherwise} \end{cases} && \text{for } t\in\mathcal{T}.
+\end{align*}
+
+We use the equivalent formulation with the modified cover constraints and the trip costs $\hat{c}^{\operatorname{t}}$ for implementing the optimal approach.
+
+\paragraph{Instance Creation and General Procedure} \parfill
+
+The procedure for creating the test instances and providing them to the heuristical and the optimal solver is implemented in Python 2.7. The instances are created based on a test instance with realistic trips, provided by \cite{Kaiser} and \cite{Knoll}.
+
+The following main files are called by the user in order to create a test instance and to solve it. The file \texttt{data.py} provides the functionality to create a test instance for a given number of customers, vehicles and a maximal number of alternative routes per customer. It calls OTP via a HTTP-request in order to create the multimodal routes and OSRM in order to compute a distance and time matrix. The file \texttt{build.py} is called to build the task graph. For each pair of trips, the time feasibility is examined. If applicable, a refuel point is picked for this arc and the arc fuel and arc costs are computed. The procedure to run the heuristics is contained in the file \texttt{heuristic.py}. As an argument, it requires the number of vertices per partial instance and the kind of heuristic to execute. After splitting the instance, it iteratively creates a partial task graph, calls a solver for the partial instance, reads the partial solution and creates the endpoints. Finally, it composes an overall solution. For the iterative approach, it iteratively determines the customers to review and calls a solver. The file \texttt{optimal\_approach.py} is called to compute an optimal solution. It reads a feasible initial solution, computes the Pareto-optimal refuel points and calls the process for solving the instance to optimality.
+
+The following auxiliary files contain the methods that are called by the main procedures. The file \texttt{otp.py} provides the methods to communicate with OTP. It opens the HTTP-connection and handles the requests. The file \texttt{osrm.py} opens the HTTP-connection to OSRM and creates the distance and time matrix for an instance. The file \texttt{instance.py} contains all information of a problem instance, \ie the sets $\mathcal{C}$, $\mathcal{M}$, $\mathcal{T}$, $\mathcal{V}$ and $\mathcal{R}$. It further contains the distance and time matrix and the Pareto-optimal refuel points for each pair of trips. The file \texttt	{solution.py} comprises a problem solution. Besides the information for vehicle duties and route choices, it contains methods to test the feasibility of the solution and to evaluate it. The methods to determine the estimated costs and the reviewed customers for the iterative approach, are contained in \texttt{iterative\_approach.py}. The file \texttt{entities.py} contains all entities, \ie trips, vehicles and refuel points. The file \texttt{taskgraph.py} provides methods to create the task graph and all kinds of partial task graphs. If further saves and loads the graphs to a file. The file \texttt{storage.py} contains methods to save instances, solutions and partial solutions to file and loads them.
+
+\paragraph{Models and Heuristics} \parfill
+
+The model formulations that are used in the heuristics are implemented in the modeling language Mosel which is used by FICO Xpress Optimization Suite. The mixed-integer linear programs are realized just as defined in \Cref{ch:heuristics}. The files \texttt{CMILP\_i.mos} and \texttt{CMILP\_1.mos} contain the $(\operatorname{CMILP}_i)$, the files \texttt{TMILP\_i.mos} and \texttt{TMILP\_1.mos} contain the $(\operatorname{TMILP}_i)$ for $i\geq 2$ and $i = 1$, respectively. For the iterative heuristic, the file \texttt{HSP.mos} contains the $(\operatorname{HSP}_B)$ and \texttt{MMILP\_E.mos} contains both $\eqref{eq:FMILP_max}$ and $\eqref{eq:FMILP_min}$. The models read the structure of the task graph from a \texttt{.txt} file which has been created in \texttt{taskgraph.py} and write the computed solution to another \texttt{.txt} file that is loaded by \texttt{taskgraph.py} again.
+
+In order to restrict the running times of the heuristics, for each of these problems a maximum time of is set. This means, if after this time no optimal solution for this partial instance is found, the algorithm terminates and returns the current best feasible solution. If no feasible solution is found up to then, the solver continues until he finds a feasible solution.
+
+\paragraph{Optimal Approach} \parfill
+
+For the realization of the optimal approach, we use the framework DIP (cf.~\cite{DIP}). This framework provides the core function for a Dantzig-Wolfe decomposition and is implemented in C++. In order to solve the problem optimally, we customize the framework by overriding the respective methods. We create the class \texttt{SchedulingDecompApp} which is derived from the class \texttt{DecompApp}. This class is represented in the following files: \texttt{SchedulingDecompApp.h} and \texttt{SchedulingDecompApp.cpp} contain the methods for creating the task graph, defining the model, generating the initial values and the main method for solving the subproblem. The file \texttt{SchedulingDecompSolveRelaxed.h} contains the heuristic for solving the subproblem and\par \texttt{SchedulingDecompSolveRelaxedBoost.h} solves the subproblem optimally. We further create the class \texttt{SchedulingAlgoPC} which is derived from the class \texttt{DecompAlgoPC} and contains the Branch-and-Bound procedure.
+
+The file \texttt{module.cpp} provides the interface which is available in Python. To the method \texttt{Solve}, a problem instance and an initial solution is submitted. This is then converted into an internal representation in the files \texttt{instance.h} and \texttt{instance.cpp}. With this, the customized algorithm is executed and solves the problem to optimality. After termination, the solution is returned and saved to file.
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Computational Results}
+\label{sec:computational_results}
+
+We have implemented all heuristical approaches that we have discussed in \Cref{ch:heuristics} an the optimal approach as examined in \Cref{ch:optimal_approach}. We evaluate these algorithms on different test instances. We vary different parameters in the instances as well as in the algorithms in order to appraise the solution methods in more detail. We expect the heuristics to cope with significantly larger input sizes than the optimal approach. Thus, we examine the heuristics as both initial solution for the optimal approach and solution method itself. In the former case, we choose the instance sizes such that an optimal solution can be expected in reasonable time. In the latter case, we aspire realistic instance sizes in order to estimate the behavior in a realistic environment. According to the results of the underlying theses, we expect the optimal approach to cope with about 140 trips (cf.~\cite[p.~139]{Kaiser}) and the heuristics to cope with about 2000 trips (cf.~\cite[p.~138]{Knoll}).
+
+\paragraph{Test Instances} \parfill
+
+For testing the heuristical solution methods, we consider instances with 100 vehicles and 500 customers. We examine three cases, the number of alternative routes per customer is restricted to 2 in the first case, restricted to 3 in the seconds case and unrestricted in the third case. For each of these cases, we create 4 test instances independent from each other according to \Cref{ch:instance_creation}. Thus, in average there are approximately 1800, 2300 and 3200 trips in each instance, respectively. Additionally, there are 313 refuel points in each instance. All of these instances cover a time range of 24 hours and the trips are distributed over time similar to \Cref{fig:trip_distribution}. Further, we aim to test the heuristics on instances with varied customer extension. Therefore, we create a copy of each test instances, where we shift each route up to 6 hours randomly in time.
+
+For the optimal approach ...
+
+\paragraph{Heuristics} \parfill
+
+As stated before, we have a total of 24 test instances. For each of these instances, we have applied the Successive Heuristic with a customer-dependent splitting and a time-dependent splitting. We have tested them with an aspired number of vertices of 100, 200 and 400 for each partial instance. The computations took place on the Compute-Server.\fxnote{Compute Server}
+
+For each execution of the heuristic, we have measured the computation time. This time comprises creating the partial task graphs, solving the partial instances, determining the end points and connecting the partial solution. It does not contain retrieving the distance and time matrix and building the task graph, from which the partial task graphs are created. We have not examined the determination of a lower bound for the optimal objective value for this problem. Therefore we cannot come up with an optimality gap for these heuristics.
+
+Most of the heuristic applications result in feasible duties. In some cases, a partial instance is infeasible. Then, the complete heuristic cannot be completed. In order to avoid these infeasibilities, we have ensured that the number of available vehicles is sufficient for the number of customers. Nevertheless, the first partial instance $I_1$ is infeasible in several executions of the heuristic with the following reason: Let $t\in\Phat_1$ be an end point with initial fuel $f^0_t$. Due to $()$\fxnote{Fmax} holds ${f^0_t\leq f^{\max}_t}$ with ${f^{\max}_t = 1 - \min_{r\in\mathcal{R}}\left(\fd_{r,t}\right)}$. Due to the simplification as described in \Cref{sec:implementation}, there is only one refuel point on each arc. We call this refuel point $R(s,t)$ for ${(s,t)\in\overline{A}}$. If the initial fuel of the end point $t$ is too large, \ie ${f^0_t > 1 - \max_{v\in\mathcal{V}}\left(\fd_{R(v,t),t}\right)}$, the end point cannot be connected feasibly to any vehicle and thus $I_1$ is infeasible. In order to avoid this malfunction, we could add a suitable refuel point ${r\in\argmin_{r\in\mathcal{R}}\left(\fd_{r,t}\right)}$ to each arc ${(v,t)\in\overline{A}}$ with ${v\in\mathcal{V}}$ and ${t\in\mathcal{T}}$. As the scenario does not happen so often, this improvement has not been implemented.
+
+
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{ccccccccc}
+		\toprule
+		$\vert\mathcal{V}\vert$ & $\vert\mathcal{C}\vert$ & $\vert\mathcal{M}\vert$ & $\vert\mathcal{T}\vert$ & Total Cost & Duties & Trip & Deadhead & Route \\
+		\midrule
+		100 & 500 &  996 & 1793 & 13,149,336 & 23 & 3,063,922 & 1,626,368 & 7,309,047 \\
+		100 & 500 &  997 & 1828 & 13,641,367 & 26 & 3,398,177 & 1,518,512 & 7,424,678 \\
+		100 & 500 & 1486 & 2327 & 12,171,599 & 21 & 2,840,081 & 1,033,910 & 7,247,609 \\
+		100 & 500 & 1486 & 2327 & 12,673,550 & 24 & 2,959,392 & 1,177,083 & 7,337,076 \\
+		100 & 500 & 2335 & 3190 & 11,327,191 & 17 & 2,103,052 & 1,207,107 & 7,167,032 \\
+		100 & 500 & 2335 & 3190 & 11,424,600 & 19 & 2,116,789 & 1,195,578 & 7,162,232 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Caption}
+\end{table}
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{cccccccc}
+		\toprule
+		&& \multicolumn{2}{c}{Extension} & \multicolumn{2}{c}{Customer} & \multicolumn{2}{c}{Time} \\
+		\cmidrule(r){3-8}
+		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & avg & max & Cost & Duties & Cost & Duties \\
+		\midrule
+		500 & 1793 & 0:28 & 2:38 &  -         & -  & 13,149,336 & 23 \\
+		500 & 1793 & 2:08 & 6:00 & 13,579,114 & 27 & 13,684,189 & 29 \\
+		500 & 2327 & 0:32 & 1:55 & 12,445,088 & 19 & 12,385,898 & 21 \\
+		500 & 2327 & 3:10 & 6:42 & 12,963,918 & 23 & 12,937,916 & 26 \\
+		500 & 3190 & 0:37 & 2:22 & 11,448,625 & 17 & 11,447,670 & 16 \\
+		500 & 3190 & 3:58 & 8:25 & 11,824,691 & 18 & 11,572,252 & 20 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Caption}
+\end{table}
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{cc|ccc|ccc|ccc}
+		\toprule
+		\multicolumn{2}{c}{Splitting} & \multicolumn{3}{c}{Cost} & \multicolumn{3}{c}{Duties} & \multicolumn{3}{c}{Time} \\
+		\cmidrule(r){3-11}
+		&& $I_1$ & $I_2$ & $I_3$ & $I_1$ & $I_2$ & $I_3$ & $I_1$ & $I_2$ & $I_3$ \\
+		\midrule
+		customer & 100  &  13.65 & 12.83 &   -    &  25 & 21 & -   &  0:15 & 0:16 &  -   \\
+		time     & 100  &  13.49 & 12.47 & 11.59  &  25 & 19 & 17  &  0:27 & 0:12 & 0:29 \\
+		customer & 200  &    -   & 12.44 & 11.44  &  -  & 19 & 17  &   -   & 1:22 & 1:29 \\
+		time     & 200  &  13.14 & 12.25 & 11.44  &  23 & 20 & 16  &  0:43 & 0:40 & 0:40 \\
+		customer & 400  &  13.51 & 12.38 & 11.59  &  29 & 21 & 18  &  1:18 & 1:45 & 2:54 \\
+		time     & 400  &  13.85 & 12.17 & 11.32  &  39 & 21 & 17  &  0:49 & 1:27 & 2:20 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Caption}
+\end{table}
+
+\paragraph{Optimal Approach} \parfill
+
+%----------------------------------------------------------------------------------------------------------------------------------------
+
+\section{Interpretation of the Results}

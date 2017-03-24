@@ -77,7 +77,7 @@ The only constraints that are not ensured in $X_v$ are the cover constraints $\e
 \begin{align}
 	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
-	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} = u_m && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking}\\
+	& \sum_{v\in\mathcal{V}}\sum_{s\in\Nin(t)}x^v_{s,t} = u_m && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking} \\
 	& \left(x^v,z^v,e^v\right)\in X_v && \text{for all } v\in\mathcal{V} \nonumber \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \tag{\ref{eq:MMILP:um}}
 \end{align}
@@ -90,13 +90,13 @@ Because of the introduction of variables for each vehicle, the resulting problem
 \end{align*}
 
 The dimension of the codomain of $\psi$ is much smaller than the dimension of the domain. We can rewrite $\eqref{eq:MMILP}$ by using $y^v:=\psi\left(x^v,z^v,e^v\right)$:
-\begin{align*}
-	\min \quad & \omit\rlap{$\displaystyle{\sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m}$} \\
+\begin{align}
+	\min \quad & \omit\rlap{$\displaystyle{\sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m}$} \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
-	& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
-	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
+	& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \label{eq:MMILP:linking_y} \\
+	& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \nonumber \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \tag{\ref{eq:MMILP:um}}
-\end{align*}
+\end{align}
 
 The mapping $\psi$ is not injective in general. Thus, there is more than one feasible duty that serves exactly the trips of $y^v$. These duties can have different cost. We therefore use the minimal resulting cost
 \begin{align*}
@@ -747,7 +747,7 @@ Considering the other resources and contraction of vertices does not destroy the
 \section{Solving the Master Problem}
 \label{sec:solving_masterproblem}
 
-With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. But this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply the \enquote{Branch-and-Bound} rule in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly taken over by the branching rules created by \cite{Kaiser}. The branching rule concerning the choice of routes is modified.
+With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. However, this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply a \enquote{Branch-and-Bound} process in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly taken over by the branching rules created by \cite{Kaiser}. The branching rule concerning the choice of routes is modified.
 
 \subsection{Branch-and-Bound}
 
@@ -761,14 +761,14 @@ Depending on the problem and the branching strategy, the decision tree might bec
 
 A branching decision is always an inequality that we add to the master problem. As suggested by \cite{Kaiser}, we only use inequalities written in terms of ${(x,z,e,u)\in X_v}, {\vinV}$ such that the structure of the subproblems is not changed. Further, we do not want to affect the symmetry of the subproblems since we exploit this when we solve the subproblems. Thus, we discuss the decision rules with respect to keeping the symmetry.
 
-If an inequality concerns only a single subproblem, we move this restriction completely to the subproblem. This has the advantage that we still create feasible columns. However, moving the inequalities to the subproblems might lead to a change of their structure and therefore might make it harder to solve. In \Cref{sec:branching_rules} we discuss several branching rules.
+If an inequality concerns only one single subproblem, we move this restriction completely to the subproblem. This has the advantage that we still create feasible columns. However, moving the inequalities to the subproblems might lead to a change of their structure and therefore might make it harder to solve. In \Cref{sec:branching_rules} we discuss several branching rules.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Branching Rules}
 \label{sec:branching_rules}
 
-In the following, we present a number of branching rules. In order to keep the branching tree small, we try to create decisions that lead to a balanced branching. The branching is used for enforcing integrality in the master problem. In order to discuss the branching rules, we introduce for $\vinV$ the set of vertices that can be reached from $v$ and the set of vertices from which $v$ can be reached:
+In the following, we present a number of branching rules. In order to keep the branching tree small, we try to create decisions that lead to a balanced branching. The branching is used for enforcing integrality in the master problem. In order to discuss the branching rules, we introduce for each vertex $v\in V$ the set of vertices that can be reached from $v$ and the set of vertices from which $v$ can be reached:
 \begin{align*}
 	\operatorname{N}_G^{++}(v) := \left\{w\in V\mid\exists v \text{-} w \text{-path in } G\right\} && \operatorname{N}_G^{--}(v) := \left\{w\in V\mid\exists w \text{-} v \text{-path in } G\right\}
 \end{align*}
@@ -777,32 +777,39 @@ In the following, we present a number of branching rules. In order to keep the b
 
 We first consider a branching on the components of the image with respect to $\psi$. This is a branching on the single variables of the master problem and thus the most specific branching rule we consider. We fix a value for the expression
 \begin{align*}
-	\psi\left(x^v,z^v,e^v\right)_t = \sum_{s\in\Nin(t)} x^v_{s,t}
+	\psi\left(x^v,z^v,e^v\right)_t = \sum_{s\in\Nin(t)} x^v_{s,t} \in\left\{0,1\right\}
 \end{align*}
 
-for some $\vinV, t\in\mathcal{T}$. This decision can be interpreted as determining whether trip $t$ is fulfilled by vehicle $v$. This is a very specific decision since it implicitly chooses the route $M(t)$ for customer $(M\circ C)(t)$ and assigns it to vehicle $v$.
+for some $\vinV, t\in\mathcal{T}$. This decision can be interpreted as determining whether trip $t$ is fulfilled by vehicle $v$. This is a very specific decision since it implicitly chooses the route $M(t)$ for customer $(M\circ C)(t)$ and assigns trip $t$ to vehicle $v$.
 
 Branching down means setting ${\sum_{s\in\Nin(t)} x^v_{s,t} = 0}$ for some $\vinV, t\in\mathcal{T}$. This can be implemented in $\eqref{eq:SPv}$ by setting
 \begin{align*}
 	x^v_{s,t}=0 && \text{for all } s\in\Nin(t)
 \end{align*}
 
-This corresponds to deleting the respective arcs in the task graph.
+This corresponds to deleting the respective arcs in the task graph corresponding to subproblem~$v$.
 
 Branching up means demanding ${\sum_{s\in\Nin(t)} x^v_{s,t} = 1}$ for some $\vinV, t\in\mathcal{T}$. With the constraints $\eqref{eq:MMILP:flow}, \eqref{eq:Xv:vehicle}, \eqref{eq:Xv:other_vehicles}$ and the fact that $G$ is acyclic, this is equivalent to setting
 \begin{align*}
 	x^v_{s,u} = 0 && \text{for all } (s,u)\in A\cap\left(\left(\operatorname{N}_G^{--}(t)\backslash\{t\}\right)\times\left(\operatorname{N}_G^{++}(t)\backslash\{t\}\right)\right)
 \end{align*}
 
-This corresponds to deleting all arc skipping trip $t$.
+This corresponds to deleting all arcs skipping trip $t$.
 
-Branching up excludes a lot of possible assignments, while branching only forbids one such assignment. This leads to an quite unbalanced tree. Another disadvantage is that this rule destroys symmetry between the subproblems as it concerns only one subproblem. Nevertheless, there is always a branching decision that can be made if the previous solution was not integral. This means, this rule is enough to completely ensure integrality in the master problem.
+According to the cover constraints $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:linking}$, branching up implicitly choose the route for customer $(C\circ M)(t)$. Therefore, it further demands
+\begin{align*}
+	x^v_{s,t'} = 0 && \text{for all } v\in\mathcal{V}, t'\in\overline{M}(t), s\in\Nin(t')
+\end{align*}
+
+Hence all trips belonging to another route of the same customer are deleted. This applies for all subproblems simultaneously.
+
+While branching up excludes a lot of possible assignments, branching down only forbids one such assignment. This leads to a quite unbalanced tree. Another disadvantage is that this rule destroys symmetry between the subproblems as it concerns only one subproblem. Nevertheless, there is always a branching decision that can be made if the previous solution was not integral. This means, this rule is enough to completely ensure integrality in the master problem.
 
 \paragraph{Length of Vehicle Duties} \parfill
 
 Another suggestion is to consider not a single trip, but the sum up over all trips for the components of the image of $\psi$. We fix a value for the expression
 \begin{align*}
-	\sum_{t\in\mathcal{T}}\psi\left(x^v,z^v,e^v\right)_t = \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} x^v_{s,t}
+	\sum_{t\in\mathcal{T}}\psi\left(x^v,z^v,e^v\right)_t = \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} x^v_{s,t} \in\left\{0,\dots,\vert\mathcal{T}\vert\right\}
 \end{align*}
 
 for some $\vinV$. This can be interpreted as determining the duty length for vehicle $v$. As the length of the duty can be expressed linearly in terms of $\left(x^v,z^v,e^v\right)$ and in terms of images of $\psi$ it would be possible to include this decision in the master problem without changing the subproblems. But since this decision affects only one specific vehicle, we move it to the subproblem.
@@ -814,51 +821,51 @@ This leads to the following general setting of the subproblem using a lower boun
 	& \left(x^v,z^v,e^v\right)\in X_v \nonumber
 \end{align}
 
-As proven by \cite{Kaiser}, this problem can be solved by using the resource length as introduced before. We modify the resource extension function for $(c,e,l,b)\in I$ as follows:
+As proven by \cite{Kaiser}, this problem can be solved by using the resource length as introduced before. We modify the resource extension function for $(c,e,l,b)\in I$ and ${t\in\mathcal{V}\cupdot\mathcal{T}}$ as follows:
 \begin{align*}
 	\REF_{t,\de}(c,e,l,b) := \left(\left\{(c,e,l,b)\mid l^{\operatorname{LB}}\leq l \leq l^{\operatorname{UB}}\right\} + \mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0}\right) \cap I
 \end{align*}
 
-This is a coarser branching rule as the assignment of trips, but still destroys the symmetry between the subproblems. In contrast to before, this rule alone is not sufficient to completely ensure integrality in the master problem.
+This is a coarser branching rule than the assignment of trips, but still destroys the symmetry between the subproblems. In contrast to before, this rule alone is not sufficient to completely ensure the integrality in the master problem.
 
 \paragraph{Choice of Multimodal Routes} \parfill
 
 The next approach is to sum up over all vehicles for the components of the image of $\psi$. We fix a value for the expression
 \begin{align*}
-	\sum_{\vinV}\psi\left(x^v,z^v,e^v\right)_t = \sum_{\vinV} \sum_{s\in\Nin(t)} x^v_{s,t}
+	\sum_{\vinV}\psi\left(x^v,z^v,e^v\right)_t = \sum_{\vinV} \sum_{s\in\Nin(t)} x^v_{s,t} \in\left\{0,1\right\}
 \end{align*}
 
 for some $t\in\mathcal{T}$. This can be interpreted as deciding whether trip $t$ is fulfilled by some vehicle. Because of the cover constraint $\eqref{eq:MMILP:linking}$, this decision directly determines the route variable $u_m$ for ${m := M(t)}$ and therefore all other trips ${t'\in M^{-1}(m)}$. Because of this implication, we directly regard the case of branching on $u_m$.
 
-Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. From this follows ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
+Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. By $\eqref{eq:MMILP:linking}$ follows\linebreak ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
 \begin{align*}
 	x^v_{s,t} = 0 && \text{for all } \vinV, t\in M^{-1}(m), s\in\Nin(t)
 \end{align*}
 
 This corresponds to deleting the respective arcs in all task graphs.
 
-Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
+Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding\linebreak ${\sum_{s\in\Nin(t)}x_{s,t}^v = 1}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
 \begin{align*}
 	x^v_{s,t} = 0 && \text{for all } & \vinV, m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}, \\
 	&&& t\in M^{-1}(m'), s\in\Nin(t)
 \end{align*}
 
-In other words, stating that a multimodal route is fulfilled by some vehicles is equivalent to stating that all trips belonging to other routes of the same customer are not fulfilled by any vehicle, if $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:linking}$ hold. Again, this can be realized by deleting the respective arcs in all task graphs.
+In other words, stating that a multimodal route is fulfilled by some vehicle is equivalent to stating that all trips belonging to other routes of the same customer are not fulfilled by any vehicle, if $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:linking}$ hold. Again, this can be realized by deleting the respective arcs in all task graphs.
 
-This branching rule maintains the symmetry for the various subproblems since for all $\vinV$ the same arcs are deleted. Therefore, we can still solve all subproblems by just one executing of the algorithm. Further, the tree is more balanced than before. Similar to the duty length, this rule alone is not sufficient to completely ensure integrality in the master problem.
+This branching rule maintains the symmetry for the various subproblems since for all $\vinV$ the same arcs are deleted. Therefore, we can still solve all subproblems by just one execution of the algorithm. Further, the tree is more balanced than before. Similar to the duty length, this rule alone is not sufficient to completely ensure integrality in the master problem.
 
 \paragraph{Number of Used Vehicles} \parfill
 
-Finally, we regard the branching on the number of used vehicles. We say, a vehicle is used if it fulfills at least one trip. The only duty that a vehicle can have to be unused is the duty with no trip, uniquely described by the path ${\left(\ds,v,\de\right)}$ in $G$. For a duty $(x,z,e)\in X_v$ for $\vinV$ the term
+Finally, we regard the branching on the number of used vehicles. We say, a vehicle is used if it fulfills at least one trip. The only duty that a vehicle can have to be unused is the duty with no trip, uniquely described by the path ${\left(\ds,v,\de\right)}$ in $G$. For a duty $(x,z,e)\in X_v, \vinV$ the term
 \begin{align*}
-	\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x_{s,t}
+	\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t}\in\left\{0,1\right\}
 \end{align*}
 
-is one if and only if the vehicles serves at least one trip. One possibility would be to decide if a specific vehicle is used or not. But the various subproblems are to similar as only the vehicle vertex is different and therefore this branching rule leads to an unbalanced tree.
+is one if and only if the vehicles serves at least one trip. One possibility would be to decide if a specific vehicle is used or not. But the various subproblems are too similar as only the vehicle vertex is different and therefore this branching rule leads to an unbalanced tree.
 
 Instead, we regard the number of used vehicles. For ${\left(x^v,e^v,z^v\right)\in X_v}$ the number of used vehicles can be expressed as
 \begin{align*}
-	\sum_{\vinV}\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t}
+	\sum_{\vinV}\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t}\in\left\{0,\dots,\vert\mathcal{V}\vert\right\}.
 \end{align*}
 
 Using this branching decision requires adding a suitable inequality to the master problem. As these inequalities concern the duties of all vehicles, they cannot be moved to the subproblems. We modify the master problem using a lower bound $v^{\operatorname{LB}}$ and an upper bound $v^{\operatorname{UB}}$ for the number of used cars as follows:
@@ -876,117 +883,26 @@ Using this branching decision requires adding a suitable inequality to the maste
 
 \subsection{Choosing Branching Decisions}
 
-%########################################################################################################################################
-%#
-%#   Variants of the Problem Formulation
-%#
-%########################################################################################################################################
+Consider, we have received a non-integer solution after solving the relaxed master problem. Then we need to choose a branching rule for the Branch-and-Bound process. Further we select the expression on which the branching rule is applied, \eg ${(v,t)\in\mathcal{V}\times\mathcal{T}}$ for applying the rule for trip assignment. Using this, we create inequalities which define the resulting subproblems. The branching rule is only applicable, if the solution violates the inequalities. As mentioned before, in each non-integer solution the rule for trip assignment is applicable for some ${(v,t) \in\mathcal{V}\times\mathcal{T}}$.
 
-%\section{Variants of the Problem Formulation}
-%
-%\subsection{Master Problem with Route Choice Restriction}
-%
-%Remember the formulation from before:
-%
-%\begin{align*}
-	%\min \quad & \sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m \\
-	%\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
-	%& \sum_{v\in\mathcal{V}}y^v_t = u_m && \text{for all } m\in\mathcal{M},t\in m \\
-	%& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
-	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
-%\end{align*}
-%
-%The constraints $\eqref{eq:MMILP:customer}$ depend only on $u_m$. Therefore, we create another subproblem for the choice of routes. We define the set of feasible route choices as follows:
-%
-%\begin{align*}
-	%\hat{X} := \left\{\{0,1\}^{\mathcal{M}}|\sum_{m\in C^{-1}(c)} u_m = 1 \text{ for all } c\in\mathcal{C}\right\}
-%\end{align*}
-%
-%We introduce variable $\hat{u}$ and the respective route cost function $\hat{g}$ and rewrite $\eqref{eq:MMILP}$ again:
-%
-%\begin{align*}
-	%\min \quad & \sum_{v\in\mathcal{V}} \min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \hat{g}\left(\hat{u}\right) \\
-	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}}y_t^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
-	%& y^v\in \psi\left(X_v\right) && \text{for all } v\in\mathcal{V} \\
-	%& \hat{u}\in\hat{X}
-%\end{align*}
-%
-%\paragraph{Column Generation} \parfill
-%
-%For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\mathcal{T}\times\Iv}$ be exactly those points. Let $\Ihat$ be an index set for the finitely many points in $\hat{X}$ and let the columns of $\hat{Y}\in\mathbb{R}^{\mathcal{M}\times\hat{\mathcal{I}}}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$ and $\hat{G}\in\mathbb{R}^{1\times\Ihat}$ be the respective route costs. Then we can reformulate the master problem as
-%
-%\begin{align*}
-	%\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{IMMP} \\
-	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	%& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	%& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
-	%& \lambda^v\in\{0,1\}^{\Iv} && \text{for all } v\in\mathcal{V} \\
-	%& \hat{\lambda}\in\{0,1\}^{\Ihat}
-%\end{align*}
-%
-%We regard the LP-relaxation by dropping the integrality constraints:
-%
-%\begin{align*}
-	%\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \hat{G}\hat{\lambda} \tag{LMMP} \label{eq:LMMP} \\
-	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = \hat{Y}_{m,\cdot}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	%& \sum_{i\in\Iv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	%& \sum_{i\in\Ihat}\hat{\lambda}_i= 1 \\
-	%& \lambda^v\in\mathbb{R}_{\geq 0}^{\Iv} && \text{for all } v\in\mathcal{V} \\
-	%& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\Ihat}
-%\end{align*}
-%
-%We reduce the size by considering only subsets $\Jv\subset\Iv$ and $\hat{\mathcal{J}}\subset\Ihat$ and formulate the relaxed restricted master problem:
-%
-%\begin{align*}
-	%\min \quad & \sum_{v\in\mathcal{V}}G^v_{\Jv}\lambda^v + \hat{G}_{\hat{\mathcal{J}}}\hat{\lambda} \tag{LRMMP} \\
-	%\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\Jv}\lambda^v = \hat{Y}_{m,\hat{\mathcal{J}}}\hat{\lambda} && \text{for all } m\in\mathcal{M},t\in m \\
-	%& \sum_{i\in\Jv}\lambda_i^v=1 && \text{for all } v\in\mathcal{V}\\
-	%& \sum_{i\in\hat{\mathcal{J}}}\hat{\lambda}_i= 1 \\
-	%& \lambda^v\in\mathbb{R}_{\geq 0}^{\Jv} && \text{for all } v\in\mathcal{V} \\
-	%& \hat{\lambda}\in\mathbb{R}_{\geq 0}^{\hat{\mathcal{J}}}
-%\end{align*}
-%
-%For the dual relaxed restricted master problem, we introduce dual variables $\gamma\in\mathbb{R}^{\mathcal{T}}$, $\mu\in\mathbb{R}^{\mathcal{V}}$ and $\alpha\in\mathbb{R}$. The dual problem is:
-%
-%\begin{align*}
-	%\max \quad & \sum_{v\in\mathcal{V}}\mu_v + \alpha \tag{DLRMMP} \label{eq:DLRMMP} \\
-	%\text{s.t.} \quad & \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Jv \\
-	%& \alpha - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma_t \leq \hat{G}_i && \text{for all } i\in\hat{\mathcal{J}} \\
-	%& \gamma\in\mathbb{R}^{\mathcal{T}} \\
-	%& \mu\in\mathbb{R}^{\mathcal{V}} \\
-	%& \alpha\in\mathbb{R}
-%\end{align*}
-%
-%\paragraph{Solving of the Relaxed Master Problem} \parfill
-%
-%Let $\left(\gamma^*,\mu^*,\alpha^*\right)$ be a solution of $\eqref{eq:DLRMMP}$ with $\Jv\subset\Iv$ for all $v\in\mathcal{V}$ and $\hat{\mathcal{J}}\subset\Ihat$. 
-%
-%We want to find out whether $\left(\gamma^*,\mu^*,\alpha^*\right)$ corresponds to an optimal solution of $\eqref{eq:LMMP}$. This is the case if it is feasible for the dual relaxed master problem, i.e. the following constraints hold for the entire sets $\Iv$ and $\Ihat$. This means, the following equations hold for $\left(\gamma^*,\mu^*,\alpha^*\right)$:
-%
-%\begin{align}
-	%& \sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma^* + \mu^*_v \leq G^v_i && \text{for all } v\in\mathcal{V},i\in\Iv \label{eq:DLMMP:vehicle} \\
-	%& \alpha^* - \sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t \leq \hat{G}_i && \text{for all } i\in\Ihat \label{eq:DLMMP:route}
-%\end{align}
-%
-%In order to find an optimal solution of $\eqref{eq:LMMP}$ we have to find indices $i\in\Iv$ or $j\in\Ihat$ where the previous constraints are violated. This leads to the following subproblems:
-%
-%\begin{align*}
-	%& \text{Find } i\in\Iv\backslash\Jv \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \\
-	%& \text{Find } i\in\Ihat\backslash\hat{\mathcal{J}} \text{ s.t.} && \alpha^*-\sum_{m\in\mathcal{M}}\sum_{t\in m}\hat{Y}_{m,i}\gamma^*_t > \hat{G}_i
-%\end{align*}
-%
-%The vehicle subproblem $\eqref{eq:SPv}$ was already considered before. For the route choice, an additional subproblem arises.
-%
-%\paragraph{Route Subproblem} \parfill
-%
-%The route subproblem for finding violated constraints $\eqref{eq:DLMMP:route}$ reads as follows:
-%
-%\begin{align*}
-	%\min \quad & \sum_{m\in\mathcal{M}}u_m\left(\croute_m + \sum_{t\in m}\gamma^*_t\right) \tag{$\SPm$} \label{SPm} \\
-	%\text{s.t.} \quad & \sum_{m\in C^{-1}(c)}u_m = 1 && \text{for all } c\in\mathcal{C} \\
-	%& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M}
-%\end{align*}
-%
-%This problem is easy to solve: For every $c\in\mathcal{C}$ choose the multimodal route $m\in C^{-1}(c)$ with the smallest cost $\croute_m + \sum_{t\in m}\gamma^*_t$. 
-%
-%Let $\bar{u}$ be an optimal solution of $\eqref{SPm}$. If $\operatorname{val}\left(\bar{u}\right)<\alpha^*$ then add this to $\hat{\mathcal{J}}$ and continue the master problem.
+We select the branching rule in a lexicographic order. We prefer coarser rules and rules that maintain the symmetry of the resulting tree. If applicable, we always branch on the number of vehicles. If not, we branch on the multimodal routes, the length of the duties and the assignment of trips, when one of the rules is applicable. After choosing the branching rule, we apply this on the variable which differs most from the nearest integer. \Cref{alg:branching_decision} describes the procedure.
+
+\begin{algorithm}[hbt]
+	\SetAlgoLined
+	\KwIn{solution $(y,u)$ of $\eqref{eq:LMP}$ with $\left(y^v\right)\in\operatorname{conv}\left(\psi\left(X_v\right)\right)$ for $\vinV$ and $\left(u_m\right)_{m\in\mathcal{M}}$}
+	\KwOut{branching inequalities or statement that solution is integer}
+	$v_{\operatorname{sum}}\gets\sum_{v\in\mathcal{V}}\left(1-\prod_{t\in\mathcal{T}}y^v_t\right)$\;
+	\uIf{$v_{\operatorname{sum}}\notin\mathbb{N}_0$}{
+		$v^{\operatorname{UB}}\gets\lfloor v_{\operatorname{sum}}\rfloor$ and $v^{\operatorname{LB}}\gets\lceil v_{\operatorname{sum}}\rceil $\;}
+	\uElseIf{$\exists m\in\argmin_{m'\in\mathcal{M}}\vert u_{m'}-0.5\vert$ with $ u_m\notin\mathbb{N}_0$}{
+		$u_m = 0$ and $u_m = 1$\;}
+	\uElseIf{$\exists v\in\argmin_{v'\in\mathcal{V}}\vert\mathbbm{1}^T_{\mathcal{T}}y^{v'} - \lfloor\mathbbm{1}^T_{\mathcal{T}}y^{v'} + 0.5\rfloor\vert$ with $\mathbbm{1}^T_{\mathcal{T}}y^v\notin\mathbb{N}_0$}{
+		$l^{\operatorname{UB}}\gets\lfloor\mathbbm{1}^T_{\mathcal{T}}y^v\rfloor$ and $l^{\operatorname{LB}}\gets\lceil\mathbbm{1}^T_{\mathcal{T}}y^v\rceil$\;}
+	\uElseIf{$\exists(v,t)\in\argmin_{\left(v',t'\right)\in\mathcal{V}\times\mathcal{T}}\vert y^{v'}_{t'} - 0.5\vert$ with $y^v_t\notin\mathbb{N}_0$}{
+		$y^v_t = 0$ and $y^v_t=1$\;}
+	\Else{Solution is integer\;}
+	\caption{Selection of a branching decisions}
+	\label{alg:branching_decision}
+\end{algorithm}
+
+The choice of the branching rules is based on the observations of \cite[Sec.~8.3]{Kaiser}. They investigated the symmetry of the Branch-and-Bound tree for the respective branching rules and came up with this strategy.
