@@ -1,6 +1,6 @@
 \documentclass[fontsize=11pt,paper=a4,headsepline,chapterprefix,numbers=noenddot,BCOR=5mm]{scrbook}
 
-\usepackage[english]{babel}
+\usepackage[english, ngerman]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[utf8]{inputenc}
@@ -125,12 +125,12 @@
 \frontmatter
 \maketitle
 
+\include{tex/abstract}
+
 \tableofcontents
 
 \mainmatter
 \pagestyle{headings}
-
-%\include{tex/abstract}
 
 \include{tex/Introduction}
 
@@ -154,12 +154,12 @@
 
 \include{tex/Previous_Formulations}
 
+\listoffigures
+\listoftables
+\listofalgorithms
+
 \bibliography{Literatur}
 \bibliographystyle{alpha}
-
-\listoffigures
-
-\listoftables
 
 \listoffixmes
 

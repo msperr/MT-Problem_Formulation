@@ -58,6 +58,7 @@ We use the customer start time as the start time for each search request. From e
 Besides trips, a test instance contains vehicles and refuel points. Depending on the requested vehicle number, we take a sample of the previous vehicle set. If this does not suffice, \ie the requested vehicle number is greater than the vehicle set, we additionally create vehicles with the trips' end positions as starting positions of the vehicles. Since we do not have further information about the availability of the vehicles, we choose 2:00~am as the starting time of all vehicles. For the refuel point set, we use a sample of the existing refuel point set with the requested size.
 
 \section{Fuel and Cost}
+\label{sec:fuel_cost}
 
 We need to determine the distances and times between two points for the fuel states and the costs. We compute these values with the open source software OpenSourceRoutingMachine (cf.~\cite{OSRM}). The input are start and end positions and it provides the time and distance between each pair of start and end positions. We request the distances~$d$ and the times~$t$ for
 \begin{align*}

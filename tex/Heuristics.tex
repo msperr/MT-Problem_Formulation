@@ -385,7 +385,12 @@ We are given initial fuel levels for the end points. They indicate the required 
 
 Since there are no vehicles in the partial instance, the constraint $\eqref{eq:MMILP:initial_fuel}$ is dropped.
 
-We introduce two additional constraints. If a duty starts or ends with a trip, then the fuel at the start or at the end of this duty is bounded by $f^{\min}$ or $f^{\max}$, respectively. How these boundaries are actually defined, is part of the heuristic. The constraints are the following:
+We introduce two additional constraints: If a duty starts or ends with a trip, it is necessary that a vehicle can reach some refuel point before or after fulfilling the trip. Thus, if a duty starts or ends with a trip, the fuel at the start or at the end of this duty is bounded by $f^{\min}$ or $f^{\max}$, respectively. We define
+\begin{align*}
+	f^{\min}_t := \min_{r\in\mathcal{R}}\fd_{t,r} && f^{\max}_t := 1 - \min_{r\in\mathcal{R}}\ft_{r,t} && \text{for } t\in\mathcal{T}.
+\end{align*}
+
+Value $f^{\min}_t$ is the minimal fuel level at the end of ${t\in\mathcal{T}}$ such that the next refuel point can be reached afterwards. Value $f^{\max}_t$ is the maximal fuel state at the start of ${t\in\mathcal{T}}$ if some refuel point has been visited before. The constraints are the following:
 \begin{align}
 	& e_s + \ft_s \leq f^{\max}_s + \left(1-x_{\ds,s}\right)\cdot\left(1+\ft_s\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmax} \\
 	& f^{\min}_s \leq e_s + \left(1-x_{s,\de}\right) && \text{for all } s\in\Ti \label{eq:CMILP:fmin}

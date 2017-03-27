@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=132
-Cursor=4667
+TopLine=60
+Cursor=2985
 
 [Frame1]
 Flags=0
@@ -53,8 +53,8 @@ Class=LaTeXView
 Document=tex\Heuristics.tex
 
 [Frame2_View0,0]
-TopLine=2010
-Cursor=120638
+TopLine=579
+Cursor=36578
 
 [Frame3]
 Flags=0
@@ -71,7 +71,7 @@ Class=LaTeXView
 Document=tex\Optimal_Approach.tex
 
 [Frame3_View0,0]
-TopLine=123
+TopLine=317
 Cursor=11517
 
 [Frame4]
@@ -89,8 +89,8 @@ Class=LaTeXView
 Document=tex\Instance_Creation.tex
 
 [Frame4_View0,0]
-TopLine=36
-Cursor=12275
+TopLine=96
+Cursor=7862
 
 [Frame5]
 Flags=0
@@ -107,7 +107,7 @@ Class=LaTeXView
 Document=tex\Mathematical_Models.tex
 
 [Frame5_View0,0]
-TopLine=92
+TopLine=252
 Cursor=16576
 
 [Frame6]
@@ -125,8 +125,8 @@ Class=LaTeXView
 Document=tex\Implementation_Results.tex
 
 [Frame6_View0,0]
-TopLine=156
-Cursor=14904
+TopLine=410
+Cursor=34172
 
 [Frame7]
 Flags=0
