@@ -120,9 +120,9 @@ The basic constraints are developed by \cite{Kaiser} and \cite{Knoll} and not ex
 
 In $\eqref{eq:MILP}$, each customer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. This is modeled as follows:
 
-\begin{align*}
-	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \tag{\ref{eq:MILP:customer}}
-\end{align*}
+\begin{align}
+	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MILP:customer}
+\end{align}
 
 In contrast to $\eqref{eq:MILP}$, here each customer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:customer}$ by the following formulation:
 
@@ -172,6 +172,8 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:MMILP:um}
 \end{align}
 
+\newpage
+
 \paragraph{Model Equivalence} \parfill
 
 The problem formulation as developed in \Cref{ch:mathematical_models} is equivalent to to the problem setting as stated in \Cref{sec:problem_description}. This means that each feasible schedule according to \Cref{def:feasible_schedule} corresponds to a solution of the mixed-integer linear program $\eqref{eq:MMILP}$ and vice versa. This fact is shown in the following theorem.
@@ -189,8 +191,8 @@ Let ${S=(x,z,u,e)}$ be a feasible solution of the $\eqref{eq:MMILP}$. We constru
 
 Due to the construction of the graph $G$ and the sets $\Rst$ for ${s\in\mathcal{V}\cupdot\mathcal{T}}$ with $s\prec t$, the time feasibility for $S'$ is fulfilled. During a trip or deadhead trip, the fuel level of a vehicle decreases monotonously. While visiting a refuel points, the fuel level increases. Therefore we observe that a vehicle has its minimal fuel state directly before a refuel point or after a trip and its maximal fuel state directly after a refuel point or at the beginning of the duty. Constraints $\eqref{eq:MMILP:min_fuel}$ and $\eqref{eq:MMILP:es}$ ensure the fuel feasibility for the minimal fuel states and constraints $\eqref{eq:MMILP:max_fuel}$ and $\eqref{eq:MMILP:initial_fuel}$ for the maximal fuel states. Constraint $\eqref{eq:MMILP:fuel_consumption}$ describes the fuel consumption between two trips. The cover constraints are directly fulfilled by $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. Therefore $S'$ is a feasible schedule according to \Cref{def:feasible_schedule}.
 
-Let $S'$ be a feasible schedule with $v\mapsto d(v)$ and $c\mapsto m(c)$. We construct a solution $(x,z,u,e)$ as follows: Set ${x_{\ds,v}:=1}$ for all ${v\in\mathcal{V}}$. For each ${v\in\mathcal{V}}$, let
-${d(v)=\left(\left(r_1,t_1\right),\dots,\left(r_{k_v},t_{k_v}\right)\right)}$ and ${t_0:= v}$. For ${i\in\left[k_v\right]}$, set ${x_{t_{i-1},t_i}:=1}$ and
+Let $S'$ be a feasible schedule with $v\mapsto d(v)$ and $c\mapsto m(c)$. We construct a solution $(x,z,u,e)$ as follows: Set ${x_{\ds,v}:=1}$ for all ${v\in\mathcal{V}}$. For each ${v\in\mathcal{V}}$, let\linebreak
+${d(v)=\left(\left(r_1,t_1\right),\dots,\left(r_{k_v},t_{k_v}\right)\right)}$ and ${t_0:= v}$. For ${i\in\left[k_v\right]}$, set ${x_{t_{i-1},t_i}:=1}$ and\linebreak
 ${z_{t_{i-1},r_i,t_i}:=1}$ if ${r_i\neq\emptyset}$. If ${d(v)\neq\emptyset}$ set ${x_{t_{k_v},\de}:=1}$, else set ${x_{v,\de}:=1}$. Set ${e_v:=f^0_v}$ for ${v\in\mathcal{V}}$ and $e_t$ as the respective fuel states after fulfilling trip ${t\in\Cupdot_{v\in\mathcal{V}} d(v)}$. For each ${c\in\mathcal{C}}$, set ${u_{m(c)}:=1}$. All other variables that have not been mentioned, are set to~$0$. The proof of the feasibility works analogously to the first part of the proof.
 
 The objective function of the $\eqref{eq:MMILP}$ is constructed as follows: The vehicle cost $\cv$ arises for each non-empty duty. The deadhead cost between two subsequently fulfilled trips $s$ and $t$ is $\cd_{s,t}$ or ${\cd_{s,r}+\cd_{r,t}}$ if refuel point ${r\in\Rst}$ is visited in-between. The trip and route costs are charged, iff the respective trip or route is fulfilled. Therefore holds

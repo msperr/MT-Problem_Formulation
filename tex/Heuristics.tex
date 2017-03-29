@@ -453,6 +453,8 @@ As mentioned before, the partial instance~$I_1$ plays a special role since the v
 	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
 \end{align}
 
+\newpage
+
 \begin{definition}[Partial Transformed Task Graph]
 
 Let $i=1$. For a set of vehicles $\mathcal{V}$, a set of end points $\Phat_1$ and the partial trip set $\mathcal{T}_1$, the partial transformed task graph for $I_1$ is the directed graph $\overline{G}_1=\left(\overline{V}_1,\overline{A}_1\right)$ with vertex set
@@ -499,6 +501,8 @@ to $(\operatorname{SMILP}_1)$.
 \end{figure}
 
 The objective function is not modified. The vehicle cost is charged for each non-empty duty that does not end with an end point. The deadhead cost $\cd_{s,t}$ or $\cd_{s,r} + \cd_{r,t}$ for ${s\in\mathcal{V}}$ is respected in the objective function. \Cref{fig:graph_instance_1} shows a simplified visualization of the partial task graph $\overline{G}_1$ and the vehicle cost.
+
+\newpage
 
 \paragraph{Model Equivalence} \parfill
 
@@ -1021,7 +1025,8 @@ If $d$ is not feasible in $(\operatorname{CMILP})$, let $a$ be the smallest inde
 	 \zstart_{t_{a+1}} > \zstart_{t_a} \geq \zstart_{\left(M\circ C\right)\left(t_a\right)} > c_1.
 \end{align*}
 
-Further we have $v\prec t_a$, $t_a\prec t_{a+1}$ and $t_a\not\to t_{a+1}$ and therefore ${\zstart_{t_{a+1}}>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t_{a+1}, s\not\to t_{a+1}\right\}\neq\emptyset}$. For $v'$ and $t_{a+1}$ hold either $\eqref{eq:doubleduties:timecond}$ and $\eqref{eq:doubleduties:fuelcond}$ or $\eqref{eq:doubleduties:timecond_r}$ and $\eqref{eq:doubleduties:fuelcond_r}$ for some ${r\in\mathcal{R}_{v',t_{a+1}}}$. The implications ${\eqref{eq:doubleduties:timecond}\Rightarrow\eqref{eq:doubleduties:time}}$ or ${\eqref{eq:doubleduties:timecond_r}\Rightarrow\eqref{eq:doubleduties:time_r}}$, respectively, can be seen easily.
+Further we have $v\prec t_a$, $t_a\prec t_{a+1}$ and $t_a\not\to t_{a+1}$ and therefore ${\zstart_{t_{a+1}}>c_1}$ and ${\left\{s\in\mathcal{T}\mid v\prec s, s\prec t_{a+1}, s\not\to t_{a+1}\right\}\neq\emptyset}$. For $v'$ and $t_{a+1}$ hold either $\eqref{eq:doubleduties:timecond}$ and $\eqref{eq:doubleduties:fuelcond}$ or $\eqref{eq:doubleduties:timecond_r}$ and $\eqref{eq:doubleduties:fuelcond_r}$ for some ${r\in\mathcal{R}_{v',t_{a+1}}}$. The implications ${\eqref{eq:doubleduties:timecond}\Rightarrow\eqref{eq:doubleduties:time}}$ or\linebreak
+${\eqref{eq:doubleduties:timecond_r}\Rightarrow\eqref{eq:doubleduties:time_r}}$, respectively, can be seen easily.
 
 We can estimate the fuel state $e_{t_{a+1}}$ from above by the maximal fuel of vehicle~$v$ after serving $t_{a+1}$, \ie
 \begin{align*}
@@ -1233,6 +1238,7 @@ Consider an arbitrary customer $c\in\mathcal{C}$. In the partial instance~$I_{\g
 In the partial trip set~$\mathcal{T}_{\gamma(c)}$ there is at least one trip of $c$. But there are also trips of $c$ that are in other partial trip sets. There are even routes with no trip in $\mathcal{T}_{\gamma(c)}$ at all. These routes must not be neglected. Therefore, we need a method to choose the routes where all routes ${m\in C^{-1}(c)}$ are considered. For this, we try to estimate the total cost of the routes in advance. Solving the partial instances is based on the $\eqref{eq:SMILPi}$.
 
 We consider a partial instance~$I_i$. For the cover constraints, we introduce the decision variable ${u_m\in\{0,1\}}$ for ${m\in C^{-1}\left(\mathcal{C}_i\right)}$. In the customer constraints, only the customers in $\mathcal{C}_i$ are considered. The route constraints are restricted to the trips in $\Ti$. The cover constraints read as follows:
+
 \begin{align}
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C}_i \label{eq:TMILP:customer} \\
 	& \sum_{s\in\operatorname{N}_{\overline{G}_i}^-(t)} x_{s,t} = u_m && \text{for all } m\in C^{-1}\left(\mathcal{C}_i\right), t\in m\cap\Ti \label{eq:TMILP:route} \\
@@ -1511,6 +1517,7 @@ Let ${B\subseteq\mathcal{C}}$. We set
 \end{align*}
 
 and define a splitting $\left\{\mathcal{T}_1,\mathcal{T}_2,\mathcal{T}_3\right\}$ by
+
 \begin{align*}
 	\mathcal{T}_i := \begin{cases}
 		\left\{t\in\mathcal{T}\mid \zstart_t<\zstart_B\right\} & \text{if } i=1 \\

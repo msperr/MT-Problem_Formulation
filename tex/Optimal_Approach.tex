@@ -90,6 +90,7 @@ Because of the introduction of variables for each vehicle, the resulting problem
 \end{align*}
 
 The dimension of the codomain of $\psi$ is much smaller than the dimension of the domain. We can rewrite $\eqref{eq:MMILP}$ by using $y^v:=\psi\left(x^v,z^v,e^v\right)$:
+
 \begin{align}
 	\min \quad & \omit\rlap{$\displaystyle{\sum_{v\in\mathcal{V}}\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) + \sum_{m\in\mathcal{M}}u_m\croute_m}$} \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
@@ -171,6 +172,8 @@ Since $\left(\gamma^*,\mu^*,\eta^*\right)$ is a solution of the restricted probl
 \begin{align}
 	\text{Find } i\in\Iv\backslash\Jv && \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \label{eq:DLMP:index}
 \end{align}
+
+\newpage
 
 \paragraph{Identification of the Subproblem} \parfill
 
@@ -282,7 +285,8 @@ After introducing the graph with resource constraints, we define resource-feasib
 
 \begin{definition}[Resource-feasible path]
 
-Let ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. A path ${P:=\left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is called resource-feasible if
+Let ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. A path\linebreak
+${P:=\left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is called resource-feasible if
 \begin{align*}
 	\exists r^{v_i}\in I,i\in\{0,\dots,n\}: \left(r^{v_{i-1}},r^{v_i}\right)\in\REF_{v_{i-1},v_i} \forall i\in\{1,\dots,n\}
 \end{align*}
@@ -609,7 +613,10 @@ First, we prove that the previously developed problem formulation is equivalent 
 \begin{theorem}[Correspondence to $\eqref{eq:MMILP}$]
 \label{th:equivalence_SPv_MMILP}
 
-For every resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$ with $n\in\mathbb{N}_0$ in the graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$, there is a feasible solution ${(x,z,e,u)\in X_v}$ satisfying $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ such that ${g^v(x,z,e,u)\leq r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}}$.
+For every resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$ with $n\in\mathbb{N}_0$ in the graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$, there is a feasible solution ${(x,z,e,u)\in X_v}$ satisfying $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ such that
+\begin{align*}
+	g^v(x,z,e,u)\leq r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}.
+\end{align*}
 
 Inversely, for every feasible solution ${(x,z,e,u)\in X_v}$ to some subproblem $\vinV$ that satisfies $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$, there is a resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$, $n\in\mathbb{N}_0$ in ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$ such that the equation ${g^v(x,z,e)=r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}}$ holds.
 
@@ -623,7 +630,8 @@ We show that we can create a solution of $\eqref{eq:MMILP}$ out of a resource-fe
 
 \paragraph{\enquote{$\boldsymbol{\Rightarrow}$}: Resource-feasible path to feasible solution} \proofparfill
 
-Let ${P:=\left(\ds,t_0,t_1,\dots,t_n,\de\right)}, {n\in\mathbb{N}_0}$ be a resource-feasible $\ds$-$\de$-path in ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^s\right)_{s\in P}$. Construct the following solution $(x,z,e,u)$: For $a\in A$, set $x_a$ to $1$ if the path $P$ uses the arc $a$ and $0$ otherwise. Set ${e_s := r^s_{\operatorname{fuel}}}$ if $s\in P$ and $e_s:=0$ otherwise. For all $i\in[n]$ and $r\in\mathcal{R}_{t_{i-1},t_i}$, set ${z_{t_{i-1},r,t_i} := 1}$ if ${r^{t_{i-1}}\in\left(\REF_{r,t_i}\circ\REF_{t_{i-1},r}\right)\left(r^{t_{i-1}}\right)}$ and ${z_{t_{i-1},r,t_i} := 0}$ otherwise. If this holds true for more than one ${r\in\mathcal{R}_{t_{i-1},t_i}}$, change $z_{t_{i-1},r,t_i}$ to $0$ for all such $r$ but one. For all other arcs $a\in A$, set $z_a:=0$. For all $m\in\mathcal{M}$ set ${u_m := 1}$ if there is an ${i\in[n]}$ such that ${M\left(t_i\right)=m}$ and ${u_m := 0}$ otherwise. We claim that $(x,z,e,u)\in X_v$, \ie $(x,z,e,u)$ is a feasible solution to the subproblem of vehicle $v:=t_0$.
+Let ${P:=\left(\ds,t_0,t_1,\dots,t_n,\de\right)}, {n\in\mathbb{N}_0}$ be a resource-feasible $\ds$-$\de$-path in\linebreak
+${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^s\right)_{s\in P}$. Construct the following solution $(x,z,e,u)$: For $a\in A$, set $x_a$ to $1$ if the path $P$ uses the arc $a$ and $0$ otherwise. Set ${e_s := r^s_{\operatorname{fuel}}}$ if $s\in P$ and $e_s:=0$ otherwise. For all $i\in[n]$ and $r\in\mathcal{R}_{t_{i-1},t_i}$, set ${z_{t_{i-1},r,t_i} := 1}$ if ${r^{t_{i-1}}\in\left(\REF_{r,t_i}\circ\REF_{t_{i-1},r}\right)\left(r^{t_{i-1}}\right)}$ and ${z_{t_{i-1},r,t_i} := 0}$ otherwise. If this holds true for more than one ${r\in\mathcal{R}_{t_{i-1},t_i}}$, change $z_{t_{i-1},r,t_i}$ to $0$ for all such $r$ but one. For all other arcs $a\in A$, set $z_a:=0$. For all $m\in\mathcal{M}$ set ${u_m := 1}$ if there is an ${i\in[n]}$ such that ${M\left(t_i\right)=m}$ and ${u_m := 0}$ otherwise. We claim that $(x,z,e,u)\in X_v$, \ie $(x,z,e,u)$ is a feasible solution to the subproblem of vehicle $v:=t_0$.
 
 The flow conservation and the fuel constraints hold as proven by \cite{Kaiser}. This applies directly since the respective parts of $X_v$ and $\REF$ have not been modified. The claim concerning the reduced cost is also proven there.
 
@@ -854,6 +862,8 @@ As proven by \cite{Kaiser}, this problem can be solved by using the resource len
 
 This is a coarser branching rule than the assignment of trips, but still destroys the symmetry between the subproblems. In contrast to before, this rule alone is not sufficient to completely ensure the integrality in the master problem.
 
+\newpage
+
 \paragraph{Choice of Multimodal Routes} \parfill
 
 The next approach is to sum up over all vehicles for the components of the image of $\psi$. We fix a value for the expression
@@ -863,14 +873,16 @@ The next approach is to sum up over all vehicles for the components of the image
 
 for some $t\in\mathcal{T}$. This can be interpreted as deciding whether trip $t$ is fulfilled by some vehicle. Because of the cover constraint $\eqref{eq:MMILP:linking}$, this decision directly determines the route variable $u_m$ for ${m := M(t)}$ and therefore all other trips ${t'\in M^{-1}(m)}$. Because of this implication, we directly regard the case of branching on $u_m$.
 
-Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. By $\eqref{eq:MMILP:linking}$ follows ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
+Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. By $\eqref{eq:MMILP:linking}$ follows\linebreak
+${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
 \begin{align*}
 	x^v_{s,t} = 0 && \text{for all } \vinV, t\in M^{-1}(m), s\in\Nin(t).
 \end{align*}
 
 This corresponds to deleting the respective arcs in all task graphs.
 
-Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding ${\sum_{s\in\Nin(t)}x_{s,t}^v = 1}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
+Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding\linebreak
+${\sum_{s\in\Nin(t)}x_{s,t}^v = 1}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
 \begin{align*}
 	x^v_{s,t} = 0 && \text{for all } & \vinV, m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}, \\
 	&&& t\in M^{-1}(m'), s\in\Nin(t).
