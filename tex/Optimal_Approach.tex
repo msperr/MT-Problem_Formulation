@@ -73,7 +73,7 @@ Consider a solution of the $\eqref{eq:MMILP}$. This solution can be decomposed i
 
 Constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure that exactly vehicle $v$ is used in this formulation. We denote the set of feasible duties for any vehicle by $X:=\bigcup_{v\in\mathcal{V}}X_v$. Any feasible solution of $\eqref{eq:MMILP}$ can be decomposed into vehicle duties. This is guaranteed by $\eqref{eq:MMILP:vehicles}$ which forces the duties of the vehicles to be disjoint with respect to the trips. The only variables that are not considered in $X_v$ are the route variables $u_m$ which can be determined by the arc variables $x_{s,t}$. The objective function is additive with respect to the decomposition except for the route cost which we then consider explicitly. We write the cost for a configuration $\left(x^v,z^v,e^v\right)$ as $g\left(x^v,z^v,e^v\right)$.
 
-The only constraints that are not ensured in $X_v$ are the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. These are the linking constraints for the various subproblems. In summary, we can rewrite $\eqref{eq:MMILP}$ as
+The only constraints that are not ensured in $X_v$ are the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$. These are the linking constraints for the various subproblems. In summary, we can rewrite $\eqref{eq:MMILP}$ as:
 \begin{align}
 	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
@@ -84,7 +84,7 @@ The only constraints that are not ensured in $X_v$ are the cover constraints $\e
 
 \paragraph{Reduction of the Master Problem} \parfill
 
-Because of the introduction of variables for each vehicle, the resulting problem size is very large. For maintaining the master problem, not all information of $X_v$ are needed. In order to fulfill $\eqref{eq:MMILP:linking}$ we need only the term ${\sum_{s\in\Nin(t)} x^v_{s,t}}$, which is the set of trips served by a specific vehicle. Therefore, we define the linear mapping
+Because of the introduction of variables for each vehicle, the resulting problem size is very large. For maintaining the master problem, not all information of $X_v$ are needed. In order to fulfill $\eqref{eq:MMILP:linking}$ we need only the term ${\sum_{s\in\Nin(t)} x^v_{s,t}}$, which is the set of trips served by a specific vehicle. Therefore, we define the linear mapping:
 \begin{align*}
 	\psi:X\to\{0,1\}^{\mathcal{T}} && (x,z,e)\mapsto\left(\sum_{s\in\Nin(t)}x_{s,t}\right)_{t\in\mathcal{T}} \label{eq:psi}
 \end{align*}
@@ -100,14 +100,14 @@ The dimension of the codomain of $\psi$ is much smaller than the dimension of th
 
 The mapping $\psi$ is not injective in general. Thus, there is more than one feasible duty that serves exactly the trips of $y^v$. These duties can have different cost. We therefore use the minimal resulting cost
 \begin{align*}
-	\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) = \min \left\{g\left(x^v\right)|x^v\in X_v, \psi\left(x^v\right)=y^v\right\}
+	\min g\left(\psi^{-1}\left(y^v\right)\cap X_v\right) = \min \left\{g\left(x^v\right)|x^v\in X_v, \psi\left(x^v\right)=y^v\right\}.
 \end{align*}
 
 This is the smallest cost of a vehicle duty that serves exactly the trips as indicated by the incidence vector $y^v$. We do not have to determine these costs now. As we will see later, the costs are a byproduct of solving the subproblems.
 
 \paragraph{Column Generation} \parfill
 
-We apply column generation to our problem. For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\mathcal{T}\times\Iv}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$. Then we can reformulate the master problem as
+We apply column generation to our problem. For every $v\in\mathcal{V}$, let $\Iv$ be an index set for the finitely many points in $\psi\left(X_v\right)$ and let the columns of $Y^v\in\mathbb{R}^{\mathcal{T}\times\Iv}$ be exactly those points. Let $G^v\in\mathbb{R}^{1\times\mathcal{I}}$ be the respective values of $\min g\left(\psi^{-1}(\cdot)\cap X_v\right)$. Then we can reformulate the master problem as:
 \begin{align*}
 	\min \quad & \sum_{v\in\mathcal{V}}G^v\lambda^v + \sum_{m\in\mathcal{M}}u_m\croute_m \tag{IMP} \label{eq:IMP} \\
 	\text{s.t.} \quad & \sum_{v\in\mathcal{V}} Y^v_{t,\cdot}\lambda^v = u_m && \text{for all } m\in\mathcal{M},t\in m \\
@@ -164,17 +164,17 @@ We can check for optimality and find columns to add by using the dual problems o
 
 We therefore consider the constraints of the dual problems. Constraints $\eqref{eq:DLRMP:route}$ are equivalent in both formulations. The constraints $\eqref{eq:DLRMP:vehicle}$ read as follows in the unrestricted case
 \begin{align}
-	\sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } \vinV,i\in\Iv \label{eq:DLMP:vehicle}
+	\sum_{t\in\mathcal{T}} Y^v_{t,i}\gamma_t + \mu_v \leq G^v_i && \text{for all } \vinV,i\in\Iv. \label{eq:DLMP:vehicle}
 \end{align}
 
 Since $\left(\gamma^*,\mu^*,\eta^*\right)$ is a solution of the restricted problem, $\eqref{eq:DLMP:vehicle}$ is fulfilled for all $i\in\Jv$. It remains to check $\Iv\backslash\Jv$ which leads to the following subproblem:
 \begin{align}
-	\text{Find } i\in\Iv\backslash\Jv && \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV
+	\text{Find } i\in\Iv\backslash\Jv && \text{ s.t.} && \sum_{t\in\mathcal{T}}Y^v_{t,i}\gamma^*_t + \mu^*_v > G^v_i && \text{for } \vinV \label{eq:DLMP:index}
 \end{align}
 
 \paragraph{Identification of the Subproblem} \parfill
 
-Recall the definitions ${G^v_i = \min g\left(\psi^{-1}\left(Y^v_i\right)\cap X_v\right)}$ and ${Y^v_i = \psi(x,z,e)}$ for the respective ${(x,z,e)\in X_v}$. Using this, we can rewrite the subproblem to
+Recall the definitions ${G^v_i = \min g\left(\psi^{-1}\left(Y^v_i\right)\cap X_v\right)}$ and ${Y^v_i = \psi(x,z,e)}$ for the respective ${(x,z,e)\in X_v}$. Using this, we can rewrite the subproblem to:
 \begin{align*}
 	\min \quad & g\left(x,z,e\right)-\sum_{t\in\mathcal{T}}\sum_{s\in\Nin(t)}x_{s,t}\gamma^*_t \tag{$\operatorname{SP}_v$} - \mu^*_v \label{eq:SPv} \\
 	\text{s.t.} \quad & \left(x,z,e\right)\in X_v
@@ -239,11 +239,11 @@ We call ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ a graph with resource con
 	\item{$\sqsubseteq\in\left\{\leq,=,\geq\right\}^{\mathcal{U}}$ is a vector of resource relations and is called the resource dominance relation.}
 		For two resources ${r,\tilde{r}\in\mathbb{R}^{\mathcal{U}}}$, we write ${r\sqsubseteq\tilde{r}}$ if ${r_u\sqsubseteq_u \tilde{r}_u}$ for all $u\in\mathcal{U}$ and say that $\tilde{r}$ dominates $r$. The subset of maximal vectors of a set $R\subseteq\mathbb{R}^{\mathcal{U}}$ with respect to $\sqsubseteq$ is denoted by
 		\begin{align*}
-			\max_{\sqsubseteq} R := \left\{r\in R\mid \forall\tilde{r}\in R: r\sqsubseteq\tilde{r}\Rightarrow r=\tilde{r}\right\}
+			\max_{\sqsubseteq} R := \left\{r\in R\mid \forall\tilde{r}\in R: r\sqsubseteq\tilde{r}\Rightarrow r=\tilde{r}\right\}.
 		\end{align*}
 		The closed cone of resource vectors less than or equal to zero with respect to $\sqsubseteq$ is denoted by
 		\begin{align*}
-			\mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0} := \left\{r\in\mathbb{R}^{\mathcal{U}}\mid r\sqsubseteq 0_{\mathcal{U}}\right\}
+			\mathbb{R}^{\mathcal{U}}_{\sqsubseteq 0} := \left\{r\in\mathbb{R}^{\mathcal{U}}\mid r\sqsubseteq 0_{\mathcal{U}}\right\}.
 		\end{align*}
 	\item{$I\subseteq\mathbb{R}^{\mathcal{U}}$ is the Cartesian product of closed intervals of $\mathbb{R}$.}
 		The projection onto a single resource $u\in\mathcal{U}$ denoted by $\Pi_u(I)$ is called its resource window. If $\Pi_u(I)=\mathbb{R}$ for some resource $u\in\mathcal{U}$ it is called unrestricted.
@@ -305,7 +305,7 @@ Let ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource const
 For $(u,v)\in A_H$, the concatenation of resource extension functions is defined as
 \begin{align*}
 	\REF_{v,w}\circ\REF_{u,v} := \left\{\vphantom{\REF_{v,w}}\right. & \left(r^u,r^w\right)\in I\times I\mid \exists r^v\in I: \\
-	& \left.\left(r^u,r^v\right)\in\REF_{u,v}\land\left(r^v,r^w\right)\in\REF_{v,w}\right\}
+	& \left.\left(r^u,r^v\right)\in\REF_{u,v}\land\left(r^v,r^w\right)\in\REF_{v,w}\right\}.
 \end{align*}
 	\item
 The graph with resource constraints ${\widehat{H} := \left(V_{\widehat{H}},A_{\widehat{H}},\sqsubseteq,I,\widehat{\REF}\right)}$ which results from $H$ by contracting the arc $(v,w)$ is defined by the vertex set ${V_{\widehat{H}} := V_H\backslash\{v\}}$, the arc set
@@ -416,7 +416,7 @@ In the following, we show how we apply the (SPPRC) and \Cref{alg:label_setting} 
 
 First we insert additional valid inequalities. They are not necessary but may improve the column generation process. In the original problem, we have the linking constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ which ensure that for every customer exactly one route is fulfilled. These constraints cannot be moved into the subproblems since the customers can be satisfied by different vehicles. It is even likely that two trips of the same route are fulfilled by different vehicles.
 
-Nevertheless, we can identify duties that are infeasible with respect to the cover constraints. This is the case, if a vehicle fulfills two trips that belong to the same costumer but not to the same route. If this duty is part of the overall solution, it is not possible that $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are fulfilled simultaneously. Therefore, we want to prevent such a duty from being added to the column set.
+Nevertheless, we can identify duties that are infeasible with respect to the cover constraints. This is the case, if a vehicle fulfills two trips that belong to the same customer but not to the same route. If this duty is part of the overall solution, it is not possible that $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are fulfilled simultaneously. Therefore, we want to prevent such a duty from being added to the column set.
 
 In order to use the inequalities, we have to introduce decision variables $u_m\in\{0,1\}$ for $m\in\mathcal{M}$. We insert the following inequalities to $\eqref{eq:SPv}$ for each $\vinV$. They are not necessary since they are implied by the cover constraints of the master problem, but they strengthen the formulation of the subproblem.
 \begin{align}
@@ -441,7 +441,7 @@ In order to ensure the constraints $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:
 
 Altogether, we consider resources ${\mathcal{U} := \left\{\operatorname{redcost},\operatorname{fuel},\operatorname{length}\right\}\cupdot\mathcal{M}}$ in the resource window
 \begin{align*}
-	I := \mathbb{R}\times[0,1]\times[0,|\mathcal{T}|]\times\bigotimes_{m\in\mathcal{M}}[0,|m|]\subseteq\mathbb{R}^{\mathcal{U}}
+	I := \mathbb{R}\times[0,1]\times[0,|\mathcal{T}|]\times\bigotimes_{m\in\mathcal{M}}[0,|m|]\subseteq\mathbb{R}^{\mathcal{U}}.
 \end{align*}
 
 A resource vector $r\in I$ consists of the reduced cost ${r_{\operatorname{redcost}}\in\mathbb{R}}$, the fuel level ${r_{\operatorname{fuel}}\in[0,1]}$, the duty length ${r_{\operatorname{length}}\in[0,|\mathcal{T}|]}$ and the route resources ${r_m\in[0,|m|]}$ for $m\in\mathcal{M}$ in this order. The resource relation vector is given by ${\sqsubseteq := \left(\geq,\leq,=,=,\dots,=\right)}$.
@@ -467,7 +467,7 @@ We define the extended task graph with split vertices ${\widetilde{G} := \left(\
 and arc set
 \begin{align*}
 	\widetilde{A} := & \left\{\left(\ds,s^-\right)\mid \left(\ds,s\right)\in\widehat{A}\right\}\cupdot\left\{\left(s^+,\de\right)\mid\left(s,\de\right)\in\widehat{A}\right\} \\
-	& \cupdot\left\{\left(s^+,t^-\right)\mid (s,t)\in\widehat{A}\right\}\cupdot\left\{\left(s^-,s^+\right)\mid s\in\widehat{V}\backslash\left\{\ds,\de\right\}\right\}
+	& \cupdot\left\{\left(s^+,t^-\right)\mid (s,t)\in\widehat{A}\right\}\cupdot\left\{\left(s^-,s^+\right)\mid s\in\widehat{V}\backslash\left\{\ds,\de\right\}\right\}.
 \end{align*}
 
 Based on the graph $\widetilde{G}$, we define the resource extension functions $\widetilde{\operatorname{REF}}$. For this, we use $\sqsubseteq$ and $I$ as described in \Cref{sec:resources}. The values $\gamma_t$ for $t\in\mathcal{T}$ and $\mu_v$ for the specific $\vinV$ come from the dual solution of $\eqref{eq:DLRMP}$, from which the subproblem results. We define the resource extension function
@@ -598,7 +598,7 @@ for $s\notin\mathcal{V}$ and with an additional $\cv$ in the first component of 
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
-\subsection{An Exact Algorithm for Solving the Subproblems}
+\subsection{Algorithms for Solving the Subproblems}
 
 After specification of the resources and the resource extension function, we present an algorithm that solves the subproblem for every vehicle optimally.
 
@@ -606,7 +606,7 @@ After specification of the resources and the resource extension function, we pre
 
 First, we prove that the previously developed problem formulation is equivalent to the subproblem and that the values for the reduced cost coincide.
 
-\begin{theorem}[Correspondence to MMILP formulation]
+\begin{theorem}[Correspondence to $\eqref{eq:MMILP}$]
 \label{th:equivalence_SPv_MMILP}
 
 For every resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$ with $n\in\mathbb{N}_0$ in the graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$, there is a feasible solution ${(x,z,e,u)\in X_v}$ satisfying $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ such that ${g^v(x,z,e,u)\leq r^{\de}_{\operatorname{redcost}} - r^{\ds}_{\operatorname{redcost}}}$.
@@ -724,7 +724,7 @@ According to \Cref{def:inversion}, the inverted relation is given by
 	F^{-1}_{t^-,t^+} := \left\{\left(r^{t^+},r^{t^-}\right)\mid \left(r^{t^-},r^{t^+}\right)\in F_{t^-,t^+}\right\}
 \end{align*}
 
-for all $t\in\mathcal{T}$. Applying the respective definitions we get
+for all $t\in\mathcal{T}$. Applying the respective definitions we get:
 \begin{align*}
 	F_{t^-,t^+} & = \left\{\left(b, a^t(b)\right)\right. && \mid \left. b\in I_{\mathcal{M}}, b_{M(t)}\geq 1\right\} \\
 	F^{-1}_{t^-,t^+} & = \left\{\left(a^t(b), b\right)\right. && \mid \left. b\in I_{\mathcal{M}}, b_{M(t)}\geq 1\right\} \\
@@ -737,6 +737,32 @@ We show that $F^{-1}_{t^-,t^+}$ is a resource extension function with respect to
 Considering the other resources and contraction of vertices does not destroy the invertibility. Therefore $\REF$ is invertible.
 
 \end{proof}
+
+\paragraph{Heuristic Approach to the Subproblem} \parfill
+
+For the column generation approach, it is sufficient to receive a duty with negative reduced cost for each vehicle. This solution is not necessarily optimal \wrt the negative reduced cost. This follows directly from the formulation $\eqref{eq:DLMP:index}$. Thus, we describe a heuristic approach for solving the subproblem. This is directly applied by \cite[pp.~104-107]{Kaiser}.
+
+As the label-setting algorithm is very expensive as it create many labels, we try to decrease the number of possible labels by discretizing some continuous resources, \eg the fuel resource. For this, we define a discrete set of allowed fuel levels as
+\begin{align*}
+	\mathcal{E}\subseteq[0,1] && 0,1\in\mathcal{E} && \text{and} && \lfloor e\rfloor_{\mathcal{E}} := \max\left\{e'\in\mathcal{E}\mid e'\leq e\right\} && \text{for } e\in[0,1].
+\end{align*}
+
+Using the set of fuel levels $\mathcal{E}$, the fuel component of $\widehat{\REF}_{s,t}$ for ${s\in\mathcal{V}\cupdot\mathcal{T}}$, ${t\in\mathcal{T}}$ changes to
+\begin{align*}
+	e\mapsto \left(\left\lfloor e - \fd_{s,t} - \ft_t\right\rfloor_{\mathcal{E}}\right)\cap I_{\operatorname{fuel}}
+\end{align*}
+
+for $e\in I_{\operatorname{fuel}} = [0,1]$. Similarly, the fuel component for ${\widehat{\REF}_{r,t}\circ\widehat{\REF}_{s,r}}$ reads as
+\begin{align*}
+	e\mapsto \left\{\begin{tabular}{cr}
+		$\displaystyle{\left(\left\lfloor\min\left(e - \fd_{s,r} - \ft_r, 1\right) - \fd_{r,t} - \ft_t\right\rfloor_{\mathcal{E}} + \mathbb{R}_{\leq 0}\right)\cap I_{\operatorname{fuel}}}$ & if $e\geq \fd_{s,r}$ \\
+		$\emptyset$ & otherwise.
+	\end{tabular}\right.
+\end{align*}
+
+The modified $\REF$ with fuel levels $\mathcal{E}$ is also an invertible resource extension function. Further, each duty that is resource-feasible in the heuristic is also feasible in the original formulation. This is proven by \cite{Kaiser}.
+
+In the column generation process, we create columns with the heuristic methods. If the heuristic finds duties with negative reduced cost, we insert these duties to the index set. Only if we cannot find suitable duties we apply the optimal label-setting algorithm. If the optimal algorithm does not find any duties with negative reduced cost any more, we have reached an optimal solution to the relaxed master problem.
 
 %########################################################################################################################################
 %#
@@ -784,21 +810,21 @@ for some $\vinV, t\in\mathcal{T}$. This decision can be interpreted as determini
 
 Branching down means setting ${\sum_{s\in\Nin(t)} x^v_{s,t} = 0}$ for some $\vinV, t\in\mathcal{T}$. This can be implemented in $\eqref{eq:SPv}$ by setting
 \begin{align*}
-	x^v_{s,t}=0 && \text{for all } s\in\Nin(t)
+	x^v_{s,t}=0 && \text{for all } s\in\Nin(t).
 \end{align*}
 
 This corresponds to deleting the respective arcs in the task graph corresponding to subproblem~$v$.
 
 Branching up means demanding ${\sum_{s\in\Nin(t)} x^v_{s,t} = 1}$ for some $\vinV, t\in\mathcal{T}$. With the constraints $\eqref{eq:MMILP:flow}, \eqref{eq:Xv:vehicle}, \eqref{eq:Xv:other_vehicles}$ and the fact that $G$ is acyclic, this is equivalent to setting
 \begin{align*}
-	x^v_{s,u} = 0 && \text{for all } (s,u)\in A\cap\left(\left(\operatorname{N}_G^{--}(t)\backslash\{t\}\right)\times\left(\operatorname{N}_G^{++}(t)\backslash\{t\}\right)\right)
+	x^v_{s,u} = 0 && \text{for all } (s,u)\in A\cap\left(\left(\operatorname{N}_G^{--}(t)\backslash\{t\}\right)\times\left(\operatorname{N}_G^{++}(t)\backslash\{t\}\right)\right).
 \end{align*}
 
 This corresponds to deleting all arcs skipping trip $t$.
 
 According to the cover constraints $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:linking}$, branching up implicitly choose the route for customer $(C\circ M)(t)$. Therefore, it further demands
 \begin{align*}
-	x^v_{s,t'} = 0 && \text{for all } v\in\mathcal{V}, t'\in\overline{M}(t), s\in\Nin(t')
+	x^v_{s,t'} = 0 && \text{for all } v\in\mathcal{V}, t'\in\overline{M}(t), s\in\Nin(t').
 \end{align*}
 
 Hence all trips belonging to another route of the same customer are deleted. This applies for all subproblems simultaneously.
@@ -837,17 +863,17 @@ The next approach is to sum up over all vehicles for the components of the image
 
 for some $t\in\mathcal{T}$. This can be interpreted as deciding whether trip $t$ is fulfilled by some vehicle. Because of the cover constraint $\eqref{eq:MMILP:linking}$, this decision directly determines the route variable $u_m$ for ${m := M(t)}$ and therefore all other trips ${t'\in M^{-1}(m)}$. Because of this implication, we directly regard the case of branching on $u_m$.
 
-Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. By $\eqref{eq:MMILP:linking}$ follows\linebreak ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
+Branching down means setting ${u_m = 0}$ for some ${m\in\mathcal{M}}$. By $\eqref{eq:MMILP:linking}$ follows ${\sum_{s\in\Nin(t)}x_{s,t}^v = 0}$ for all ${t\in M^{-1}(m)}, \vinV$ and therefore
 \begin{align*}
-	x^v_{s,t} = 0 && \text{for all } \vinV, t\in M^{-1}(m), s\in\Nin(t)
+	x^v_{s,t} = 0 && \text{for all } \vinV, t\in M^{-1}(m), s\in\Nin(t).
 \end{align*}
 
 This corresponds to deleting the respective arcs in all task graphs.
 
-Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding\linebreak ${\sum_{s\in\Nin(t)}x_{s,t}^v = 1}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
+Branching up means setting ${u_m = 1}$ for some ${m\in\mathcal{M}}$ and therefore demanding ${\sum_{s\in\Nin(t)}x_{s,t}^v = 1}$ for all ${t\in M^{-1}(m)}, \vinV$. Due to the cover constraint $\eqref{eq:MMILP:customer}$ this is equivalent to setting ${u_{m'} = 0}$ for all ${m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}}$. We therefore set
 \begin{align*}
 	x^v_{s,t} = 0 && \text{for all } & \vinV, m'\in\left(C^{-1}\circ C\right)(m)\backslash\{m\}, \\
-	&&& t\in M^{-1}(m'), s\in\Nin(t)
+	&&& t\in M^{-1}(m'), s\in\Nin(t).
 \end{align*}
 
 In other words, stating that a multimodal route is fulfilled by some vehicle is equivalent to stating that all trips belonging to other routes of the same customer are not fulfilled by any vehicle, if $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:linking}$ hold. Again, this can be realized by deleting the respective arcs in all task graphs.

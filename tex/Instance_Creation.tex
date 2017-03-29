@@ -72,17 +72,17 @@ and set the end times ${\zend_t := \zstart_t + t_t}$ for ${t\in\mathcal{T}}$.
 
 We assume that the fuel consumption depends linearly on the driven distance of the electrically powered vehicles and the refuel rate depends linearly on the time the vehicle stays at the refuel point. The fuel state of a vehicle is always in the interval $[0,1]$. We introduce the constants $v^{\operatorname{range}}$ which describes the maximal range of a vehicle and $v^{\operatorname{refuel}}$ which describes the maximal refueling time. Therefore the fuel consumption is given by
 \begin{align*}
-	\fd_{s,t} := \frac{d_{s,t}}{v^{\operatorname{range}}} && \text{for } s\in\mathcal{V}\cupdot\mathcal{R}\cupdot\mathcal{T}, t\in\mathcal{R}\cupdot\mathcal{T} && && \ft_t := \frac{d_t}{v^{\operatorname{range}}} && \text{for } t\in\mathcal{T}
+	\fd_{s,t} := \frac{d_{s,t}}{v^{\operatorname{range}}} && \text{for } s\in\mathcal{V}\cupdot\mathcal{R}\cupdot\mathcal{T}, t\in\mathcal{R}\cupdot\mathcal{T} && && \ft_t := \frac{d_t}{v^{\operatorname{range}}} && \text{for } t\in\mathcal{T}.
 \end{align*}
 
 The refuel rate is fiven by
 \begin{align*}
-	\ft_r := -\frac{\zstart_t - \zend_s - t_{s,r} - t_{r,t}}{v^{\operatorname{refuel}}} && \text{for all } r\in\Rst
+	\ft_r := -\frac{\zstart_t - \zend_s - t_{s,r} - t_{r,t}}{v^{\operatorname{refuel}}} && \text{for all } r\in\Rst.
 \end{align*}
 
 Since we do not have further information about the fuel states of the vehicles, we set
 \begin{align*}
-	f^0_v := 1 && \text{for all } v\in\mathcal{V}
+	f^0_v := 1 && \text{for all } v\in\mathcal{V}.
 \end{align*}
 
 As realistic values we assume that the vehicle range is 135km and the refueling time is 8h. Therefore we set ${v^{\operatorname{range}} =}$~135,000 and ${v^{\operatorname{refuel}} =}$~28,800.
@@ -91,7 +91,7 @@ As realistic values we assume that the vehicle range is 135km and the refueling 
 
 The costs also depend linearly on the driven distance. The constant $c^{\operatorname{meter}}$ describes the cost for each meter a vehicle drives. Thus we set
 \begin{align*}
-	\cd_{s,t} := c^{\operatorname{meter}}\cdot d_{s,t} && \text{for } s\in\mathcal{V}\cupdot\mathcal{R}\cupdot\mathcal{T}, t\in\mathcal{R}\cupdot\mathcal{T} && && \ct_t := c^{\operatorname{meter}}\cdot d_t && \text{for } t\in\mathcal{T}
+	\cd_{s,t} := c^{\operatorname{meter}}\cdot d_{s,t} && \text{for } s\in\mathcal{V}\cupdot\mathcal{R}\cupdot\mathcal{T}, t\in\mathcal{R}\cupdot\mathcal{T} && && \ct_t := c^{\operatorname{meter}}\cdot d_t && \text{for } t\in\mathcal{T}.
 \end{align*}
 
 We set the constants ${c^{\operatorname{meter}} =}$~1 and ${\cv =}$~50,000.
@@ -112,15 +112,17 @@ Consider that the route as described in \Cref{tab:exemplary_route} has been deve
 \begin{table}[htb]
 	\centering
 	\begin{tabular}{cccccc}
+		\toprule
 		Time & Mode & $d_t$ & $\ct$ & $\croute$ & Cost \\
-		\hline
+		\midrule
 		8:00 - 8:12 & Car & 6km & 6000 & & 3.00 euros \\
 		8:12 - 8:15 & Walk & & & 1000 & 0.50 euros \\
 		8:15 - 8:25	& Subway & & & 2000 & 1.00 euros \\
 		8:25 - 8:28 & Wait & & & & \\
 		8:28 - 8:33 & Bus & & & 1000 & 0.50 euros \\
 		8:33 - 8:39 & Walk & & & 2000 & 1.00 euros \\
-		8:39 - 8:45 & Car & 3km & 3000 & & 1.50 euros
+		8:39 - 8:45 & Car & 3km & 3000 & & 1.50 euros \\
+		\bottomrule
 	\end{tabular}
 	\caption{Route according to \Cref{ex:example_route}}
 	\label{tab:exemplary_route}
@@ -135,6 +137,3 @@ Only the car trips of this route are part of the input. Thus we have $t_1,t_2\in
 The route cost comprises a penalty of 15,000 for the total travel time and in summary we have ${\croute_m =}$~21,000.
 
 \end{example}
-
-\section{Instance Sizes}
-
