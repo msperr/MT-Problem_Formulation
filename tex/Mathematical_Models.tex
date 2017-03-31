@@ -42,7 +42,7 @@ Consider an arbitrary cycle of trips $t_1,\dots,t_k\in\mathcal{T}$, $k\geq 2$. T
 \end{gather*}
 
 This is a contradiction. Therefore no cycle exists.
-
+%
 \end{proof}
 
 In order to consider refueling and refuel stations, we introduce an extended task graph.
@@ -75,7 +75,7 @@ $\widehat{G}$ is a directed acyclic graph.
 \begin{proof}
 
 Assume there is a cycle in $\widehat{G}$. In comparison to $G$, only arcs $(s,r)$ and $(r,t)$ for ${r\in\Rst, s\prec t}$ were added. Assume there is a cycle containing $r\in\Rst$. $r$ has only one ingoing arc $(s,r)$ and one outgoing arc $(r,t)$ and only if the arc $(s,t)$ exists. There is no cycle on the vertices $\left\{s,r,t\right\}$. Every other cycle containing $r$ is also a cycle using the arc $(s,t)$. This is a contradiction to the fact that $G$ is cycle-free as proven in \Cref{lem:taskgraph_cyclefree}.
-
+%
 \end{proof}
 
 In the extended task graph $\widehat{G}$, a $\ds$-$\de$-path further represents the duty of a vehicle. The additional arcs $(s,r),(r,t)$ for $r\in\Rst$ describe a possible detour between the trips $s$ and $t$ in order to refuel at refuel station $r$.
@@ -199,7 +199,7 @@ The objective function of the $\eqref{eq:MMILP}$ is constructed as follows: The 
 \begin{align*}
 	\operatorname{val}(S) = \operatorname{cost}\left(S'\right).
 \end{align*}
-
+%
 \end{proof}
 
 \begin{remark}

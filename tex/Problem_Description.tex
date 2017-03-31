@@ -254,7 +254,8 @@ There are no zero-time rentals:
 	\zstart_t < \zend_t && \text{for all } t\in\mathcal{T}
 \end{align}
 
-We assume the Triangle Inequalities for time, fuel consumption and cost. For $s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}$ and $r,t\in\mathcal{T}\cupdot\mathcal{R}$ holds:
+We assume the Triangle Inequalities for time, fuel consumption and cost. For \linebreak
+${s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}}$ and $r,t\in\mathcal{T}\cupdot\mathcal{R}$ holds:
 \begin{align}
 \label{eq:triangle_inequality}
 	t_{s,t} \leq t_{s,r} + t_{r,t} && \cd_{s,t} \leq \cd_{s,r} + \cd_{r,t} && \fd_{s,t} \leq \fd_{s,r} + \fd_{r,t}
@@ -348,7 +349,7 @@ and the mappings
 The solution of VSP-SC can easily be mapped to a solution of the corresponding VSP-MC and vice versa. If a trip is chosen in VSP-SC, the respective route is chosen in VSP-MC. Then, every trip of this route is fulfilled and the customer is satisfied. The other way round, if a route is chosen in VSP-MC, the trip contained in this route is chosen in VSP-SC and the customer is satisfied. The feasibility of the vehicle duties is not affected by this procedure.
 
 This is a polynomial reduction, VSP-SC is $\mathcal{NP}$-hard by \Cref{th:complexity_VSPSC} and hence VSP-MC is $\mathcal{NP}$-hard.
-
+%
 \end{proof}
 
 With \Cref{th:complexity_VSPRC} and \Cref{th:complexity_VSPMC} we can see that our problem gets $\mathcal{NP}$-hard only with cover constraints or with resource constraints and considering the number of vehicles.

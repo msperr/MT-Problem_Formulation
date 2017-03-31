@@ -78,7 +78,7 @@ that covers a time range of 24 hours. Out of this test instance, we create sever
 
 \paragraph{Heuristics} \parfill
 
-As stated before, we have a total of 24 test instances. For each of these instances, we have applied the Successive Heuristic with a customer-dependent splitting and a time-dependent splitting. We have tested them with an aspired number of vertices of 100, 200 and 400 for each partial instance. The computations took place on the Compute-Server.\fxnote{Compute Server}
+As stated before, we have a total of 24 test instances. For each of these instances, we have applied the Successive Heuristic with a customer-dependent splitting and a time-dependent splitting. We have tested them with an aspired number of vertices of 100, 200 and 400 for each partial instance. The computations took place on the Compute-Server. All computations have been performed on a Linux-based operation system with 2.2GHz CPU and 128GB main memory.
 
 For each execution of the heuristic, we measure the computation time. This time comprises creating the partial task graphs, solving the partial instances, determining the end points and connecting the partial solutions. It does not contain retrieving the distance and time matrix and building the task graph, from which the partial task graphs are created. We have not examined the determination of a lower bound for the optimal objective value for this problem. Therefore we cannot come up with an optimality gap for these heuristics.
 
@@ -100,7 +100,7 @@ We have evaluated 24 test instances, where 12 of them emerge from shifting route
 		100 & 500 & 2354 & 3228 & 11,364,031 & 18 & 2,114,112 & 1,034,166 & 7,315,753 \\
 		\bottomrule
 	\end{tabular}
-	\caption{Components of the cost}
+	\caption{Distribution of the schedule cost for several instances	}
 	\label{tab:results:general}
 \end{table}
 
@@ -110,11 +110,11 @@ In order to examine the influence of the customer extension $L_{\operatorname{C}
 
 \begin{table}[htb]
 	\centering
-	\begin{tabular}{cccccccc}
+	\begin{tabular}{cccc cc cc}
 		\toprule
-		&& \multicolumn{2}{c}{Extension} & \multicolumn{2}{c}{Customer} & \multicolumn{2}{c}{Time} \\
+		&& \multicolumn{2}{c}{Customer Extension} & \multicolumn{2}{c}{Customer-Splitting} & \multicolumn{2}{c}{Time-Splitting} \\
 		\cmidrule(r){3-8}
-		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & avg & max & Cost & Duties & Cost & Duties \\
+		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & avg [h] & max [h] & Cost & Duties & Cost & Duties \\
 		\midrule
 		500 & 1793 & 0:28 & 2:38 & 13,369,843 & 24 & 13,149,336 & 23 \\
 		500 & 1793 & 2:08 & 6:00 & 13,579,114 & 27 & 13,684,189 & 29 \\
@@ -141,9 +141,9 @@ The columns 1-2 state the splitting type and the approximate number of vertices 
 
 \begin{table}[htb]
 	\centering
-	\begin{tabular}{cc|ccc|ccc|ccc}
+	\begin{tabular}{lc|ccc|ccc|ccc}
 		\toprule
-		\multicolumn{2}{c}{Splitting} & \multicolumn{3}{c}{Cost} & \multicolumn{3}{c}{Duties} & \multicolumn{3}{c}{Time} \\
+		\multicolumn{2}{c}{Splitting} & \multicolumn{3}{c}{Total Cost $[\cdot 10^6]$} & \multicolumn{3}{c}{Duties} & \multicolumn{3}{c}{Comp. Time [h]} \\
 		\cmidrule(r){3-11}
 		&& $I_1$ & $I_2$ & $I_3$ & $I_1$ & $I_2$ & $I_3$ & $I_1$ & $I_2$ & $I_3$ \\
 		\midrule
@@ -184,9 +184,9 @@ Finally, we provide the evaluation results for one exemplary instance with ${\ve
 
 \begin{table}[htb]
 	\centering
-	\begin{tabular}{cccccc}
+	\begin{tabular}{ccc c cc}
 		\toprule
-		$r_{\min}$ & Cost & Duties & Reviewed & Changed & Time \\
+		$r_{\min}$ & Total Cost & Duties & \parbox[c]{2cm}{\centering Reviewed \\ Customers} & \parbox[c]{2cm}{\centering Adjusted \\ Customers} & \parbox{1.5cm}{\centering Comp. \\ Time [h]} \\
 		\midrule
 		1.5 & 12,180,474 & 22 & 85 & 13 & 1:01 \\
 		2   & 12,277,797 & 20 & 25 & 5  & 0:30 \\
@@ -201,35 +201,35 @@ It is remarkable that the number of duties increases in the first evaluation. In
 
 \paragraph{Optimal Approach} \parfill
 
-We examine the optimal approach with an initial solution that has been computed with a time-dependent heuristic. Instead of just one possible refuel point in each arc, we consider a set of Pareto-optimal refuel points. This heavily increases the number of feasible duties and therefore the computation time. A great issue in the optimal approach is solving the subproblem, \ie finding feasible vehicle duties with negative reduced cost. For this, we create a SPPRC with the resources reduced cost, fuel, duty length and routes. The number of labels in \Cref{alg:label_setting} grows exponentially with the number of resources. As there is one resource for each route ${m\in\mathcal{M}}$, we expect a considerably increased computation time by the route resources. Thus, we examine whether including the route resources yields a better behavior of the algorithm. All computations have been performed on a notebook with Intel Core i5-6200U CPU and 8GB main memory that runs on an Microsoft Windows 10 operation system.\fxnote{Laptop}
+We examine the optimal approach with an initial solution that has been computed with a time-dependent heuristic. Instead of just one possible refuel point in each arc, we consider a set of Pareto-optimal refuel points. This heavily increases the number of feasible duties and therefore the computation time. A great issue in the optimal approach is solving the subproblem, \ie finding feasible vehicle duties with negative reduced cost. For this, we create a SPPRC with the resources reduced cost, fuel, duty length and routes. The number of labels in \Cref{alg:label_setting} grows exponentially with the number of resources. As there is one resource for each route ${m\in\mathcal{M}}$, we expect a considerably increased computation time by the route resources. Thus, we examine whether including the route resources yields a better behavior of the algorithm. All computations have been performed on a notebook with Intel Core i5-6200U 2.3GHz CPU and 8GB main memory that runs on an Microsoft Windows 10 operation system.
 
-First, we apply the optimal approach without including the route resources. \Cref{tab:results:optimal} provides the computational results for the sequence of test instances. The test instances in the first part have 2 alternatives per customer, in the second part 3 alternatives each. The maximum computation time is set to 2 hours. After reaching the time limit, the algorithm returns the current best solution. The columns show the number of customers and trips in the test instance, the total cost of the initial solution and the optimal solution, the number of duties in the optimal solution and the computation time in minutes.
+First, we apply the optimal approach without including the route resources. \Cref{tab:results:optimal} provides the computational results for the sequence of test instances. The test instances in the first part have 2 alternatives per customer, in the second part 3 alternatives each. The maximum computation time is set to 30 minutes. After reaching the time limit, the algorithm returns the current best solution. The columns show the number of customers and trips in the test instance, the total cost of the initial solution and the optimal solution and the number of duties in the optimal solution. Further the gap between the initial solution and the optimal solution, the number of nodes in the Branch-and-Bound process and the computation time in minutes is shown.
 
 \begin{table}[htb]
 	\centering
-	\begin{tabular}{cccccc}
+	\begin{tabular}{cccccccc}
 		\toprule
-		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & Initial cost & Optimal cost & Duties & Time \\
+		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & Initial Cost & Optimal Cost & Duties & Gap & Nodes & \parbox[c]{2cm}{\centering Comp. \\ Time [min]} \\
 		\midrule
-		10 & 32 & 284,281 & 284,202 & 1 & 0:02 \\
-		15 & 47 & 417,268 & 417,034 & 2 & 0:04 \\
-		20 & 61 & 602,907 & 602,889 & 2 & 0:33 \\
-		25 & 79 & 776,536 & 773,129 & 2 & 4:33 \\
-		30 & 92 & 840,628 & 839,993 & 3 &  - \\
+		10 & 32 & 284,281 & 284,202 & 1 & 0.03\% & 1 & 0:02 \\
+		15 & 47 & 417,268 & 417,034 & 2 & 0.06\% & 1 & 0:04 \\
+		20 & 61 & 602,907 & 602,889 & 2 & 0.00\% & 1 & 0:33 \\
+		25 & 79 & 776,536 & 773,129 & 2 & 0.44\% & 3 & 4:33 \\
+		30 & 92 & 826,880 & 826,358 & 3 & 0.06\% & 5 & 30:00 \\
 		\midrule
-		10 & 47 & 279,419 & 278,795 & 1 & 0:11 \\
-		15 & 69 & 404,437 & 401,027 & 2 &  -   \\
+		10 & 47 & 279,419 & 278,795 & 1 & 0.22\% & 1 & 0:11 \\
+		15 & 69 & 404,437 & 403,174 & 2 & 0.31\% & 3 & 30:00 \\
 		\bottomrule
 	\end{tabular}
-	\caption{Test results of the optimal approach}
+	\caption{Test results for the optimal approach}
 	\label{tab:results:optimal}
 \end{table}
 		
-For the respective last instances with ${\vert\mathcal{T}\vert=92}$ and ${\vert\mathcal{T}\vert=69}$, the algorithm does not have an optimal solution when reaching the time limit. There, the current best solution is shown. It is noteworthy that the computation time of the largest solvable instances is still far away from the time limit. While the instance with ${\vert\mathcal{T}\vert=79}$ is solved to optimality in less than 5 minutes, the instance with ${\vert\mathcal{T}\vert=92}$ cannot be solved in 120 minutes. Further, in each evaluation the number of duties is equal and the route choice is not changed for any customer in comparison to the initial solution. Only the deadhead cost is decreased during the algorithm.
+For the respective last instances with ${\vert\mathcal{T}\vert=92}$ and ${\vert\mathcal{T}\vert=69}$, the algorithm does not have an optimal solution when reaching the time limit. There, the current best solution and the number of nodes that have been created so far is shown. It is noteworthy that the computation time of the largest solvable instances is still far away from the time limit. While the instance with ${\vert\mathcal{T}\vert=79}$ is solved to optimality in less than 5 minutes, the instance with ${\vert\mathcal{T}\vert=92}$ cannot be solved in 120 minutes. Further, in each evaluation the number of duties is equal and the route choice is not changed for any customer in comparison to the initial solution. Only the deadhead cost is decreased during the algorithm.
 
 As stated before, including the route resources results in a significantly larger number of labels and thus solving the subproblem requires more computation time. The benefit is that the column generation process does not add duties that solely violate the cover constraints. For the decision whether the route resources are used, this benefit has to be balanced to the enlarged computation time. We have evaluated the test instances with using the route resources. With this, no solution was computed in the given time limit. What is more, in the larger instances the algorithm stopped earlier as the available main memory was not sufficient.
 
-As the optimal approach is only an enhancement of the already existing approach, we do not evaluate this approach in more detail. For a more extensive examination, particularly with test instances on smaller time windows and an analysis of the column generation and the Branch-and-Bound process, we refer to \cite[Sec.~10.2]{Kaiser}.
+As the optimal approach is only an enhancement of the already existing approach, we do not evaluate this approach in more detail. For a more extensive examination, particularly with test instances on smaller time windows and an analysis of the column generation and the Branch-and-Bound process, we refer to \cite[Sec.~10.2]{Kaiser}. 
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -243,7 +243,7 @@ In \Cref{tab:results:realistic} we see the distribution of the total costs and a
 
 \begin{table}[htb]
 	\centering
-	\begin{tabular}{l|rrr}
+	\begin{tabular}{l|rrc}
 		\toprule
 		& Total & per Duty & per Customer \\
 		\midrule
@@ -257,7 +257,7 @@ In \Cref{tab:results:realistic} we see the distribution of the total costs and a
 		Refueling Time &  91:01 & 4:08 & 0:07 \\
 		\bottomrule
 	\end{tabular}
-	\caption{Cost of a realistic instance}
+	\caption{Cost distribution for a realistic instance}
 	\label{tab:results:realistic}
 \end{table}
 
@@ -266,3 +266,45 @@ The heuristic solution contains 22 duties, \ie we need 22 autonomous vehicles in
 Considering the time, each vehicle spends in average 6 hours for carrying customers and 1 hour for deadhead trips. Further it is recharged 4 hours. The waiting time amounts 10 hours. We can see that the vehicle are not working to capacity. However, during the peak there are more than 60 trips per hour. Thus, the majority of vehicles is needed to cover the trips at the peak. During the periods with less demand, the vehicles are idle. As we do not require the vehicles to be recharged after usage, the recharging time is only 4 hours. The range of a vehicle is 135km, with 4 hours recharging it increases to about 205km. This is only a little more than the actually covered distance of 188km.
 
 We can see that instances, where more alternatives are available, result in significantly better solutions. This behavior is caused by two reasons: On the one hand, each solution in an instance with fewer alternatives is also a feasible solution in an instance with more alternatives, but not vice versa. This obviously leads to a better solution for the instance with more alternatives. On the other hand, while creating the instances we prefer routes with two trips to routes with only one trip. We do this in order to include all facets of the problem setting in a relatively small instance. However, routes with two trips are not very profitable in general due to the restricted ability of the OTP. The later included alternatives are more profitable and thus the solution is better for instances with more alternatives.
+
+\paragraph{Comparison to the Underlying Theses} \parfill
+
+Finally, we compare our computational results to the respective results of the underlying theses. \cite[pp.~135-136]{Knoll} have evaluated the Successive Heuristic for the simplified problem setting without cover constraints. They used realistic instances as shown in \Cref{tab:results:knoll}. It states the number of vehicles and trips, the number of partial instances, the optimality gap and the computation time in hours. The optimality gap has been computed with relaxing the fuel constraints.
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{ccccc}
+		\toprule
+		$\vert\mathcal{V}\vert$ & $\vert\mathcal{T}\vert$ & \parbox[c]{2cm}{\centering Partial \\ Instances} & Gap & \parbox[c]{2cm}{\centering Comp. \\ Time [h]} \\
+		\midrule
+		387 & 1836 & 7 & 7.30\% & 0:54 \\
+		423 & 2031 & 6 & 2.63\% & 1:16 \\
+		450 & 2400 & 7 & 9.61\% &  -   \\
+		\bottomrule
+	\end{tabular}
+	\caption{Summarized results of \cite[Tables~10.3,~10.4,~10.5]{Knoll}}
+	\label{tab:results:knoll}
+\end{table}
+
+The time limit for the partial instances was 900 seconds. For the last instance, no computation time was given. In summary, the computation times as stated in \Cref{tab:results:splittings} and \Cref{tab:results:knoll} are similar for the same number of trips and the same size of the partial instances. In contrast to the problem setting without cover constraints, we cannot determine a lower bound with relaxing the fuel constraints. According to \Cref{th:complexity_VSPMC}, our problem is still $\mathcal{NP}$-hard then. 
+
+\cite[pp.~137-140]{Kaiser} have evaluated the Optimal Approach for the simplified problem setting with single-leg cover constraints. In \Cref{tab:results:kaiser}, we compare the respective largest instances that could be solved to optimality in the time limit of 30 minutes. The upper section shows the previous results for single-leg cover constraints and the lower section shows the results for the multi-leg cover constraints. The columns show the number of customers, the number of trips, the number of trips per customer, the number of nodes of the Branch-and-Bound tree and the computation time in minutes. The computation conditions of both evaluations are similar.
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{cccccccc}
+		\toprule
+		$\vert\mathcal{C}\vert$ & $\vert\mathcal{T}\vert$ & $\vert\mathcal{T}\vert/\vert\mathcal{C}\vert$ & Nodes & \parbox[c]{2cm}{\centering Comp. \\ Time [min]} \\
+		\midrule
+		50 & 114 & 2.3 & 1 & 9:02 \\
+		60 & 138 & 2.3 & 1 & 22:02 \\
+		\midrule
+		25 & 79 & 3.2 & 3 & 4:33 \\
+		10 & 47 & 4.7 & 1 & 0:11 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Summarized results of \cite[Table~10.4]{Kaiser} and \Cref{tab:results:optimal}}
+	\label{tab:results:kaiser}
+\end{table}
+
+We see that the previous algorithm is able to cope with a far larger number of trips. Possibly, this is caused by an increased number of alternative trips per customer. The previous algorithm can solve instances with more trips, while the number of trips per customer is significantly lower than in our setting. This assumption is confirmed by the face that our algorithm is able to solve an instance with 79 trips and 25 customers, but not a similar instance wit 69 trips and 15 customers.

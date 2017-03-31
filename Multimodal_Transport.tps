@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Multimodal_Transport.tex
 
 [Frame0_View0,0]
-TopLine=78
-Cursor=4787
+TopLine=141
+Cursor=4843
 
 [Frame1]
 Flags=0
@@ -32,11 +32,11 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Introduction.tex
+Document=tex\Problem_Description.tex
 
 [Frame1_View0,0]
 TopLine=0
-Cursor=10
+Cursor=7
 
 [Frame2]
 Flags=0
@@ -50,11 +50,11 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Problem_Description.tex
+Document=tex\Mathematical_Models.tex
 
 [Frame2_View0,0]
-TopLine=0
-Cursor=70
+TopLine=168
+Cursor=6732
 
 [Frame3]
 Flags=0
@@ -68,11 +68,11 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Mathematical_Models.tex
+Document=tex\Heuristics.tex
 
 [Frame3_View0,0]
-TopLine=224
-Cursor=12105
+TopLine=2199
+Cursor=36682
 
 [Frame4]
 Flags=0
@@ -86,11 +86,11 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Heuristics.tex
+Document=tex\Optimal_Approach.tex
 
 [Frame4_View0,0]
-TopLine=699
-Cursor=36682
+TopLine=0
+Cursor=14
 
 [Frame5]
 Flags=0
@@ -104,11 +104,11 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Optimal_Approach.tex
+Document=tex\Instance_Creation.tex
 
 [Frame5_View0,0]
 TopLine=0
-Cursor=14
+Cursor=11
 
 [Frame6]
 Flags=0
@@ -122,49 +122,13 @@ NormalPos.top=32
 NormalPos.right=1574
 NormalPos.bottom=627
 Class=LaTeXView
-Document=tex\Instance_Creation.tex
-
-[Frame6_View0,0]
-TopLine=0
-Cursor=14
-
-[Frame7]
-Flags=0
-ShowCmd=1
-MinPos.x=-1
-MinPos.y=-1
-MaxPos.x=-1
-MaxPos.y=-1
-NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1574
-NormalPos.bottom=627
-Class=LaTeXView
 Document=tex\Implementation_Results.tex
 
-[Frame7_View0,0]
-TopLine=0
-Cursor=68
-
-[Frame8]
-Flags=0
-ShowCmd=1
-MinPos.x=-1
-MinPos.y=-1
-MaxPos.x=-1
-MaxPos.y=-1
-NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1574
-NormalPos.bottom=627
-Class=LaTeXView
-Document=tex\Conclusion.tex
-
-[Frame8_View0,0]
-TopLine=0
-Cursor=1130
+[Frame6_View0,0]
+TopLine=509
+Cursor=29204
 
 [SessionInfo]
-FrameCount=9
+FrameCount=7
 ActiveFrame=0
 

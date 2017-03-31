@@ -160,7 +160,7 @@ Additionally, we set ${\bar{e}_s := e_s}$ for all ${s\in\mathcal{V}\cupdot\mathc
 The time feasibility of $\bar{S}$ follows directly from the definition of ${s\prec\operatorname{SP}_i(t)}$. Visiting a refuel point between $s$ and $\operatorname{SP}_i(t)$ in the $\eqref{eq:SMILP}$ is equivalent to visiting a refuel point between $s$ and $t$ in the $\eqref{eq:MMILP}$. Visiting a refuel point between $\operatorname{SP}_i(t)$ and $t$ is not feasible in the $\eqref{eq:SMILP}$. The fuel constraints are equivalent by construction and therefore $\bar{S}$ is feasible \wrt fuel. The cover constraints are equivalent in both formulations. Therefore $\bar{S}$ is a feasible solution of the $\eqref{eq:MMILP}$.
 
 The objective function of $\eqref{eq:SMILP}$ is adapted such that the trip and deadhead costs arise for exactly the same trips, the vehicle and route costs are not affected by the transformation. Thus ${\operatorname{val}(S)=\operatorname{val}(\bar{S})}$.
-
+%
 \end{proof}
 
 \begin{remark}
@@ -555,7 +555,7 @@ In each partial instance, we distinguish the non-empty duties concerning the veh
 \begin{align*}
 	\sum_{i=1}^n\operatorname{val}\left(S_i\right) = \operatorname{val}\left(\overline{S}\right).
 \end{align*}
-
+%
 \end{proof}
 
 \begin{theorem}[Transformation of $\eqref{eq:SMILP}$ into $\eqref{eq:SMILPi}$]
@@ -592,7 +592,7 @@ We further state
 \end{align*}
 
 Each $S_i$ is a feasible solution of the $\eqref{eq:SMILPi}$ and the objective values $\operatorname{val}(\overline{S})$ and ${\sum_{i=1}^n\operatorname{val}\left(S_i\right)}$ coincide up to the route cost. The proof works analogously to the proof of \Cref{thm:equivalence_heuristic_SMILP}. The route cost is not considered in the objective function of $\eqref{eq:SMILPi}$.
-
+%
 \end{proof}
 
 %########################################################################################################################################
@@ -670,7 +670,7 @@ Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and t
 According to \Cref{thm:equivalence_heuristic_SMILP}, solution~$S$ is feasible in $\eqref{eq:MMILP}$ except for the cover constraints. Let $c\in\mathcal{C}$ arbitrary. Then there is a unique $i\in[n]$ with ${c\in\mathcal{C}_i}$. In $(\operatorname{CMILP}_i)$ exist decision variables $u_m$ for all ${m\in C^{-1}(c)}$ and then $\eqref{eq:MMILP:customer}$ follows directly from $\eqref{eq:CMILP:customer}$. Let ${m\in\mathcal{M}}$ arbitrary. There is a unique ${i\in[n]}$ with ${m\in C^{-1}(\mathcal{C}_i)}$ and all trips ${t\in m}$ are in $(\operatorname{CMILP}_i)$. Then $\eqref{eq:MMILP:route}$ and $\eqref{eq:MMILP:um}$ follow directly from $\eqref{eq:CMILP:route}$ and $\eqref{eq:CMILP:um}$. 
 
 In the $(\operatorname{CMILP}_i)$, the route cost is added to the objective function. For each route, the route cost arises in exactly one partial instance. Therefore $S$ is a feasible solution of the $\eqref{eq:MMILP}$ and ${\operatorname{cost}(S) = \sum_{i=1}^n\operatorname{cost}\left(S_i\right)}$.
-
+%
 \end{proof}
 
 \Cref{thm:equivalence_CMILP_MMILP} shows that each heuristical solution is a feasible solution of the $\eqref{eq:MMILP}$. Now we show that a feasible solution of the $\eqref{eq:MMILP}$ is not necessarily feasible in the heuristic using a customer-dependent splitting.
@@ -940,7 +940,7 @@ Therefore we have
 \end{align*}
 
 This concludes the proof.
-
+%
 \end{proof}
 
 \begin{remark}
@@ -1058,7 +1058,7 @@ The cost of solution~$S'$ comprises the vehicle cost $\cv$, the deadhead cost $\
 \begin{align*}
 	\operatorname{cost}\left(S'\right) \leq 2\cdot\operatorname{cost}\left(S\right).
 \end{align*}
-
+%
 \end{proof}
 
 To sum these results up, we have shown that we can always find a solution that is feasible in the customer-dependent heuristic and its total cost is not more than twice the optimal solution. For this result, we need the condition ${L_{\operatorname{C}}\leq L_{\operatorname{S}}}$. This condition applies for realistic instances, as we will discuss later. Further we need an additional vehicle set with the same size as the original vehicle set and the vehicles have certain requirements concerning their start positions and fuel states. As we regard the problem from the car sharing supplier's point of view, he is able to provide additional vehicles with the demanded properties in order to satisfy the travel request of the customers.
@@ -1330,7 +1330,7 @@ and therefore
 \begin{align*}
 	\operatorname{val}\left(\overline{S}\right) = \sum_{i=1}^n \operatorname{val}\left(S_i\right).
 \end{align*}
-
+%
 \end{proof}
 
 \begin{lemma}
@@ -1361,7 +1361,7 @@ Further, we set:
 \end{align*}
 
 The proof that $\overline{S}$ is a feasible solution of the $\eqref{eq:SMILP}$ and the objective values coincide works analogously to the proof of \Cref{thm:equivalence_SMILP_MMILP}.
-
+%
 \end{proof}
 
 \begin{theorem}[Transformation of $\eqref{eq:SMILP}$ into $\eqref{eq:TMILPi}$]
@@ -1384,7 +1384,7 @@ The triple $\left(x^i,z^i,e^i\right)$ is feasible in the $\eqref{eq:SMILP}$ acco
 \end{align*}
 
 works analogously to the proof of \Cref{thm:equivalence_TMILP_SMILP}.
-
+%
 \end{proof}
 
 %----------------------------------------------------------------------------------------------------------------------------------------
@@ -1645,7 +1645,7 @@ The partial solutions $S_1$, $\widehat{S}_2$ and $S_3$ are connected in such a w
 The deadhead and trip cost are determined as before. From the construction of the objective function of $(\operatorname{HSP}_B)$ follows that the vehicle cost arise exactly once for each non-empty duty in $\widehat{S}$. The vehicle cost is charged for each duty starting with a vehicle and not with a trip. It is subtracted for each duty ending with an end point. For ${c\in B}$, the route cost occurs in $\operatorname{cost}\left(\widehat{S}_2\right)$ and for ${c\in\mathcal{C}\backslash B}$ in the additional term.
 
 The original solution $S_2$ is a feasible solution of the $(\operatorname{HSP}_B)$ by construction. Therefore the total cost of $\widehat{S}$ is not greater than the total cost of $S$.
-
+%
 \end{proof}
 
 Finally, we describe the complete Iterative Approach to create an improved solution as follows:
