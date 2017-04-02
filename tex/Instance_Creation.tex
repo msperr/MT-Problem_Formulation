@@ -5,11 +5,11 @@ In the following we explain, how the test instances are created. This concerns t
 
 \section{Available Data}
 
-As the mathematical content of this thesis is based on two previous theses \cite{Kaiser} and \cite{Knoll}, we also use their data in order to test our solution approaches. There are two reasons that we cannot apply these test data directly. Firstly, because of the simplified problem setting, the respective data fulfill these restrictions. We need customers and routes that consist of more than one car trip in order to test all the abilities of the developed solution methods. Secondly, only exemplary instances that are strongly restricted in time are provided to us. Therefore we need to extract these exemplary instances in order to receive a full test instance. 
+As the mathematical content of this thesis is based on two previous theses \cite{Kaiser} and \cite{Knoll}, we also use their data in order to test our solution approaches. There are two reasons that we cannot apply these test data directly. Firstly, the respective data fulfill the restrictions of the simplified problem setting. We need customers and routes that consist of more than one car trip in order to test all the abilities of the developed solution methods. Secondly, only exemplary instances that are strongly restricted in time are provided to us. Therefore we need to extract these exemplary instances in order to receive a full test instance. 
 
 The available test data are historical data that have been provided by the car sharing supplier Car2Go. The refuel point data have been provided by the electricity provider EnBW. The location of the data is Stuttgart. This suits best to the problem setting, since these data haven been recorded with electrically powered vehicles. The problem setting is constructed especially for the needs of electrically powered vehicles since then we have a restricted fuel range for the vehicles and a restricted number of available refuel points.
 
-The trip set~$\mathcal{T}$ of the provided test instance consists of 176 trips that all start on the same day in 2015 between 7:00~pm and 8:00~pm. The vehicle set~$\mathcal{V}$ consists of 50 vehicles and the refuel point set~$\mathcal{R}$ consists of 313 refuel points.
+The trip set~$\mathcal{T}$ of the provided test instance consists of 176 trips that all start at the same day in 2015 between 7:00~pm and 8:00~pm. The vehicle set~$\mathcal{V}$ consists of 50 vehicles and the refuel point set~$\mathcal{R}$ consists of 313 refuel points.
 
 \section{Trips, Vehicles and Refuel Points}
 \label{sec:trip_creation}
@@ -45,10 +45,10 @@ The multimodal routes are created with the open source software Open\-Trip\-Plan
 
 For each customer, we are given a start and end position and a start time. We create the routes as follows:
 \begin{enumerate}
-	\item Request a reverse search from the end position to the start position. Restrict the search to 3 alternative routes. For each alternative, identify the station where the public transport trip starts.
+	\item Request a reverse search from the end position to the start position. Restrict the search to 3 alternative routes. For each alternative, identify the station where the first public transport trip starts.
 	\item For each station, request a search from the start position to the station. Restrict the search to one alternative. Append a direct car trip from the station to the end position.
-	\item Request a search from the start position to the station. Restrict the search to 3 alternatives.
-	\item Create a route with a direct car trip from the start to the end position
+	\item Request a search from the start position to the end position. Restrict the search to 3 alternatives.
+	\item Create a route with a direct car trip from the start to the end position.
 \end{enumerate}
 
 We use the customer start time as the start time for each search request. From each route, we extract the car trips. They are the only trips that are part of the problem input. With this procedure we create the multimodal route set~$\mathcal{M}$ and the trip set~$\mathcal{T}$ with up to 7 alternative routes and 10 trips for each customer.
@@ -96,9 +96,11 @@ The costs also depend linearly on the driven distance. The constant $c^{\operato
 
 We set the constants ${c^{\operatorname{meter}} =}$~1 and ${\cv =}$~50,000.
 
-The only cost left is the route cost. As mentioned in \Cref{sec:problem_description}, we use the route cost in order to model a realistic customer behavior. It contains the cost for public transport and the user inconvenience that arises if the customer chooses this route. We approximate the public transport cost in comparison to cost for car sharing. The constant $c^{\operatorname{public}}$ describes the cost for using public transport. The main user inconveniences are the total travel time and the walking time. The constants $c^{\operatorname{time}}$ and $c^{\operatorname{walk}}$ describe the respective penalty costs.
+The only cost left is the route cost. As mentioned in \Cref{sec:problem_description}, we use the route cost in order to model a realistic customer behavior. It contains the cost for public transport and the user inconvenience that arises if the customer chooses this route. We approximate the public transport cost in comparison to the cost for car sharing. The constant $c^{\operatorname{public}}$ describes the cost for using public transport. The main user inconveniences are the total travel time and the walking time. The constants $c^{\operatorname{time}}$ and $c^{\operatorname{walk}}$ describe the respective penalty costs.
 
 Based on the charges of Car2Go (cf.~\cite{Car2Go}), we assume that a customer pays in average 0.50 euros per kilometer driving with a car. Due to the public transport provider in Stuttgart (cf.~\cite{VVS}), we assume that a customer pays in average 6 euros per hour using public transport. In order to compare the user inconveniences, we additionally charge 10 euros per hour for the total travel time and 10 euros per hour walking.
+
+\newpage
 
 \paragraph{Example} \parfill
 
@@ -134,6 +136,6 @@ Only the car trips of this route are part of the input. Thus we have $t_1,t_2\in
 	\zstart_{t_2} = \text{8:39pm} && \zend_{t_2} = \text{8:45pm} && \ct_{t_2} = 3000 && \ft_{t_2} = 0.022
 \end{align*}
 
-The route cost comprises a penalty of 15,000 for the total travel time and in summary we have ${\croute_m =}$~21,000.
+The total travel time amounts 0:45 hours. Thus, the route cost comprises a penalty of 15,000 for the total travel time, 3,000 for the walking time and 3,000 for the public transport cost. In summary we have ${\croute_m =}$~21,000.
 
 \end{example}

@@ -31,8 +31,10 @@ Let $n\in\mathbb{N}$ and let
 \begin{align*}
 	\mathcal{T}=\Cupdot_{i=1}^n\Ti
 \end{align*}
+\nomenclature[n]{$n$}{number of partial instances}
 
 be a partition of the set of trips. Then we call $\left\{\Ti\mid i\in[n]\right\}$ splitting of $\mathcal{T}$ and $\Ti$ partial trip set.
+\nomenclature[ti]{$\Ti$}{partial trip set}
 
 \end{definition}
 
@@ -49,6 +51,10 @@ Let $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ be a splitting of $\mathca
 	\item{Partial Split Point Set: For $j\in[n-1]$, we define the partial split point set $\mathcal{P}_j:=\Cupdot_{i=j+1}^n \mathcal{P}_{j,i}$.}
 	\item{Split Point Set: We define the split point set $\mathcal{P}:=\Cupdot_{j=1}^{n-1}\mathcal{P}_j$.}
 \end{enumerate}
+\nomenclature[sp]{$\SPjs$}{split point}
+\nomenclature[pji]{$\mathcal{P}_{j,i}$}{partial split point set for trips in $\Ti$}
+\nomenclature[pj]{$\mathcal{P}_j$}{partial split point set}
+\nomenclature[p]{$\mathcal{P}$}{split point set}
 
 Let $G=(V,A)$ be the task graph.
 \begin{enumerate}
@@ -65,6 +71,9 @@ Let $G=(V,A)$ be the task graph.
 			& \cupdot\bigcup_{i=2}^n\left(\bigcup_{j=1}^{i-1}\left\{(s,t)\in\mathcal{P}_{j,i}\times\Ti\mid s=\operatorname{SP}_j(t)\right\}\right)\cupdot \left(\left(\mathcal{V}\cupdot\mathcal{T}\right)\times\left\{\de\right\}\right).
 		\end{align*}}
 \end{enumerate}
+\nomenclature[ggraph]{$\overline{G}=\left(\overline{V},\overline{A}\right)$}{transformed task graph}
+\nomenclature[vgraph]{$\overline{V}$}{vertex set of the transformed task graph}
+\nomenclature[agraph]{$\overline{A}$}{arc set of the transformed task graph}
 
 \end{definition}
 
@@ -113,6 +122,7 @@ The equations $\eqref{eq:MMILP:flow}$ and $\eqref{eq:SMILP:splitpoint_flow}$ are
 	& e_s\in[0,1] & & \text{for all } s\in\overline{V}\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \\
 	& u_m \in\{0,1\} && \text{for all } m\in\mathcal{M} \tag{\ref{eq:MMILP:um}}
 \end{align}
+\nomenclature[smilp]{$\left(\operatorname{SMILP}\right)$}{split arc flow formulation}
 
 The fuel constraints are adapted in the following way: $\eqref{eq:MMILP:refuel}$, $\eqref{eq:MMILP:min_fuel}$, $\eqref{eq:MMILP:max_fuel}$ and $\eqref{eq:MMILP:fuel_consumption}$ hold also on the arcs leading to $\mathcal{P}$ and are therefore replaced by $\eqref{eq:SMILP:refuel}$, $\eqref{eq:SMILP:min_fuel}$, $\eqref{eq:SMILP:max_fuel}$ and $\eqref{eq:SMILP:fuel_consumption}$.
 
@@ -245,12 +255,15 @@ For all ${s\in\Ti}$, ${t\in\mathcal{T}_j}$ with ${i<j}$, the arc $(s,t)$ is repl
 \label{sec:general_setting}
 
 In this section, we describe the general setting of the heuristic. Let $\left\{\mathcal{T}_1,\dots,\mathcal{T}_n\right\}$ be a splitting. For each partial trip set, we create a partial instance ${I_1,\dots,I_n}$ which contains exactly the partial trip set $\mathcal{T}_i$ and some endpoints $\Phat_i$. How these endpoints are created is explained afterwards. The partial instance~$I_1$ additionally contains the vehicle set. The partial instances are solved from the end to the start, \ie ${I_n,\dots,I_1}$ are solved successively. For each partial instance~$I_i$, a partial solution~$S_i$ is computed which is based on the already solved partial instances. In $I_1$ which is solved last, the partial duties are actually assigned to the vehicles. Finally the partial solutions are feasibly connected to an overall solution.
+\nomenclature[i]{$I_i$}{partial instance}
+\nomenclature[s]{$S_i$}{partial solution}
 
 This heuristic is directly applied from \cite[Sec.~10.4]{Knoll}. As presented there, the order in which the partial instances are solved can be stated arbitrarily as long as $I_1$ is solved last. They argue that the setting with ordering from the end to the start suits best to the underlying instance structure. Therefore we present only this approach here.
 
 \paragraph{Determination of the Endpoints} \parfill
 
 The sets of end points $\Phat_i$ are initially empty for all $i\in[n]$. We first solve the partial instance~$I_n$ with ${\Phat_n = \emptyset}$. For ${i\in[n-1]}$ assume that we have solved $I_{i+1}$ right before. Based on the received partial solution~$S_{i+1}$, we update the endpoint set for the preceding partial instance~$I_i$.
+\nomenclature[phat]{$\Phat_i$}{set of endpoints}
 
 Each duty of $S_{i+1}$ consists of a sequence of trips out of $\mathcal{T}_{i+1}$ and refuel points and possibly ends with an end point out of $\Phat_{i+1}$. It is possible that a duty only consists of an end point. For each duty we create an end point in $\Phat_i$. If the duty starts with a trip or end point $s$, we create the end point $t$ with the properties
 \begin{align*}
@@ -354,7 +367,7 @@ First we define the task graph with which we can solve the partial instances. Th
 
 \begin{definition}[Partial Transformed Task Graph]
 
-Let ${i\in[n]\backslash\{1\}}$. For a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task grah is the directed graph ${\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)}$ with vertex set
+Let ${i\in[n]\backslash\{1\}}$. For a set of end points $\Phat_i$ and the partial trip set $\Ti$, the partial transformed task graph is the directed graph ${\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)}$ with vertex set
 \begin{align*}
 	\overline{V}_i := \left\{\ds,\de\right\}\cupdot\Ti\cupdot\Phat_i
 \end{align*}
@@ -363,6 +376,9 @@ and arc set
 \begin{align*}
 	\overline{A}_i := & \left(\left\{\ds\right\}\times\left(\Ti\cupdot\Phat_i\right)\right)\cupdot\left\{(s,t)\in\Ti\times\left(\Ti\cupdot\Phat_i\right)\mid s\prec t\right\} \cupdot\left(\left(\Ti\cupdot\Phat_i\right)\times\left\{\de\right\}\right).
 \end{align*}
+\nomenclature[ggraph]{$\overline{G}_i=\left(\overline{V}_i,\overline{A}_i\right)$}{partial transformed task graph}
+\nomenclature[vgraph]{$\overline{V}_i$}{vertex set of the partial transformed task graph}
+\nomenclature[agraph]{$\overline{A}_i$}{arc set of the partial transformed task graph}
 
 \end{definition}
 
@@ -388,6 +404,8 @@ We introduce two additional constraints: If a duty starts or ends with a trip, i
 \begin{align*}
 	f^{\min}_t := \min_{r\in\mathcal{R}}\fd_{t,r} && f^{\max}_t := 1 - \min_{r\in\mathcal{R}}\ft_{r,t} && \text{for } t\in\mathcal{T}.
 \end{align*}
+\nomenclature[fmin]{$f^{\min}_t$}{minimal fuel at the end of a duty}
+\nomenclature[fmax]{$f^{\max}_t$}{maximal fuel at the start of a duty}
 
 Value $f^{\min}_t$ is the minimal fuel level at the end of ${t\in\mathcal{T}}$ such that the next refuel point can be reached afterwards. Value $f^{\max}_t$ is the maximal fuel state at the start of ${t\in\mathcal{T}}$ if some refuel point has been visited before. The constraints are the following:
 \begin{align}
@@ -452,6 +470,7 @@ As mentioned before, the partial instance~$I_1$ plays a special role since the v
 	& z_{s,r,t}\in\{0,1\} & & \text{for all } t\in\Ti\cup\Phat_i,s\in\Ninoi(t)\backslash\left\{\ds\right\},r\in\Rst \label{eq:CMILP:zsrt} \\
 	& e_s\in[0,1] & & \text{for all } s\in\overline{V}_i\backslash\left\{\ds,\de\right\} \label{eq:CMILP:es}
 \end{align}
+\nomenclature[smilp]{$\left(\operatorname{SMILP}_i\right)$}{basic formulation for a partial instance}
 
 \newpage
 
@@ -625,6 +644,7 @@ Given points in time $c_i$, $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We f
 		\left\{c\in\mathcal{C}\mid c_{n-1}<\zstart_c\right\} & \text{for } i=n.
 	\end{cases}
 \end{align*}
+\nomenclature[c]{$\mathcal{C}_i$}{partial customer set}
 
 Based on the customer splitting, we define the splitting of $\mathcal{T}$ as
 \begin{align*}
@@ -648,6 +668,8 @@ Further the route costs are not considered in $\eqref{eq:SMILPi}$ so far. We aga
 \end{align*}
 
 We call this formulation $(\operatorname{CMILP}_i)$ for $i\in[n]$. Let $S$ be a solution that is created with \Cref{alg:successive_heuristic} and the respective partial solutions~$S_i$ are feasible in $(\operatorname{CMILP}_i)$ for ${i\in[n]}$. Then we call $S$ a feasible solution of the $(\operatorname{CMILP})$.
+\nomenclature[cmilp]{$(\operatorname{CMILP}_i)$}{partial instance with customer-dependent splitting}
+\nomenclature[cmilp]{$(\operatorname{CMILP})$}{split arc flow formulation with customer-dependent splitting}
 
 \paragraph{Model Equivalence} \parfill
 
@@ -721,6 +743,8 @@ Consider a customer set $\mathcal{C}$ and time points $c_i$, $i\in[n-1]$ with $c
 	\item{Customer Extension: $\displaystyle{L_{\operatorname{C}} := \max_{c\in\mathcal{C}} \left(\zend_c - \zstart_c\right)}$}
 	\item{Splitting Length: $\displaystyle{L_{\operatorname{S}} := \min_{i\in[n-1]} \left(c_{i+1}-c_i\right)}$}
 \end{itemize}
+\nomenclature[lc]{$L_{\operatorname{C}}$}{customer extension}
+\nomenclature[ls]{$L_{\operatorname{S}}$}{splitting length}
 
 \end{definition}
 
@@ -1193,6 +1217,7 @@ Given time points $c_i$ for $i\in[n-1]$ with $c_i<c_{i+1}$ for $i\in[n-2]$. We d
 \end{definition}
 
 We denote the formulation $\eqref{eq:SMILP}$ with a splitting according to \Cref{def:time_dependent_splitting} as (TMILP).
+\nomenclature[tmilp]{$(\operatorname{TMILP})$}{split arc flow formulation with time-dependent splitting}
 
 \paragraph{Solving the Partial Instances} \parfill
 
@@ -1227,6 +1252,7 @@ The partial instances $\left\{I_1,\dots,I_n\right\}$ are solved in reversed orde
 \begin{align*}
 	\gamma: \mathcal{C}\to[n] && \gamma(c) := \max\left\{i\in[n]\mid\left(\left(M\circ C\right)^{-1}(c)\cap\Ti\right)\neq\emptyset\right\}
 \end{align*}
+\nomenclature{$\gamma:\mathcal{C}\to[n]$}{earliest solved partial instance for a customer}
 
 Depending on $\gamma$ and $\left\{\mathcal{T}_1,\dots\mathcal{T}_n\right\}$ we define a partition ${\mathcal{C}=\Cupdot_{i=1}^n \mathcal{C}_i}$ as
 \begin{align*}
@@ -1258,6 +1284,7 @@ Let ${i\in[n]}$. We define
 \begin{align*}
 	\overline{\mathcal{C}}_i := \left\{c\in\mathcal{C}\mid \gamma\left(c\right)>i\right\}
 \end{align*}
+\nomenclature[ci]{$\overline{\mathcal{C}}_i$}{customers with fixed route choices}
 
 as the set of customers that have been treated before $I_i$.
 
@@ -1265,6 +1292,7 @@ Let ${m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)}$ and let $\left\{S_{i+1}
 \begin{align*}
 	\hat{u}^i_m := u^j_m && \text{for } j=\left(C\circ\gamma\right)(m).
 \end{align*}
+\nomenclature[uhat]{$\hat{u}^i_m$}{fixed route choice}
 
 \end{definition}
 
@@ -1281,11 +1309,13 @@ We have to select one route of customer ${c\in\mathcal{C}}$ in the partial insta
 \begin{align*}
 	C_1(m) := \croute_m + \sum_{t\in m}\ct_t && \text{for } m\in\mathcal{M}
 \end{align*}
+\nomenclature[c1]{$C_1(m)$}{estimated route cost}
 
 We use this cost in order to define the modified route cost
 \begin{align*}
 	\hat{c}^{\operatorname{r}}_m := \croute_m + \sum_{t\in m\backslash\Ti}\ct_t && \text{for } i\in[n], m\in C^{-1}\left(\mathcal{C}_i\right).
 \end{align*}
+\nomenclature[crhat]{$\hat{c}^{\operatorname{r}}_m$}{modified route cost}
 
 With this, we state the objective function as follows: Let ${m\in C^{-1}\left(\mathcal{C}_i\right)}$. Its trips in the partial trip set ${t\in m\cap\Ti}$ are not considered in $\hat{c}^{\operatorname{r}}_m$ since their trip costs are already part of the objective function. The other trips ${t\in m\backslash\Ti}$ are added to $\hat{c}^{\operatorname{r}}_m$ such that they have an impact on the choice of the routes.
 
@@ -1296,6 +1326,7 @@ In summary, the objective function reads as:
 	& \sum_{s\in\Ti} x_{s,\de}\cv + \sum_{t\in\Ti} x_{\ds, t}\ct_t + \sum_{m\in C^{-1}\left(\mathcal{C}_i\right)} u_m \hat{c}^{\operatorname{r}}_m - \sum_{m\in C^{-1}\left(\overline{\mathcal{C}}_i\right)} \hat{u}^i_m \left(\sum_{t\in m\cap\Ti} \ct_t\right)\nonumber \\
 	& \sum_{t\in\Ti\cup\Phat_i}\sum_{s\in\Ninoi(t)\backslash\left\{\ds\right\}}\left[x_{s,t}\left(\cd_{s,t}+\ct_t\right)+\sum_{r\in\Rst}z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right] \tag{$\operatorname{TMILP}_i$} \label{eq:TMILPi}
 \end{align}
+\nomenclature[tmilp]{$(\operatorname{TMILP}_i)$}{partial instance with time-dependent splitting}
 
 \paragraph{Model Equivalence} \parfill
 
@@ -1428,6 +1459,9 @@ Let $s\in\mathcal{V}\cup\mathcal{T},s'\in\mathcal{T}$ be the trips covered direc
 \end{align*}
 If $t$ is the last trip of the duty, i.e. $\bar{x}_{s,t}=\bar{x}_{t,d^{\operatorname{e}}}=1$, then $\cd_t(S) := \frac 1 2 \cd_{s,t}$. The deadhead cost $\cd_t(S)$ assigns the cost for the deadhead trips to the respective trips. For each deadhead trip, the deadhead cost $\cd_{s,t}$ is equally divided up to $s$ and $t$.
 \end{enumerate}
+\nomenclature[cv]{$\cv_t(S)$}{auxiliary vehicle cost}
+\nomenclature[cr]{$c^{\operatorname{refuel}}_t(S)$}{auxiliary refueling cost}
+\nomenclature[cd]{$\cd_t(S)$}{auxiliary deadhead cost}
 
 The schedule cost according to \Cref{def:schedule_cost} comprises vehicle costs, trip costs, deadhead costs and route costs. To each multimodal route, we can easily assign its route cost and the sum of its trip costs. In contrast, we cannot directly assign the vehicle and deadhead costs. Thus, we use the auxiliary costs in order to assign the vehicle and deadhead costs approximately to the trips and the routes. With these auxiliary costs we can define new route costs which give a better description of the contribution of a multimodal route to the entire solution:
 
@@ -1437,6 +1471,7 @@ Let $S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)$ be a solution of the $\eqre
 \begin{align*}
 	C_2(S,m) := C_1(m) + \sum_{t\in m}\left(\cv_t(S) + c^{\operatorname{refuel}}_t(S) + \cd_t(S)\right)
 \end{align*}
+\nomenclature[c2]{$C_2(S,m)$}{improved cost estimation}
 
 We further define
 \begin{align*}
@@ -1448,6 +1483,7 @@ We further define
 Now we can evaluate the previous estimation for the route contribution. If $C_2(S,c)$ is significantly higher than $C_1(S,c)$ then possibly a bad route has been chosen for customer $c\in\mathcal{C}$.
 
 After defining an indicator for bad route choices, we decide which of the customers we want to review. It is presumably not profitable to solve a subproblem for a single customer. Instead we create a set ${B\subseteq\mathcal{C}}$ with customers that are reviewed. In total, we aim to develop an efficient procedure. To achieve this, the subproblem should significantly decrease the objective value of the solution on the one hand, on the other hand it should be solved very fast. We examine desirable properties of the customer set~$B$. Note that we provide only indicators for the properties and statements about the qualitative behavior.
+\nomenclature[b]{$B$}{set of reviewed customers}
 
 Let ${c\in\mathcal{C}}$ with ${\bar{m}\in C^{-1}(c)}$ be the route chosen in the solution~$S$. Assume that~$\bar{m}$ is a bad route choice for~$c$ and with changing the route choice a large cost saving can be achieved. We explain qualitatively, how the respective costs behave. Then the following properties apply:
 \begin{enumerate}
@@ -1471,6 +1507,7 @@ We consider these properties for creating the customer set~$B$. Further we have 
 \end{enumerate}
 
 It is not possible to meet the requirements for~$B$ and simultaneously cover all customers with potential bad route choices. Therefore we partition the customer set into several subsets ${B=\Cupdot_{j=1}^n B_j}$. It suffices if $B_j$ fulfill the set requirements for all ${j\in[k]}$. We iteratively execute the subproblem, each with a small customer set~$B_j$.
+\nomenclature[bj]{$B_j$}{set of reviewed customers in an iteration}
 
 \begin{algorithm}[htb]
 	\SetAlgoLined
@@ -1499,6 +1536,10 @@ It is not possible to meet the requirements for~$B$ and simultaneously cover all
 	\item{$t_{\max}$:} The maximal time range of the customers in $B_j$
 	\item{$n_{\max}$:} The maximal number of iterations
 \end{itemize}
+\nomenclature[rmin]{$r_{\min}$}{minimal ratio in the iterative heuristic}
+\nomenclature[cmax]{$c_{\max}$}{maximal number of customers in the iterative heuristic}
+\nomenclature[tmax]{$t_{\max}$}{maximal time range in the iterative heuristic}
+\nomenclature[nmax]{$n_{\max}$}{maximal number of iterations in the iterative heuristic}
 
 The properties taken into account by \Cref{alg:critical_customers} as follows: With the choice of $B$ the amount of the ratio and the availability of alternatives is considered. By the choice of $c_{\max}$ and $t_{\max}$ the size of the subproblem is restricted. By iteratively choosing the customer with the highest ratio and restricting the number of iterations, we ensure that many customers with high potential for improvement are treated in a short time.
 
@@ -1528,7 +1569,9 @@ and define a splitting $\left\{\mathcal{T}_1,\mathcal{T}_2,\mathcal{T}_3\right\}
 
 \end{definition}
 
-The $(\operatorname{HSP}_B)$ is a partial instance of the Successive Heuristic with a splitting according to \Cref{def:splitting_HSP}. We split the duties of $S$ into three partial solutions $\left\{S_1,S_2,S_3\right\}$, each having trips only in $\Ti$. For this, we identify the transitions from $\mathcal{T}_1$ to $\mathcal{T}_2$ and from $\mathcal{T}_2$ to $\mathcal{T}_3$. These transitions form a start point set $\Vhat$ and an end point set $\Phat$. We solve the subproblem with a modified formulation of $(\operatorname{SMILP}_1)$. The vehicle set is replaced by $\Vhat$ and the end point set is $\Phat$. 
+The $(\operatorname{HSP}_B)$ is a partial instance of the Successive Heuristic with a splitting according to \Cref{def:splitting_HSP}. We split the duties of $S$ into three partial solutions $\left\{S_1,S_2,S_3\right\}$, each having trips only in $\Ti$. For this, we identify the transitions from $\mathcal{T}_1$ to $\mathcal{T}_2$ and from $\mathcal{T}_2$ to $\mathcal{T}_3$. These transitions form a start point set $\Vhat$ and an end point set $\Phat$. We solve the subproblem with a modified formulation of $(\operatorname{SMILP}_1)$. The vehicle set is replaced by $\Vhat$ and the end point set is $\Phat$.
+\nomenclature[hsp]{$(\operatorname{HSP}_B)$}{subproblem of the iterative heuristic}
+\nomenclature[vhat]{$\Vhat$}{set of start points}
 
 The start point set comprises the respective last trips of all partial duties of $S_1$ and all vehicles that have no duty in this partial solution. The end point set comprises the respective first trips in $S_3$. We set $\Vhat$ and $\Phat$ as
 \begin{align*}
@@ -1609,6 +1652,8 @@ Given a solution ${S=\left(\bar{x},\bar{z},\bar{e},\bar{u}\right)}$ that is feas
 	& & & \text{for all } t\in\mathcal{T}, s\in\Nin(t) \label{eq:FMILP:fuel_consumption} \\
 	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{\ref{eq:MMILP:es}}
 \end{align}
+\nomenclature[fmilp]{$(\operatorname{FMILP}^{\min}_S)$}{formulation to determine minimal fuel states}
+\nomenclature[fmilp]{$(\operatorname{FMILP}^{\max}_S)$}{formulation to determine maximal fuel states}
 
 These formulations provide the same solution as $S$ with minimal or maximal fuel states, respectively. Let $e^{\min}$ be a solution of the $\eqref{eq:FMILP_min}$ and $e^{\max}$ be a solution of the $\eqref{eq:FMILP_max}$, then we define the initial fuel states as follows:
 \begin{align*}
@@ -1655,6 +1700,7 @@ Finally, we describe the complete Iterative Approach to create an improved solut
 	\item For $i\in[k]$: Based on the previous solution $S^{i-1}$, create the subproblem $(\operatorname{HSP}_{B_i})$. Solve the subproblem and create an improved solution $S^i$. These procedures are described in \Cref{sec:iterative_approach}.
 	\item The solution $S^k$ is the improved solution.
 \end{enumerate}
+\nomenclature[s]{$S^i$}{improved solution in the iterative heuristic}
 
 Due to \Cref{lem:feasibility_hsp}, all solutions $S^i$ are feasible solutions and the total cost iteratively increases. We may use each feasible solution of the $\eqref{eq:MMILP}$ as in initial solution $S^0$. Further, each choice of the customer sets is possible, even if some customer arises more than once in the customer sets.
 

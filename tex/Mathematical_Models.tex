@@ -1,11 +1,11 @@
 \chapter{Mathematical Models}
 \label{ch:mathematical_models}
 
-We introduce the mathematical model, with which we want to solve the previously described problem. We define the underlying task graph and develop then an arc flow formulation on this graph. The main idea is to model a flow on the vehicles and the trips. This flow has to fulfill additional requirements such that the cover constraints and the fuel constraints are fulfilled. As mentioned before, the public transport trips are not part of the input. We therefore consider only the car trips in the mathematical model.
+We introduce the mathematical model, with which we want to solve the previously described problem. We define the underlying task graph and develop an arc flow formulation on this graph. The main idea is to model a flow on the vehicles and the trips. This flow has to fulfill additional requirements such that the cover constraints and the fuel constraints are fulfilled. As mentioned before, the public transport trips are not part of the input. We therefore consider only the car trips in the mathematical model.
 
 \section{Task Graph}
 
-We introduce the task graph, on which the model is based. It is a directed graph based on the relation $\prec$ which we defined in \Cref{sec:problem_description}, \ie there is an edge $(s,t)$ in the graph if $s\prec t$ holds. The graph is basically the same as used in \cite{Kaiser} and \cite{Knoll} with the only difference that the customer and route considerations are adapted here.
+We introduce the task graph, on which the model is based. It is a directed graph based on the relation $\prec$ according to \Cref{def:partial_order}, \ie there is an edge $(s,t)$ in the graph if $s\prec t$ holds. The graph is basically the same as used in \cite{Kaiser} and \cite{Knoll} with the only difference that the customer and route considerations are adapted here.
 
 \begin{definition}[Task Graph]
 \label{def:taskgraph}
@@ -21,6 +21,11 @@ is the vertex set consisting of the source, the sink, the vehicle set $\mathcal{
 \end{align*}
 
 \end{definition}
+\nomenclature[ds]{$\ds$}{source of the flow}
+\nomenclature[de]{$\de$}{sink of the flow}
+\nomenclature[ggraph]{$G=\left(V,A\right)$}{task graph}
+\nomenclature[vgraph]{$V$}{vertex set of the task graph}
+\nomenclature[agraph]{$A$}{arc set of the task graph}
 
 A vertex $s\in\mathcal{V}$ represents the initial state of a vehicle $s$ where it becomes available for the first time. Each $\ds$-$\de$-path in $G$ is the duty of one vehicle, i.e. this vehicle fulfills the trips in the order given by the path. Hence, two trips are connected only if it is possible that one car fulfills both trips, i.e. the relation $\prec$ holds.
 
@@ -51,6 +56,7 @@ In order to consider refueling and refuel stations, we introduce an extended tas
 \label{def:extended_taskgraph}
 
 For every $s,t\in\mathcal{V}\cupdot\mathcal{T}$ with $s\prec t$ we create a copy of $\left\{r\in\mathcal{R}|\zend_s+t_{s,r}+t_{r,t}\leq\zstart_t\right\}$ denoted by $\Rst$. This means, various copied sets are pairwise disjoint. The expression $r\in\Rst$ means that a vehicle is able to finish trip $s$, then drive to refuel station $r$ and then start trip $t$ in time.
+\nomenclature[refuelpoint]{$\Rst$}{set of refuel points on arc $(s,t)$}
 
 We define the extended task graph $\widehat{G}=\left(\widehat{V},\widehat{A}\right)$ with vertex set
 \begin{align*}
@@ -65,6 +71,9 @@ and arc set
 It is possible that there is a copy of each refuel station for each feasible pair of trips. This leads to an enormous size of the task graph and thus a bad solution behavior is expected. \cite{Kaiser} and \cite{Knoll} describe a method to reduce the size of $\Rst$ without cutting the optimal solution. This method only considers Pareto-optimal refuel stations \wrt a suitable function. From now on, we will use $\widehat{G}=\left(\widehat{V},\widehat{A}\right)$ with restricted $\Rst$.
 
 \end{definition}
+\nomenclature[ggraph]{$\widehat{G}=\left(\widehat{V},\widehat{A}\right)$}{extended task graph}
+\nomenclature[vgraph]{$\widehat{V}$}{vertex set of the extended task graph}
+\nomenclature[agraph]{$\widehat{A}$}{arc set of the extended task graph}
 
 \begin{lemma}[cf. \cite{Kaiser}, \cite{Knoll}]
 
@@ -84,6 +93,8 @@ We introduce the following frequently used notation:
 \begin{align*}
 	\Nin(t) := \left\{s\in V\mid (s,t)\in A\right\} && \Nout(s) := \left\{t\in V\mid (s,t)\in A\right\}
 \end{align*}
+\nomenclature[nin]{$\Nin(t)$}{set of in-neighbors}
+\nomenclature[nout]{$\Nout(t)$}{set of out-neighbors}
 
 $\Nin(t)$ is the set of in-neighbors of $t\in V$, $\Nout(s)$ is the set of out-neighbors of $s\in V$.
 
@@ -92,7 +103,7 @@ $\Nin(t)$ is the set of in-neighbors of $t\in V$, $\Nout(s)$ is the set of out-n
 \section{Arc Flow Formulation}
 \label{sec:arcflow_formulation}
 
-In the following, we model the problem via a flow of the vehicles on the task graph. The trips and multimodal routes are given in advance. The fact whether two trips can be fulfilled subsequently in one duty, is already given by the underlying task graph. We additionally have to model the cover constraints and the fuel constraints. Since the duties of various vehicles are disjoint \wrt $\mathcal{T}$, we are able to use one common set of variables for the flow of the vehicles. From the flow, we can easily extract the individual $\ds$-$\de$-paths in order to identify the duties of the respective vehicles.
+In the following, we model the problem via a flow of the vehicles on the task graph. This model is not based on the extended task graph. Instead of considering the refuel points explicitly in the flow, we rather use them implicitly with additional constraints. The trips and multimodal routes are given in advance. The fact whether two trips can be fulfilled subsequently in one duty, is already given by the underlying task graph. We additionally have to model the cover constraints and the fuel constraints. Since the duties of various vehicles are disjoint \wrt $\mathcal{T}$, we are able to use one common set of variables for the flow of the vehicles. From the flow, we can easily extract the individual $\ds$-$\de$-paths in order to identify the duties of the respective vehicles.
 
 \paragraph{Basic Model} \parfill
 
@@ -118,13 +129,13 @@ The basic constraints are developed by \cite{Kaiser} and \cite{Knoll} and not ex
 
 \paragraph{Cover Constraints} \parfill
 
-In $\eqref{eq:MILP}$, each customer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. This is modeled as follows:
+In the $\eqref{eq:MILP}$ (cf.~\cite[p.~34]{Kaiser}, \cite[p.~34]{Knoll}), each customer has a set of alternative trips and from this set, exactly one trip has to be fulfilled. The mapping of trips to customers is given by ${\widehat{C}:\mathcal{T}\to\mathcal{C}}$ there. The cover constraints are modeled as follows:
 
 \begin{align}
-	\sum_{t\in C^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MILP:customer}
+	\sum_{t\in \widehat{C}^{-1}(c)} \sum_{s\in\Nin(t)} x_{s,t} = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MILP:customer}
 \end{align}
 
-In contrast to $\eqref{eq:MILP}$, here each customer has a set of alternative routes consisting of trips and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:customer}$ by the following formulation:
+In contrast to the $\eqref{eq:MILP}$, each customer has a set of alternative routes consisting of trips here and from this set, exactly one route has to be fulfilled. Therefore, we replace $\eqref{eq:MILP:customer}$ by the following formulation:
 
 \begin{align}
 	\sum_{m\in C^{-1}(c)} u_m = 1 &&& \text{for all } c\in\mathcal{C} \label{eq:MMILP:customer} \\
@@ -135,23 +146,19 @@ Constraint $\eqref{eq:MMILP:customer}$ ensures the completion of exactly one rou
 
 \paragraph{Objective Function} \parfill
 
-The objective function in $\eqref{eq:MILP}$ is given by
+The objective function in the $\eqref{eq:MILP}$ is given by
 
 \begin{align*}
 	\sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv	+ \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]
 \end{align*}
 
-considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\mathcal{T}$ and the deadhead costs $\cd$. What is missing, are the route-dependent costs $\croute$. Thus, we add the term
+considering the vehicle costs $\cv$, the trip costs $\ct_t$ for $t\in\mathcal{T}$ and the deadhead costs $\cd$. The first part ensures that for each vehicle covering some trip the vehicle cost is charged. The second part takes care of the costs for each trip and deadhead trip under consideration of the detours for refueling. What is missing, are the route-dependent costs $\croute$. Thus, we add the term
 
 \begin{align*}
 	\sum_{m\in\mathcal{M}} u_m \croute_m
 \end{align*}
 
-to the objective function.
-
-\paragraph{LP Formulation} \parfill
-
-Putting all this together, we get the following formulation, called $\eqref{eq:MMILP}$:
+to the objective function. Putting all together, we get the following formulation, called $\eqref{eq:MMILP}$:
 
 \begin{align}
 	\min \quad & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
@@ -171,12 +178,13 @@ Putting all this together, we get the following formulation, called $\eqref{eq:M
 	& e_s\in[0,1] & & \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:es} \\
 	& u_m\in\{0,1\} && \text{for all } m\in\mathcal{M} \label{eq:MMILP:um}
 \end{align}
+\nomenclature[mmilp]{$\left(\operatorname{MMILP}\right)$}{initial arc flow formulation}
 
 \newpage
 
 \paragraph{Model Equivalence} \parfill
 
-The problem formulation as developed in \Cref{ch:mathematical_models} is equivalent to to the problem setting as stated in \Cref{sec:problem_description}. This means that each feasible schedule according to \Cref{def:feasible_schedule} corresponds to a solution of the mixed-integer linear program $\eqref{eq:MMILP}$ and vice versa. This fact is shown in the following theorem.
+The problem formulation as developed in \Cref{ch:mathematical_models} is equivalent to the problem setting as stated in \Cref{sec:problem_description}. This means that each feasible schedule according to \Cref{def:feasible_schedule} corresponds to a solution of the mixed-integer linear program $\eqref{eq:MMILP}$ and vice versa. This fact is shown in the following theorem.
 
 \begin{theorem}[Model Equivalence]
 \label{thm:equivalence_setting_mmilp}

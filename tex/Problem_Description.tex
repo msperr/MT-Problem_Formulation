@@ -3,7 +3,7 @@
 
 In this chapter, the problem is stated in detail and the notation is introduced. The problem is classified by relating it to known problems in literature and its complexity is determined. Finally, known approaches to similar problems are regarded. Most of the following considerations are already part of the underlying theses \cite{Kaiser} and \cite{Knoll}, except for the fact that multiple legs are allowed. All crucial results are repeated here for clarity.
 
-\section{Situation and Issue}
+\section{Car Sharing with Autonomous Vehicles}
 
 We regard the situation of free-floating car sharing as it exists today in combination with autonomous vehicles. Free-floating car sharing means that a customer can rent an available car wherever and whenever one is available and use it as long as he needs. After usage, he parks the car somewhere in the operation area. We assume the existence of autonomous vehicles which behave the same as if a human were driving, but without a human being necessarily present. Instead of looking for a car, a customer books a car via a smartphone application and gets picked up by the car at the desired start location at the desired start time. For the customer, this would be similar to a taxi service. 
 
@@ -50,9 +50,15 @@ We first define the car trips, the multimodal routes, the customers and the conn
 \begin{enumerate}
 	\item
 We are given a set of car trips $\mathcal{T}$. Each trip $t\in\mathcal{T}$ has a start and end location $\pstart_t, \pend_t$ and a start and end time $\zstart_t, \zend_t$.
+\nomenclature[trips]{$\mathcal{T}$}{set of trips}
+\nomenclature[pstart]{$\pstart_t$}{start position of a trip or multimodal route} 
+\nomenclature[pzend]{$\pend_t$}{end position of a trip or multimodal route}
+\nomenclature[zstart]{$\zstart_t$}{start time of a trip, multimodal route or customer}
+\nomenclature[zend]{$\zend_t$}{end time of a trip, multimodal route or customer}
 
 	\item
 Further, we are given a set of multimodal routes $\mathcal{M}$. A route ${m=\left(t_1,\dots,t_{k_m}\right)}$ is a finite sequence of trips with the following properties:
+\nomenclature[multimodal]{$\mathcal{M}$}{set of multimodal routes}
 \begin{align*}
 	\pend_{t_i} = \pstart_{t_{i+1}} && \zend_{t_i} \leq \zstart_{t_{i+1}} && \text{for all } i\in[k_m-1]
 \end{align*}	
@@ -63,15 +69,20 @@ We define the route start and end locations and times for $m\in\mathcal{M}$ as
 
 	\item
 We are given a set of customers $\mathcal{C}$. Each customer $c\in\mathcal{C}$ has a finite set of alternative multimodal routes.
+\nomenclature[customers]{$\mathcal{C}$}{set of customers}
 
 	\item
-Each trips belongs to exactly one route and each route belongs to exactly one customer. The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs and the mapping $C:\mathcal{M}\to\mathcal{C}$ shows to which customer a route belongs.	
+Each trip belongs to exactly one route and each route belongs to exactly one customer. The mapping $M:\mathcal{T}\to\mathcal{M}$ indicates to which route a trip belongs and the mapping $C:\mathcal{M}\to\mathcal{C}$ shows to which customer a route belongs.	
+\nomenclature[m]{$M:\mathcal{T}\to\mathcal{M}$}{mapping trips to multimodal routes}
+\nomenclature[c]{$C:\mathcal{M}\to\mathcal{C}$}{mapping multimodal routes to customers}
 
 	\item
-For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, but the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$
+For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, but the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$ as
 \begin{align*}
 	\zstart_c := \min_{t\in (C\circ M)^{-1}(c)}\zstart_t & & \zend_c := \max_{t\in (C\circ M)^{-1}(c)}\zstart_t .
 \end{align*}
+
+This is the earliest and the latest start time of trips for some customer.
 \end{enumerate}
 
 \end{definition}
@@ -90,26 +101,33 @@ The vehicles that are needed for fulfilling the trips are introduced as follows:
 \begin{definition}[Vehicles]
 
 We are given a set of vehicles $\mathcal{V}$. For each vehicle $\vinV$ we are given a start position $p_v$ and a start time $z_v$.
+\nomenclature[vehicles]{$\mathcal{V}$}{set of vehicles}
+\nomenclature[pv]{$p_v$}{start position of a vehicle or refuel point}
+\nomenclature[zv]{$z_v$}{start time of a vehicle}
 
 \end{definition}
 
 \paragraph{Fuel and Refueling} \parfill
 
-We have to consider fuel restrictions. Fuel can be any form of energy with which the considered vehicle is powered. For each vehicle, the fuel level is in the interval $[0,1]$, where~$1$ means full capacity and~$0$ is empty. We call a drive without a customer, \ie a drive between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once between two trips. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time at the same station. We define the refuel points and the fuel consumption as follows:
+We have to consider fuel restrictions. Fuel can be any form of energy with which the considered vehicle is powered. For each vehicle, the fuel level is in the interval $[0,1]$, where~$1$ means full capacity and~$0$ is empty. We call a drive without a customer, \ie a drive from a vehicle's start position to a trip or between two trips, a deadhead trip. A car may visit a refuel station only during a deadhead trip. For simplicity of the model, each car is allowed to refuel at most once on each deadhead trip. On a refuel station, there are no capacity constraints, \ie two or more vehicles may refuel at the same time at the same station. We define the refuel points and the fuel consumption as follows:
 
 \begin{definition}[Fuel and refuel points]
 
 \begin{enumerate}
 	\item
 We are given a set of refuel stations $\mathcal{R}$. Each refuel station $r\in\mathcal{R}$ has a location $p_r$.
+\nomenclature[refuelpoint]{$\mathcal{R}$}{set of refuel points}
 
 	\item
 We define $\fd_{s,t}$ for ${s\in\mathcal{V}\cupdot\mathcal{T}\cupdot\mathcal{R}}, {t\in\mathcal{T}\cupdot\mathcal{R}}$ as the amount the fuel level decreases along the deadhead trip between $s$ and $t$. We define $\ft_t$ for ${t\in\mathcal{T}}$ as the amount of fuel a vehicle needs for a trip and $f^0_v$ for $\vinV$ as the initial fuel state of a vehicle.
+\nomenclature[fd]{$\fd_{s,t}$}{fuel consumption for a deadhead trip}
+\nomenclature[ft]{$\ft_t$}{fuel consumption for a trip or refuel point}
+\nomenclature[f0]{$f^0_v$}{initial fuel of a vehicle}
 \end{enumerate}
 
 \end{definition}
 
-The amount of fuel that is charged at a refuel point between two trips can be determined from the time the vehicle stays at the refuel point between these trips. \fxnote{ft for r in chapter 3}
+The amount of fuel that is charged at a refuel point between two trips can be determined from the time the vehicle stays at the refuel point between these trips.
 
 \paragraph{Ordering of the Trips} \parfill
 
@@ -123,9 +141,11 @@ We define the time a vehicle needs to get from position $p_1$ to $p_2$ as $t_{p_
 		t_{p_s,p_t} & \text{if } s\in\mathcal{V},t\in\mathcal{R}
 	\end{cases}
 \end{equation*}
+\nomenclature[t]{$t_{s,t}$}{time between trips}
+
 as the time a vehicle needs from one trip to another.
 
-In order to decide whether a vehicle is able to fulfill two trips in a row, we define a partial ordering on the set of vehicles and trips. The set of public transport trips is left out in this definition.
+In order to decide whether a vehicle is able to fulfill two trips in a row, we define a binary relation on the set of vehicles and trips. The set of public transport trips is left out in this definition.
 
 \begin{definition}[Order of trips]
 \label{def:partial_order}
@@ -134,7 +154,7 @@ The binary relation $\prec$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as fol
 \begin{align*}
 	& s\prec t \quad :\Leftrightarrow \quad z_s + t_{s,t} \leq \zstart_t && \text{for all } s\in\mathcal{V}, t\in\mathcal{T} \\	
 	& \omit\rlap{$\displaystyle{s\prec t \quad :\Leftrightarrow \quad \left(\zend_s + t_{s,t} \leq \zstart_t\right)\land\left((M\circ C)(s)\neq (M\circ C)(t)\lor M(s)=M(t)\right)}$} \\
-	&&& \text{for all } s\in\mathcal{T}, t\in\mathcal{T} \\
+	&&& \text{for all } s\in\mathcal{T}, t\in\mathcal{T} \qquad\qquad\qquad\qquad\qquad\qquad \\
 	& s\not\prec t && \text{for all } s\in\mathcal{V}\cupdot\mathcal{T}, t\in\mathcal{V}
 \end{align*}
 
@@ -144,8 +164,9 @@ The binary relation $\preceq$ on $\mathcal{V}\cupdot\mathcal{T}$ is defined as:
 \end{align*}
 
 \end{definition}
+\nomenclature{$\prec$, $\preceq$}{binary relations on the set of trips and vehicles}
 
-The expression $s\prec t$ means that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same customer, except when they belong to the same route. This results from the problem description, where for each customer exactly one route is fulfilled. 
+The expression $s\prec t$ means that one car is able to fulfill both trips, first $s$ and then $t$. A car must not cover two trips of the same customer, except if they belong to the same route. This results from the problem description, according to which for each customer exactly one route is fulfilled. 
 
 \begin{remark}
 
@@ -170,7 +191,7 @@ Using the previously introduced notation, we can formally define the problem of 
 \begin{definition}[Feasible schedule]
 \label{def:feasible_schedule}
 
-A feasible schedule is an assignment of vehicles to duties. Each vehicle ${v\in\mathcal{V}}$ is assigned to a duty~$d(v)$. Each duty has the form
+A feasible schedule is an assignment of vehicles to duties. Each vehicle ${v\in\mathcal{V}}$ is assigned to a duty~$d(v)$. Each duty has the form \nomenclature[d]{$d(v)$}{duty of a vehicle}
 \begin{align*}
 	d(v) = \left(\left(r_1,t_1\right),\dots,\left(r_{k_v},t_{k_v}\right)\right)
 \end{align*}
@@ -195,6 +216,7 @@ For each customer ${c\in\mathcal{C}}$ holds:
 \end{enumerate}
 
 \end{definition}
+\nomenclature[m]{$m(c)$}{route choice for a customer}
 
 We write ${r_i = \emptyset}$ if no refuel point is visited between $t_{i-1}$ and $t_i$.
 
@@ -206,6 +228,10 @@ We define the following types of costs for a feasible schedule according to \Cre
 	\item{Trip cost $\ct_t$ for $t\in\mathcal{T}$: cost for fulfilling a trip}
 	\item{Route cost $\croute_m$ for $m\in\mathcal{M}$: cost for fulfilling a route}
 \end{enumerate}
+\nomenclature[cv]{$\cv$}{unit vehicle cost}
+\nomenclature[cd]{$\cd_{s,t}$}{deadhead cost}
+\nomenclature[ct]{$\ct_t$}{trip cost}
+\nomenclature[cr]{$\croute_m$}{route cost}
 
 The vehicle costs are unit costs for each vehicle that is used to fulfill trips. If a vehicle does not serve any trips, \ie its duty is empty, then no vehicle costs occur for this vehicle. The deadhead costs arise for all the deadhead trips that some vehicle takes. The trip costs and route costs arise if this trip or route is fulfilled.
 
@@ -219,6 +245,7 @@ For each non-empty duty, \ie $d(v)\neq\emptyset$, we define the duty cost as
 \begin{align*}
 	\operatorname{cost}\left(d(v)\right) := \cv + \sum_{\substack{i\in[k_v] \\ r_i=\emptyset}} \left(\cd_{t_{i-1},t_i} + \ct_{t_i}\right) + \sum_{\substack{i\in[k_v] \\ r_i\neq\emptyset}} \left(\cd_{t_{i-1},r_i} + \cd_{r_i,t_i} + \ct_{t_i}\right).
 \end{align*}
+\nomenclature[cost]{$\operatorname{cost}\left(d(v)\right)$}{cost of a duty}
 
 	\item
 We define the schedule cost and the number of duties as
@@ -226,6 +253,8 @@ We define the schedule cost and the number of duties as
 	\operatorname{cost}\left(S\right) & := \sum_{\substack{v\in\mathcal{V} \\ d(v)\neq\emptyset}} \operatorname{cost}\left(d(v)\right) + \sum_{c\in\mathcal{C}} \croute_{m(c)} \\
 	\operatorname{duties}\left(S\right) & := |\left\{v\in\mathcal{V}\mid d(v)\neq\emptyset\right\}|.
 \end{align*}
+\nomenclature[cost]{$\operatorname{cost}\left(S\right)$}{cost of a schedule}
+\nomenclature[duties]{$\operatorname{duties}\left(S\right)$}{number of duties of a schedule}
 \end{enumerate}
 
 \end{definition}
@@ -279,7 +308,7 @@ We aim to classify our problem in relation to other known problems in the litera
 
 According to the structure of the problem stated in \Cref{sec:problem_description}, we regard the field of vehicle scheduling problems (VSP). \cite{Bunte_Kliewer} define the VSP as follows: \enquote{Given a set of timetabled trips with fixed travel (departure and arrival) times and start and end locations as well as traveling times between all pairs of end stations, the objective is to find an assignment of trips to vehicles such that each trip is covered exactly once, each vehicle performs a feasible sequence of trips and the overall costs are minimized.} The complexity of some variants of the VSP is regarded by \cite{Lenstra_Kan}.
 
-A similar problem formulation is the dial-a-ride problem (DARP). \cite{Cordeau_Laporte} discuss the differences of the DARP to other vehicle routing problems and write: \enquote{What makes the DARP different from most such routing problems is the human perspective. When transporting passengers, reducing user inconvenience must be balanced against minimizing operating costs.} The basic formulations of VSP and DARP are the same, therefore we use the formulation of VSP as it is more common.
+A similar problem formulation is the dial-a-ride problem (DARP). \cite{Cordeau_Laporte} discuss the differences of the DARP to other vehicle routing problems and write: \enquote{What makes the DARP different from most such routing problems is the human perspective. When transporting passengers, reducing user inconvenience must be balanced against minimizing operating costs.} As the basic formulations of the VSP and DARP are the same, we use the more common formulation of the VSP.
 
 \paragraph{Depot Variants} \parfill 
 
