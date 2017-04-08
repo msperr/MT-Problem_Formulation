@@ -162,7 +162,7 @@ to the objective function. Putting all together, we get the following formulatio
 
 \begin{align}
 	\min \quad & \sum_{s\in\mathcal{V}} \sum_{t\in\Nout(s)\backslash\{d^{\operatorname{e}}\}} x_{s,t}\cv + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
-	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{MMILP} \label{eq:MMILP} \\
+	& \omit\rlap{$\displaystyle{ + \sum_{t\in\mathcal{T}} \sum_{s\in\Nin(t)} \left[x_{s,t}\left(\cd_{s,t}+\ct_{t}\right) + \sum_{r\in\Rst} z_{s,r,t}\left(\cd_{s,r}+\cd_{r,t}-\cd_{s,t}\right)\right]}$} \tag{$\operatorname{MMILP}$} \label{eq:MMILP} \\
 	\text{s.t.} \quad & \sum_{s\in\Nin(t)} x_{s,t} = \sum_{s\in\Nout(t)} x_{t,s} & & \text{for all } t\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \label{eq:MMILP:flow} \\
 	& \sum_{s\in\Nin(t)} x_{s,t} = 1 & & \text{for all } t\in\mathcal{V} \label{eq:MMILP:vehicles} \\
 	& \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\

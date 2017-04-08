@@ -1,7 +1,7 @@
 \chapter{Optimal Approach}
 \label{ch:optimal_approach}
 
-In this chapter, we develop a solution method in order to solve our problem to optimality. We expect this to require a very efficient algorithm and a lot of computation power since the problem is $\mathcal{NP}$-hard. The solution method should cope with multi-leg cover constraints as defined in \Cref{ch:problem_description}. The approach is based on the underlying master theses which have already found methods to solve a simplified version of our problem. \cite{Kaiser} provide an optimal algorithm for the problem with single-leg cover constraints. This problem setting assumes that each customer has a set of alternative trips, where one of them has to be fulfilled each. We want our algorithm to produce a result in reasonable time, therefore we require already a very good solution as an initial solution. For receiving a good initial solution, we apply the Successive Heuristics as developed in \Cref{ch:heuristics}.
+In this chapter, we develop a solution method in order to solve our problem to optimality. We expect this to require a very efficient algorithm and a lot of computation power since the problem is $\mathcal{NP}$-hard. The solution method should cope with multi-leg cover constraints as defined in \Cref{ch:problem_description}. The approach is based on the underlying master theses which have already found methods to solve a simplified version of our problem. \cite{Kaiser} provide an optimal algorithm for the problem with single-leg cover constraints. This problem setting assumes that each customer has a set of alternative trips, where one of them has to be fulfilled each. We want our algorithm to produce a result in reasonable time, therefore we require already a very good solution as an initial solution. For obtaining a good initial solution, we apply the Successive Heuristics as developed in \Cref{ch:heuristics}.
 
 In order to tackle the problem, we introduce a path flow formulation which is different to the arc flow formulation of \Cref{sec:arcflow_formulation}. Since the entire solution consists of separate vehicle duties, we decompose the problem into these single duties. This concept is an application of Dantzig-Wolfe Decomposition. There are only a few constraints connecting these subproblems, namely the cover constraints. First we regard the LP relaxation of this problem and solve this via column generation. The resulting subproblem for each duty is a Shortest Path Problem with Resource Constraints (SPPRC), which is also $\mathcal{NP}$-hard. For solving this subproblem, we have both a heuristic and an exact algorithm. In order to receive a total solution, we apply branch-and-price. We provide and discuss some branching strategies used for this procedure.
 
@@ -44,7 +44,7 @@ Dantzig-Wolfe Decomposition can be used in order to deal with large mixed-intege
 
 The entries with $\star$ denote the non-zero entries in the matrix.
 
-The subproblems emerge by considering only the constraints of a single set of this partition. The other constraints concerning the whole variable set are called linking constraints as they link the respective subproblems. The master problem considers the objective function in connection with the linking constraints. We then apply column generation for each of the subproblems separately. Starting with only a small set of feasible solutions, we successively generate further feasible solutions and include them to the master problem. Each feasible solution represents a column of the matrix representing the linear program. In the master problem, the actual formulation of the subproblems is not needed. Thus, we can extract the subproblems and solve them with specialized algorithms if they have an appropriate structure.
+The subproblems emerge by considering only the constraints of a single set of this variable partition. The other constraints concerning the whole variable set are called linking constraints as they link the respective subproblems. The master problem considers the objective function in connection with the linking constraints. We then apply column generation for each of the subproblems separately. Starting with only a small set of feasible variables, we successively generate further feasible variables and include them to the master problem. Each feasible solution represents a column of the matrix representing the linear program. In the master problem, the actual formulation of the subproblems is not needed. Thus, we can extract the subproblems and solve them with specialized algorithms if they have an appropriate structure.
 
 The column generation method is only able to solve a linear program. Thus, we have to restate the integrality afterwards. How this is done is discussed later.
 
@@ -56,7 +56,7 @@ In the original problem formulation, we regard only a single set of variables wh
 
 \paragraph{Identification of the Subproblems} \parfill
 
-Consider a solution of the $\eqref{eq:MMILP}$. This solution can be decomposed into a set of separate vehicle duties. For each of these duties, the time and fuel restrictions are applied individually. The only requirements that do not occur in the respective duties individually are the cover constraints. They guarantee that for each customer exactly one route is fulfilled and for each route, if it is fulfilled, each of its trips is fulfilled. Therefore the duty of each vehicle is a natural choice for the subproblems. We introduce $\left(x^v,z^v,e^v\right)$ for $v\in\mathcal{V}$ as the specific variables for each vehicle. With this we define the set of feasible vehicle duties as $X_v$ for $\vinV$. \nomenclature[xv]{$X_v$}{set of feasible duties for a vehicle}
+Consider a solution of the $\eqref{eq:MMILP}$. This solution can be decomposed into a set of separate vehicle duties. For each of these duties, the time and fuel restrictions are applied individually. The only requirements that do not occur in the respective duties individually are the cover constraints. They guarantee that for each customer exactly one route is fulfilled and for each route, if it is fulfilled, each of its trips is fulfilled. Therefore the duty of each vehicle is a natural choice for the subproblems. We introduce $\left(x^v,z^v,e^v\right)$ for $v\in\mathcal{V}$ as the specific variables for each vehicle. With this we define the set of feasible vehicle duties as $X_v$ for $\vinV$ as follows: \nomenclature[xv]{$X_v$}{set of feasible duties for a vehicle}
 \begin{align}
 	X_v := \left\{\vphantom{\{0,1\}^A}\right. & \omit\rlap{$\displaystyle{(x,z,e)\in\left\{0,1\right\}^A \times \{0,1\}^{\left(A\cap\left(\mathcal{V}\cupdot\mathcal{T}\right)^2\right)\times\mathcal{R}} \times [0,1]^{\mathcal{V}\cupdot\mathcal{T}}|}$} \nonumber \\
 	& \sum_{t\in\Nin(s)} x_{t,s} = \sum_{t\in\Nout(s)} x_{s,t} && \text{for all } s\in V\backslash\left\{d^{\operatorname{s}},d^{\operatorname{e}}\right\} \tag{\ref{eq:MMILP:flow}} \\
@@ -71,7 +71,7 @@ Consider a solution of the $\eqref{eq:MMILP}$. This solution can be decomposed i
 	& \left. \vphantom{\{0,1\}^A} \right\} \nonumber
 \end{align}
 
-Constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure that exactly vehicle $v$ is used in this formulation. We denote the set of feasible duties for any vehicle by $X:=\bigcup_{v\in\mathcal{V}}X_v$. Any feasible solution of $\eqref{eq:MMILP}$ can be decomposed into vehicle duties. This is guaranteed by $\eqref{eq:MMILP:vehicles}$ which forces the duties of the vehicles to be disjoint with respect to the trips. The only variables that are not considered in $X_v$ are the route variables $u_m$ which can be determined by the arc variables $x_{s,t}$. The objective function is additive with respect to the decomposition except for the route cost which we then consider explicitly. We write the cost for a configuration $\left(x^v,z^v,e^v\right)$ as $g\left(x^v,z^v,e^v\right)$.
+Constraints $\eqref{eq:Xv:vehicle}$ and $\eqref{eq:Xv:other_vehicles}$ ensure that exactly one vehicle $v$ is used in this formulation. We denote the set of feasible duties for all vehicles by $X:=\bigcup_{v\in\mathcal{V}}X_v$. Any feasible solution of $\eqref{eq:MMILP}$ can be decomposed into vehicle duties. This is guaranteed by $\eqref{eq:MMILP:vehicles}$ which forces the duties of the vehicles to be disjoint with respect to the trips. The only variables that are not considered in $X_v$ are the route variables $u_m$ which can be determined by the arc variables $x_{s,t}$. The objective function is additive with respect to the decomposition except for the route cost which we then consider explicitly. We write the cost for a configuration $\left(x^v,z^v,e^v\right)$ as $g\left(x^v,z^v,e^v\right)$.
 \nomenclature[x]{$X$}{set of feasible duties}
 \nomenclature[g]{$g$}{cost of a duty}
 
@@ -86,7 +86,7 @@ The only constraints that are not ensured in $X_v$ are the cover constraints $\e
 
 \paragraph{Reduction of the Master Problem} \parfill
 
-Because of the introduction of variables for each vehicle, the resulting problem size is very large. For maintaining the master problem, not all information of $X_v$ are needed. In order to fulfill $\eqref{eq:MMILP:linking}$ we need only the term ${\sum_{s\in\Nin(t)} x^v_{s,t}}$, which is the set of trips served by a specific vehicle. Therefore, we define the linear mapping: \nomenclature{$\psi:X\to\left\{0,1\right\}^{\mathcal{T}}$}{fulfilled trips of a duty}
+Due to the introduction of an own variable set for each vehicle, the resulting problem size is very large. For solving the master problem, not all information of $X_v$ are needed. In order to fulfill $\eqref{eq:MMILP:linking}$ we need only the term ${\sum_{s\in\Nin(t)} x^v_{s,t}}$, which is the set of trips served by a specific vehicle. Therefore, we define the linear mapping: \nomenclature{$\psi:X\to\left\{0,1\right\}^{\mathcal{T}}$}{fulfilled trips of a duty}
 \begin{align*}
 	\psi:X\to\{0,1\}^{\mathcal{T}} && (x,z,e)\mapsto\left(\sum_{s\in\Nin(t)}x_{s,t}\right)_{t\in\mathcal{T}} \label{eq:psi}
 \end{align*}
@@ -157,7 +157,7 @@ Finally, we regard the dual relaxed restricted master problem. For this, we intr
 
 \subsection{Solving the Relaxed Master Problem}
 
-The size of the index set $\Iv$ for all feasible solutions of $X_v$ can be exponential in the input size. Therefore, the formulation $\eqref{eq:IMP}$ is hard, even the relaxed version $\eqref{eq:LMP}$ is hard. In order to tackle the problem, we first consider a small subset $\Jv\subset\Iv$ of the index set. We solve the problem $\eqref{eq:LRMP}$ where only duties from the restricted set are allowed. Since $\Jv$ is small, it is easier to solve the problem. Originating from this solution, we iteratively enlarge $\Jv$ and solve $\eqref{eq:LRMP}$ until the solution is an optimal solution of $\eqref{eq:LMP}$. For this method arise the following questions.
+The size of the index set $\Iv$ for all feasible solutions of $X_v$ can be exponential in the input size. Therefore, the formulation $\eqref{eq:IMP}$ is hard, even the relaxed version $\eqref{eq:LMP}$ is difficult to solve in practice. In order to tackle the problem, we first consider a small subset $\Jv\subset\Iv$ of the index set. We solve the problem $\eqref{eq:LRMP}$ where only duties from the restricted set are allowed. Since $\Jv$ is small, it is easier to solve the problem. Originating from this solution, we iteratively enlarge $\Jv$ and solve $\eqref{eq:LRMP}$ until the solution is an optimal solution of $\eqref{eq:LMP}$. For this method arise the following questions.
 \begin{enumerate}
 	\item{Does this procedure come up with an optimal solution in finitely many steps?}
 	\item{How do we find columns to add?}
@@ -189,7 +189,7 @@ Recall the definitions ${G^v_i = \min g\left(\psi^{-1}\left(Y^v_i\right)\cap X_v
 	\text{s.t.} \quad & \left(x,z,e\right)\in X_v
 \end{align*}
 
-Actually, the term $g(x,z,e)$ would be ${\min g\left(\psi^{-1}\left(\psi(x,z,e)\right)\cap X_v\right)}$. The following result shows that this distinction is not necessary as this is done implicitly be solving the subproblem.
+Actually, the term $g(x,z,e)$ would be ${\min g\left(\psi^{-1}\left(\psi(x,z,e)\right)\cap X_v\right)}$. The following result shows that this distinction is not necessary as this is done implicitly by solving the subproblem.
 
 \begin{lemma}
 
@@ -208,7 +208,7 @@ How the subproblem $\eqref{eq:SPv}$ is solved, is shown in \Cref{sec:solving_sub
 
 \paragraph{Updating the Index Set} \parfill
 
-The value of a duty as determined in the subproblem is called reduced cost. As long as there exists a violated constraint in the dual problem, there exists a column with negative reduced cost. This is used for deciding if a duty is added to the index set. First, we solve the $\eqref{eq:DLRMP}$ and receive a solution $\left(\gamma^*,\mu^*,\eta^*\right)$. With this we solve the subproblems $\eqref{eq:SPv}$ for all $\vinV$ and receive solutions $\left(x^v,z^v,e^v\right)$. We know that all of these duties with negative reduced cost correspond to a violated constraint in (DLMP). Thus we consider these duties in the next step. 
+The value of a duty as determined in the subproblem is called reduced cost. As long as there exists a violated constraint in the dual problem, there exists a column with negative reduced cost. This fact is used for deciding if a duty is added to the index set. First, we solve the $\eqref{eq:DLRMP}$ and receive a solution $\left(\gamma^*,\mu^*,\eta^*\right)$. With this we solve the subproblems $\eqref{eq:SPv}$ for all $\vinV$ and receive solutions $\left(x^v,z^v,e^v\right)$. We know that all of these duties with negative reduced cost correspond to a violated constraint in (DLMP). Thus we consider these duties in the next step. 
 
 For each $v\in\mathcal{V}$, we have a solution ${\left(x^v,z^v,e^v\right)\in X_v}$. This solution corresponds to an index ${i\in\Iv}$. If the reduced cost for the solution is negative, \ie $\operatorname{val}\left(x^v,z^v,e^v\right)<0$, then we update the index set as follows:
 \begin{align*}
@@ -219,7 +219,7 @@ If $\operatorname{val}\left(x^v,z^v,e^v\right)\geq 0$ for all $\vinV$, then the 
 
 \paragraph{Initial Solution} \parfill
 
-For starting the column generation method, an initial index set is required for $\Jv$ for all $\vinV$. These index sets have to be feasible, \ie each occurring duty is feasible and there is a solution satisfying the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ using only duties out of $\bigcup_{\vinV}\Jv$. Otherwise the restricted problem is infeasible and its dual problem is unbounded. Then we do not receive a solution $\left(x^*,z^*,e^*\right)$ of $\eqref{eq:DLRMP}$ with which we define the subproblems. As an initial solution we use a heuristical solution of the problem, as we have developed in \Cref{ch:heuristics}.
+For starting the column generation method, an initial index set is required for $\Jv$ for all $\vinV$. These index sets have to be feasible, \ie each occurring duty is feasible and there is a solution satisfying the cover constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ that consists only of duties in $\bigcup_{\vinV}\Jv$. Otherwise the restricted problem is infeasible and its dual problem is unbounded. Then we do not receive a solution $\left(x^*,z^*,e^*\right)$ of $\eqref{eq:DLRMP}$ with which we define the subproblems. As an initial solution we use a heuristical solution of the problem, as we have developed in \Cref{ch:heuristics}.
 
 Note that this procedure only provides a solution for the relaxed master problem. In \Cref{sec:solving_masterproblem} we show how we receive a solution of the $\eqref{eq:IMP}$.
 
@@ -293,7 +293,7 @@ The monotonicity is important for the problem to be consistent. If a resource ve
 
 After introducing the graph with resource constraints, we define resource-feasible paths on this graph.
 
-\begin{definition}[Resource-feasible path]
+\begin{definition}[Resource-feasible path and witnessing resource-feasibility]
 
 Let ${H=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$ be a graph with resource constraints. A path\linebreak
 ${P:=\left(v_0,\dots,v_n\right)}$ of length ${n\in\mathbb{N}_0}$ in $H$ is called resource-feasible if
@@ -309,7 +309,7 @@ The witnessing resource vectors $\left(r^v\right)_{v\in\mathcal{P}}$ are the res
 
 \paragraph{Contraction and Inversion} \parfill
 
-We define the actions \enquote{contraction of an arc} and \enquote{inversion of a graph} in order to apply them to our problem.
+We define the actions \enquote{contraction of an arc} and \enquote{inversion of a graph} in order to apply them to our problem. We describe in \Cref{sec:ref}, how we initially define simple resource extension functions on a large graph and later contract arcs in this graph. As we see in \Cref{sec:algorithms_subproblem}, we solve all subproblems at once by inverting the graph.
 
 \begin{definition}[Contraction]
 \label{def:contraction}
@@ -397,22 +397,22 @@ We say that the resource vectors $\left(r^u\right)_{u\in P}$ witness Pareto-opti
 
 In general, there can be exponentially many paths in a graph with respect to its size. It is further possible that no two of the witnessing resource vectors are comparable. Hence, there can be an exponential number of Pareto-optimal paths in a graph. This fact gives a feeling why the (SPPRC) is $\mathcal{NP}$-hard.
 
-The idea of the algorithm is to start with a trivial path, consisting of one single vertex. We then extend the paths while we maintain resource-feasibility and Pareto-optimality for all paths. Finally, we receive Pareto-optimal paths from the starting vertex to all vertices. The algorithm works on the concept of Dynamic Programming.
+\Cref{alg:label_setting} shows the label-setting algorithm for acyclic graphs with resources constraints (\cite[p.~87]{Kaiser}). The idea is to start with a trivial path, consisting of one single vertex. We then extend the paths while we maintain resource-feasibility and Pareto-optimality for all paths. Finally, we receive Pareto-optimal paths from the starting vertex to all vertices. The algorithm works on the concept of Dynamic Programming.
 
 \begin{algorithm}[hbt]
 	\SetAlgoLined
 	\KwIn{graph with resource constraints ${H:=\left(V_H,A_H,\sqsubseteq,I,\REF\right)}$, topological sorting ${v_0,\dots,v_n}$ of $V_H$ and initial resource vector $r^{v_0}$}
 	\KwOut{shortest path tree rooted at $\left(v_0,r^{v_0}\right)$ encoded by $\delta$}
-	$\mathcal{P}_{v_0}\gets\left\{r^{v_0}\right\}$ \;
-	$\delta\left(v_0,r^{v_0}\right)\gets\emptyset$ \;
+	$\mathcal{P}_{v_0}\gets\left\{r^{v_0}\right\}$; // set of resources for all Pareto-optimal paths leading to $v_0$ \\
+	$\delta\left(v_0,r^{v_0}\right)\gets\emptyset$; // previous vertex on the path to $v_0$ with resource vector $r^{v_0}$ \\
 	\lForEach{$i\in\left\{1,\dots,n\right\}$}{$\mathcal{P}_{v_i}\gets\emptyset$}
 	\ForEach{$i=0,\dots,n$}{
 		\ForEach{$r^{v_i}\in\mathcal{P}_{v_i}$}{
 			\ForEach{$w\in\operatorname{N}^+_H\left(v_i\right)$}{
-				$\mathcal{P}\gets\max_{\sqsubseteq}\REF_{v_i,w}\left(r^{v_i}\right)$ \;
+				$\mathcal{P}\gets\max_{\sqsubseteq}\REF_{v_i,w}\left(r^{v_i}\right)$; // identify Pareto-optimal paths to $w$ \\
 				\lForEach{$r^w\in\mathcal{P}$}{$\delta\left(w,r^w\right)\gets\left(v_i,r^{v_i}\right)$}
-				$\mathcal{P}_w\gets\mathcal{P}_w\cup\mathcal{P}$ \;
-				$\mathcal{P}_w\gets\max_{\sqsubseteq}\mathcal{P}_w$ \;
+				$\mathcal{P}_w\gets\mathcal{P}_w\cup\mathcal{P}$; \\
+				$\mathcal{P}_w\gets\max_{\sqsubseteq}\mathcal{P}_w$; // maintain Pareto-optimality \\
 			}
 		}
 	}
@@ -421,7 +421,7 @@ The idea of the algorithm is to start with a trivial path, consisting of one sin
 	\label{alg:label_setting}
 \end{algorithm}
 
-We have a graph with resource constraints, a topological sorting of the vertices and an initial resource vector as input. The graph has to be acyclic. A topological sorting ${\left\{v_0,\dots,v_n\right\}}$ means that there are no $i<j$ with ${\left(v_j,v_i\right)\in A_H}$. Starting with a vertex $v_0$ and an initial resource vector $r^{v_0}$, we treat the vertices successively in topological order. For each vertex $v\in V_H$ and for each computed Pareto-optimal $v_0$-$v$-path, we try to extend the path feasibly by a single vertex. If a path is found, we add a label to the extending vertex and update the mapping $\delta$ in order to identify the origin of the extension. At the end, we receive the mapping $\delta$ which identifies all resource-feasible Pareto-optimal $v_0$-$v$-paths for each vertex $v\in V_H$.
+We have a graph with resource constraints, a topological sorting of the vertices and an initial resource vector as input. The graph has to be acyclic. A topological sorting ${\left\{v_0,\dots,v_n\right\}}$ means that there are no $i<j$ with ${\left(v_j,v_i\right)\in A_H}$. Starting with a vertex $v_0$ and an initial resource vector $r^{v_0}$, we treat the vertices successively in topological order. For each vertex $v\in V_H$ and for each computed Pareto-optimal $v_0$-$v$-path, we try to extend the path feasibly by a single vertex (Line 7). If a path is found, we add a label to the extending vertex and update the mapping $\delta$ in order to identify the origin of the extension (Line 8). Then we delete all labels that do not belong to a Pareto-optimal $v_0$-$v$-path (Line 10). At the end, we receive the mapping $\delta$ which identifies all resource-feasible Pareto-optimal $v_0$-$v$-paths for each vertex $v\in V_H$.
 
 In the following, we show how we apply the (SPPRC) and \Cref{alg:label_setting} to the subproblem $\eqref{eq:SPv}$.
 
@@ -429,7 +429,7 @@ In the following, we show how we apply the (SPPRC) and \Cref{alg:label_setting} 
 
 \subsection{Strengthening Inequalities}
 
-First we insert additional valid inequalities. They are not necessary but may improve the column generation process. In the original problem, we have the linking constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ which ensure that for every customer exactly one route is fulfilled. These constraints cannot be moved into the subproblems since the customers can be satisfied by different vehicles. It is even likely that two trips of the same route are fulfilled by different vehicles.
+Before we define the resources and the resource extension function for solving the subproblem, we add additional valid inequalities to the definition of $X_v$. They are not necessary but may improve the column generation process. In the original problem, we have the linking constraints $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ which ensure that for every customer exactly one route is fulfilled. These constraints cannot be moved into the subproblems since the customers can be satisfied by different vehicles. It is even likely that two trips of the same route are fulfilled by different vehicles.
 
 Nevertheless, we can identify duties that are infeasible with respect to the cover constraints. This is the case, if a vehicle fulfills two trips that belong to the same customer but not to the same route. If this duty is part of the overall solution, it is not possible that $\eqref{eq:MMILP:customer}$ and $\eqref{eq:MMILP:route}$ are fulfilled simultaneously. Therefore, we want to prevent such a duty from being added to the column set.
 
@@ -439,7 +439,7 @@ In order to use the inequalities, we have to introduce decision variables $u_m\i
 	& \sum_{s\in\Nin(t)} x_{s,t} \leq u_m && \text{for all } m\in\mathcal{M}, t\in m \label{eq:SPv:route}
 \end{align}
 
-These constraints ensure that for every customer at most one route can be fulfilled. Note that $\eqref{eq:SPv:customer}$ is also valid with equality. Adding these constraints possibly makes the subproblems harder to solve, but improves the behavior in the master problem since there are no duties added that are infeasible from the very beginning. If the addition is beneficial for the overall process, is not known in advance.
+These constraints ensure that for every customer at most one route can be fulfilled. Note that $\eqref{eq:SPv:customer}$ is also valid with equality. Adding these constraints possibly makes the subproblems harder to solve, but improves the behavior in the master problem since there are no duties added that are infeasible from the very beginning. Whether the addition is beneficial for the overall process, is not known in advance.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -461,7 +461,7 @@ Altogether, we consider resources ${\mathcal{U} := \left\{\operatorname{redcost}
 
 A resource vector $r\in I$ consists of the reduced cost ${r_{\operatorname{redcost}}\in\mathbb{R}}$, the fuel level ${r_{\operatorname{fuel}}\in[0,1]}$, the duty length ${r_{\operatorname{length}}\in[0,|\mathcal{T}|]}$ and the route resources ${r_m\in[0,|m|]}$ for $m\in\mathcal{M}$ in this order. The resource relation vector is given by ${\sqsubseteq := \left(\geq,\leq,=,=,\dots,=\right)}$.
 
-These resources coincide in large parts with the formulation in \cite{Kaiser}. They use resources for each customer instead of route resources in order to ensure the single-leg cover constraints. This is the only adaption of the resources.
+These resources coincide in large parts with the formulation in \cite{Kaiser}. Instead of route resources, they use a resource for each customer in order to ensure the single-leg cover constraints. The customer resources have the resource window ${[0,1]}$ and indicate for each customer, whether one of its trips may be fulfilled. In our case, the number of resources increases from ${\vert\mathcal{C}\vert+3}$ to ${\vert\mathcal{M}\vert+3}$ as we have ${\vert\mathcal{C}\vert\leq\vert\mathcal{M}\vert}$.
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -618,6 +618,7 @@ for $s\notin\mathcal{V}$ and with an additional $\cv$ in the first component of 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Algorithms for Solving the Subproblems}
+\label{sec:algorithms_subproblem}
 
 After specification of the resources and the resource extension function, we present an algorithm that solves the subproblem for every vehicle optimally and a heuristic for the subproblems.
 
@@ -625,7 +626,7 @@ After specification of the resources and the resource extension function, we pre
 
 First, we prove that the previously developed problem formulation is equivalent to the subproblem and that the values for the reduced cost coincide.
 
-\begin{theorem}[Correspondence to (MMILP)]
+\begin{theorem}[Correspondence to $\eqref{eq:MMILP}$]
 \label{th:equivalence_SPv_MMILP}
 
 For every resource-feasible $\ds$-$\de$-path ${P:=\left(\ds,v,t_1,\dots,t_n,\de\right)}$ with $n\in\mathbb{N}_0$ in the graph ${G=\left(V,A,\sqsubseteq,I,\REF\right)}$ with witnessing resource vectors $\left(r^v\right)_{v\in P}$, there is a feasible solution ${(x,z,e,u)\in X_v}$ satisfying $\eqref{eq:SPv:customer}$ and $\eqref{eq:SPv:route}$ such that
@@ -692,7 +693,7 @@ For all $m\in\mathcal{M}$, we have ${r^{t_0}_m = \vert m\vert\in I_m}$. For ${k\
 \begin{align*}
 	\left. \begin{array}{lll}
 		m = M\left(t_k\right) & \Rightarrow & r^{t_k}_m = r^{t_{k-1}}_m - 1, r^{t_k}_m\geq 0 \\
-		C(m)\neq\left(C\circ M\right)\left(t_k\right) & \Rightarrow  & r^{t_k}_m = r^{t_{k-1}}_m \\
+		C(m)\neq\left(M\circ C\right)\left(t_k\right) & \Rightarrow  & r^{t_k}_m = r^{t_{k-1}}_m \\
 		\text{else} & \Rightarrow & r^{t_k}_m = 0
 	\end{array} \right\} \Rightarrow r^{t_k}_m\in\REF_{t_{k-1},t_k}\left(r^{t_{k-1}}_m\right)
 \end{align*}
@@ -767,9 +768,9 @@ Considering the other resources and contraction of vertices does not destroy the
 
 \paragraph{Heuristic Approach to the Subproblem} \parfill
 
-For the column generation approach, it is sufficient to receive a duty with negative reduced cost for each vehicle. This duty is not necessarily optimal \wrt the negative reduced cost. This follows directly from the formulation $\eqref{eq:DLMP:index}$. Thus, we describe a heuristic approach for solving the subproblem. This is directly applied by \cite[pp.~104-107]{Kaiser}.
+For the column generation approach, it is sufficient to receive a duty with negative reduced cost for each vehicle. This duty does not have to be optimal \wrt the negative reduced cost. This follows directly from the formulation $\eqref{eq:DLMP:index}$. Thus, we describe a heuristic approach for solving the subproblem. This is directly applied by \cite[pp.~104-107]{Kaiser}.
 
-As the label-setting algorithm is very expensive as it create many labels, we try to decrease the number of possible labels by discretizing some continuous resources, \eg the fuel resource. For this, we define a discrete set of allowed fuel levels as
+As the label-setting algorithm is very expensive as it creates many labels, we try to decrease the number of possible labels by discretizing some continuous resources, \eg the fuel resource. For this, we define a discrete set of allowed fuel levels as
 \begin{align*}
 	\mathcal{E}\subseteq[0,1] && 0,1\in\mathcal{E} && \text{and} && \lfloor e\rfloor_{\mathcal{E}} := \max\left\{e'\in\mathcal{E}\mid e'\leq e\right\} && \text{for } e\in[0,1].
 \end{align*}
@@ -801,15 +802,15 @@ In the column generation process, we create columns with the heuristic method. I
 \section{Solving the Master Problem}
 \label{sec:solving_masterproblem}
 
-With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. However, this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply a \enquote{Branch-and-Bound} process in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly taken over by the branching rules created by \cite[Sec.~8.2]{Kaiser}. The branching rule concerning the choice of routes is modified.
+With the methods developed in \Cref{sec:pathflow_formulation} and \Cref{sec:solving_subproblem} we are able to solve the relaxed master problem. Having a solution of this relaxed problem, it is not guaranteed that the solution is an integer solution. However, this is a condition for feasibility in the master problem. If the solution is a fractional solution, we apply a \enquote{Branch-and-Bound} process in order to receive an integer solution. We describe how Branch-and-Bound works in general and how we can apply this to our problem. Then we discuss a number of possible branching rules. Finally, we show how the branching rules are chosen. The branching rules are mainly assumed from the branching rules created by \cite[Sec.~8.2]{Kaiser}. The branching rule concerning the choice of routes is modified.
 
 \subsection{Branch-and-Bound}
 
-First, we describe the Branch-and-Bound procedure in general. If the solution of the relaxed master problem is not an integer solution, we divide the set of feasible solutions into two separate sets with a hyperplane. Each feasible integer solution lies in one of these sets. We express this restriction as an inequality, such that the fractional solution is part of none of these sets. Then we evaluate the relaxed problem on both sets individually. An optimal integer solution for one of these sets is also an optimal integer solution for the entire problem. If we repeat this procedure, we iteratively get smaller problems. This procedure is called \enquote{Branching}. We receive a tree of subproblems where the root is the original master problem and the respective child nodes are the smaller problems resulting by branching.
+First, we describe the Branch-and-Bound procedure in general. If the solution of the relaxed master problem is not an integer solution, we divide the set of feasible solutions into two separate sets with two hyperplanes. Each feasible integer solution lies in exactly one of these sets. We express this restriction as inequalities, such that the fractional solution is part of none of these sets. Then we evaluate the relaxed problem on both sets individually. An optimal integer solution for one of these sets is also an optimal integer solution for the entire problem. If we repeat this procedure, we iteratively get smaller problems. This procedure is called \enquote{Branching}. We organize a tree of subproblems where the root is the original master problem and the respective child nodes are the smaller problems resulting by branching.
 
 The overall process works as follows: Starting with the root, we solve the respective relaxed problem. If we receive a fractional solution, we branch the problem and create child nodes. We continue this procedure for each child until we either receive a feasible integer solution or the problem becomes infeasible. After this, we iteratively assign to each node the feasible solution of its child nodes with the smaller objective value, or infeasible, if both child nodes are infeasible. Therefore, the solution assigned to the root is the optimal solution of the entire problem.
 
-Depending on the problem and the branching strategy, the decision tree might become quite large. Therefore we have to think about methods to improve the behavior of the procedure. If we already have an initial feasible solution, then the value of this solution is an upper bound to the optimal solution value. As we know, the value of the relaxation is a lower bound to the optimal value in this subtree. Therefore, if the value of the relaxation for a subtree is greater than the value of the initial solution, we know that the optimal solution does not lie in this subtree. Thus we can completely neglect this subtree. This method is called \enquote{Bounding}.
+Depending on the problem and the branching strategy, the decision tree might become quite large. Therefore we have to think about methods to improve the behavior of the procedure. If we already have an initial feasible solution, then the value of this solution is an upper bound to the optimal solution value. As we know, the value of the relaxation is a lower bound to the optimal value in this subtree. Therefore, if the value of the relaxation for a subtree is greater than the value of the current best integer solution, we know that the optimal solution does not lie in this subtree. Thus we can completely neglect this subtree. This method is called \enquote{Bounding}.
 
 \paragraph{Application to the Master Problem} \parfill
 
@@ -861,7 +862,7 @@ Hence all trips belonging to another route of the same customer are deleted. Thi
 	x^{v'}_{s,t} = 0 && \text{for all } v'\in\mathcal{V}\backslash\left\{v\right\}, s\in\Nin(t).
 \end{align*}
 
-While branching up excludes a lot of possible assignments, branching down only forbids one such assignment. This leads to a quite unbalanced tree. Another disadvantage is that this rule destroys symmetry between the subproblems as it concerns only one subproblem. Nevertheless, there is always a branching decision that can be made if the previous solution was not integral. This means, this rule is enough to completely ensure integrality in the master problem.
+While branching up excludes a lot of possible assignments, branching down only forbids one such assignment. This leads to a quite unbalanced tree. Another disadvantage is that this rule destroys symmetry between the subproblems as it concerns only one subproblem. Nevertheless, there is always a branching decision that can be made if the previous solution was not integral. This means, this rule is enough to completely ensure integrality in the master problem. If the solution is integer, then there is no branching decision on the assignment of trips.
 
 \paragraph{Length of Vehicle Duties} \parfill
 
@@ -921,7 +922,7 @@ Finally, we regard the branching on the number of used vehicles. We say, a vehic
 	\sum_{(s,t)\in A\cap\left(\mathcal{V}\times\mathcal{T}\right)} x^v_{s,t}\in\left\{0,1\right\}
 \end{align*}
 
-is one if and only if the vehicles serves at least one trip. One possibility would be to decide if a specific vehicle is used or not. But the various subproblems are too similar as only the vehicle vertex is different and therefore this branching rule leads to an unbalanced tree.
+is one if and only if the vehicles serves at least one trip. One possibility would be to decide if a specific vehicle is used or not. However, the various subproblems are too similar as only the vehicle vertex is different and therefore this branching rule leads to an unbalanced tree.
 
 Instead, we regard the number of used vehicles. For ${\left(x^v,e^v,z^v\right)\in X_v}$ the number of used vehicles can be expressed as
 \begin{align*}
@@ -929,7 +930,6 @@ Instead, we regard the number of used vehicles. For ${\left(x^v,e^v,z^v\right)\i
 \end{align*}
 
 Using this branching decision requires adding a suitable inequality to the master problem. As these inequalities concern the duties of all vehicles, they cannot be moved to the subproblems. We modify the master problem using a lower bound $v^{\operatorname{LB}}$ and an upper bound $v^{\operatorname{UB}}$ for the number of used cars as follows:
-
 \begin{align}
 	\min \quad & \sum_{v\in\mathcal{V}}g\left(x^v,z^v,e^v\right) + \sum_{m\in\mathcal{M}} u_m \croute_m \nonumber \\
 	\text{s.t.} \quad & \sum_{m\in C^{-1}(c)} u_m = 1 && \text{for all } c\in\mathcal{C} \tag{\ref{eq:MMILP:customer}} \\
@@ -939,15 +939,17 @@ Using this branching decision requires adding a suitable inequality to the maste
 	& u_m\in\{0,1\}^{\mathcal{M}} \nonumber
 \end{align}
 
+The effects of this branching rule to the subproblems are described in \cite[p.~122-123]{Kaiser}.
+
 \newpage
 
 %----------------------------------------------------------------------------------------------------------------------------------------
 
 \subsection{Choosing Branching Decisions}
 
-Consider, we have received a non-integer solution after solving the relaxed master problem. Then we need to choose a branching rule for the Branch-and-Bound process. Further we select the expression on which the branching rule is applied, \eg ${(v,t)\in\mathcal{V}\times\mathcal{T}}$ for applying the rule for trip assignment. Using this, we create inequalities which define the resulting subproblems. The branching rule is only applicable, if the solution violates the inequalities. As mentioned before, in each non-integer solution the rule for trip assignment is applicable for some ${(v,t) \in\mathcal{V}\times\mathcal{T}}$.
+Assume that we have received a non-integer solution after solving the relaxed master problem. Then we need to choose a branching rule for the Branch-and-Bound process. Further we select the expression on which the branching rule is applied, \eg ${(v,t)\in\mathcal{V}\times\mathcal{T}}$ for applying the rule for trip assignment. Using this, we create inequalities which define the resulting subproblems. The branching rule is only applicable, if the solution violates the inequalities. As mentioned before, in each non-integer solution the rule for trip assignment is applicable for some ${(v,t) \in\mathcal{V}\times\mathcal{T}}$.
 
-We select the branching rule in a lexicographic order. We prefer coarser rules and rules that maintain the symmetry of the resulting tree. If applicable, we always branch on the number of vehicles. If not, we branch on the multimodal routes, the length of the duties and the assignment of trips, when one of the rules is applicable. After choosing the branching rule, we apply this on the variable which differs most from the nearest integer. \Cref{alg:branching_decision} describes the procedure.
+We select the branching rule in a lexicographic order. We prefer coarser rules and rules that maintain the symmetry of the resulting tree. If applicable, we always branch on the number of vehicles. If not, we branch on the multimodal routes, the length of the duties and the assignment of trips, if one of the rules is applicable. After choosing the branching rule, we apply this on the variable which differs most from the nearest integer. \Cref{alg:branching_decision} describes the procedure.
 
 \begin{algorithm}[hbt]
 	\SetAlgoLined

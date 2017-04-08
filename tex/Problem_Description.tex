@@ -79,7 +79,7 @@ Each trip belongs to exactly one route and each route belongs to exactly one cus
 	\item
 For each route of the same customer $m\in C^{-1}(c)$, the start and end positions are the same, but the start and end times may differ. We define the customer start and end times for $c\in\mathcal{C}$ as
 \begin{align*}
-	\zstart_c := \min_{t\in (C\circ M)^{-1}(c)}\zstart_t & & \zend_c := \max_{t\in (C\circ M)^{-1}(c)}\zstart_t .
+	\zstart_c := \min_{t\in (M\circ C)^{-1}(c)}\zstart_t & & \zend_c := \max_{t\in (M\circ C)^{-1}(c)}\zstart_t .
 \end{align*}
 
 This is the earliest and the latest start time of trips for some customer.
